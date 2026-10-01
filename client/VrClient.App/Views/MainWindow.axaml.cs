@@ -15,10 +15,13 @@ public partial class MainWindow : Window
     private const int VrSetupTab = 0;
     private const int ModsTab = 1;
 
+    private DateTime _lastRedetect = DateTime.UtcNow;
+
     public MainWindow()
     {
         AvaloniaXamlLoader.Load(this);
         Closed += (_, _) => (DataContext as IDisposable)?.Dispose();
+        Activated += (_, _) => RedetectAfterReturning();
         DataContextChanged += (_, _) =>
         {
             if (DataContext is MainWindowViewModel vm)
@@ -29,6 +32,19 @@ public partial class MainWindow : Window
                         this.FindControl<ScrollViewer>("GameScroll")?.ScrollToHome();
                 };
         };
+    }
+
+    /// Coming back from Steam, a mod manager or the headset software usually means
+    /// something was just installed or started. Open setup steps are rechecked then,
+    /// so their prompts go away without the player pressing Refresh.
+    private void RedetectAfterReturning()
+    {
+        if (DataContext is not MainWindowViewModel { HasPendingSetup: true } vm) return;
+        // Not while one of our own dialogs is open, nor over text being typed.
+        if (OwnedWindows.Count > 0 || FocusManager?.GetFocusedElement() is TextBox) return;
+        if (DateTime.UtcNow - _lastRedetect < TimeSpan.FromSeconds(5)) return;
+        _lastRedetect = DateTime.UtcNow;
+        vm.RedetectQuietly();
     }
 
     /// One handler for all four play-mode buttons on every game: launch when the

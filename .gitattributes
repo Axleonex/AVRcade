@@ -2,3 +2,8 @@
 # repository form stable even when a developer has core.autocrlf=true.
 tests/native/supply_chain/fixtures/*.fixture text eol=lf
 tests/native/supply_chain/fixtures/config-bundle.json text eol=lf
+
+# These two are pinned by hash as well: the San Andreas bridge embeds the hash of
+# its native profile, and the Cyberpunk backend package pins the camera config.
+config/legacy/gta-san-andreas-native.json text eol=lf
+config/redengine/vrcam/vrcam.json text eol=lf

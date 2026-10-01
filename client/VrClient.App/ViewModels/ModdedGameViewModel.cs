@@ -34,6 +34,11 @@ public sealed partial class ModdedGameViewModel : ObservableObject, IDisposable
     public IReadOnlyList<ModManagerInstall> ManagersWithDataRoots { get; }
     public bool CanFindMovedProfiles => ManagersWithDataRoots.Count > 0;
     public bool HasInstalledManagers => InstalledManagers.Count > 0;
+    // Setup prompts are shown only while their step is still open.
+    public bool NoInstalledManagers => !HasInstalledManagers;
+    public string LocateManagerText => HasInstalledManagers ? "Locate another manager" : "Locate manager .exe";
+    public bool NeedsVrProfileHelp => SelectedProfile is not { VrModPresent: true, LoaderPresent: not false };
+    public bool NeedsFlatProfileHelp => SelectedFlatProfile is not { VrModPresent: false, LoaderPresent: not false };
     public string ManagedInstallLocationText => _gameDirectory is null
         ? "The VR mod installs into the Steam game folder once the game is found."
         : $"Installs into {_gameDirectory}. Manager profiles are never touched.";
@@ -65,7 +70,7 @@ public sealed partial class ModdedGameViewModel : ObservableObject, IDisposable
     public string VrWithModsManagerInstructions => SelectedManager is { } manager
         ? ModManagerVrSetupGuide.Instructions(Route, manager.Kind)
         : "Install a mod manager, then choose it here to see how to add this VR mod.";
-    public bool HasSteamVrNotice => Route.RequiresSteamVr;
+    public bool HasSteamVrNotice => Route.RequiresSteamVr && !_steamVrRunning;
     public string SteamVrNoticeText =>
         "This VR mod needs SteamVR. Start SteamVR and connect your headset before launching; Virtual Desktop can provide the wireless link. If you still see a desktop screen, choose Switch to VR in the headset.";
     public string FlatModeInstructions => SelectedManager is { } manager
@@ -272,6 +277,8 @@ public sealed partial class ModdedGameViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasSelectedFlatProfile));
         OnPropertyChanged(nameof(VrProfileStatusText));
         OnPropertyChanged(nameof(FlatProfileStatusText));
+        OnPropertyChanged(nameof(NeedsVrProfileHelp));
+        OnPropertyChanged(nameof(NeedsFlatProfileHelp));
         OnPropertyChanged(nameof(HasGameDirectoryConflict));
         OnPropertyChanged(nameof(VrModsText));
         OnPropertyChanged(nameof(FlatModsText));

@@ -32,7 +32,10 @@ def main() -> None:
 
     # One manager chooser: any installed manager .exe, no manager-specific buttons.
     san_andreas = view[view.index("San Andreas mods are installed into the game folder itself"):]
-    assert san_andreas.count('Content="Choose your manager"') == 1
+    assert san_andreas.count('Click="SelectGtaModManager_Click"') == 1
+    # The chooser reads "Choose" until a manager is set; download links go away after.
+    assert '"Choose your manager"' in main_vm and '"Change manager"' in main_vm
+    assert san_andreas.count("ShowGtaManagerDownloads") == 2
     assert 'Content="Select installed GGMM"' not in view
     assert 'Content="Select installed SAMI"' not in view
     assert "FileTypeFilter" in code and '["*.exe"]' in code

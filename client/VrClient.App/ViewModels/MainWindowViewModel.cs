@@ -60,6 +60,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _gtaVrGameFolderText = string.Empty;
     [ObservableProperty] private string _gameModManagerText = string.Empty;
     [ObservableProperty] private bool _canOpenGameModManager;
+    // Chooser buttons read "Choose" until something is chosen; download links go away after.
+    [ObservableProperty] private string _gameManagerChooserText = ChooseManager;
+    [ObservableProperty] private string _gtaManagerChooserText = ChooseManager;
+    [ObservableProperty] private string _gtaCleanFolderChooserText = "Choose clean game folder";
+    [ObservableProperty] private bool _showGtaManagerDownloads = true;
+    private const string ChooseManager = "Choose your manager";
+    private const string ChangeManager = "Change manager";
 
     public IReadOnlyList<LauncherPalette> ThemePalettes => LauncherThemeService.Current.AvailablePalettes;
     public string ThemeModeText => IsDarkTheme ? "Switch to light" : "Switch to dark";
@@ -99,9 +106,18 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 ? $"VR game folder: {folder}" : "VR game folder has not been found.";
             GtaVanillaFolderText = DescribeGtaVanillaFolder(game);
             GtaModManagerText = DescribeGtaModManager();
+            var manager = _gtaModManagerSettings.LoadSelection();
+            var hasManager = manager is not null &&
+                GtaSanAndreasModManagerSettings.Validate(manager.Executable, manager.Kind) is null;
+            GtaManagerChooserText = hasManager ? ChangeManager : ChooseManager;
+            ShowGtaManagerDownloads = !hasManager;
+            GtaCleanFolderChooserText = GtaSanAndreasVanillaSettings.Validate(
+                _controller?.GetGtaSanAndreasVanillaFolder(), game.View.InstallDir) is null
+                ? "Change clean game folder" : "Choose clean game folder";
         }
         var executable = GameModManagerExecutable(game);
         CanOpenGameModManager = executable is not null;
+        GameManagerChooserText = executable is not null ? ChangeManager : ChooseManager;
         GameModManagerText = game is not { UsesFolderMods: true } ? string.Empty
             : _gameModManagers.Load(game.Slug) is { } chosen
                 ? $"Your mod manager: {Path.GetFileNameWithoutExtension(chosen)} ({chosen})"
@@ -256,6 +272,20 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private void Refresh() => RefreshCatalogue(announce: true);
+
+    /// The page in view still asks the player for something: the headset software,
+    /// a game to install, or a setup step on one of the four play modes.
+    public bool HasPendingSetup => !RuntimeOnline ||
+        (ShowGameDetail
+            ? SelectedGame is { } game && (!game.IsInstalled || game.PlayModes.Any(mode => !mode.IsLaunch))
+            : Games.Any(game => !game.IsInstalled));
+
+    /// Recheck what is installed without replacing the status line, so a step the
+    /// player just finished outside AVRcade stops being asked for.
+    public void RedetectQuietly()
+    {
+        if (!Busy) RefreshCatalogue(announce: false);
+    }
 
     /// Remember where a game the scan missed is installed (Unity games and San Andreas).
     public void RememberGameFolder(string folder)

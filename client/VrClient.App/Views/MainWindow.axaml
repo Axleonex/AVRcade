@@ -321,10 +321,8 @@
                     <Border Classes="inset" IsVisible="{Binding IsCyberpunk}">
                       <StackPanel Spacing="6">
                         <TextBlock Text="About the Cyberpunk 2077 VR backend" FontWeight="SemiBold" />
-                        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                                   Text="VR needs a set of RED4ext plugins in the game folder, matched to one exact game build. Install VR backend copies AVRcade's VR plugins there and downloads the modding frameworks they need from their official releases, checking every hash. The monitor modes work without them." />
-                        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                                   Text="Frameworks you already have are never overwritten. Removing the VR backend takes out only AVRcade's own VR files; the frameworks stay for your other mods. Cyber Engine Tweaks asks you to pick an overlay key the first time the game starts, so do one monitor launch first." />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding CyberpunkBackendNoteText}" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding CyberpunkBackendCareText}" />
                       </StackPanel>
                     </Border>
 
@@ -372,18 +370,26 @@
                             <Button Content="Reread profiles"
                                     Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RefreshCommand}" />
                           </StackPanel>
+                          <!-- Download links are only offered while no manager is found. -->
                           <WrapPanel>
-                            <Button Content="Get r2modman" Margin="0,0,10,8" Tag="https://github.com/ebkr/r2modmanPlus/releases" Click="OpenExternalUrl_Click" />
-                            <Button Content="Get Thunderstore Mod Manager" Margin="0,0,10,8" Tag="https://www.overwolf.com/apps/mods-managers" Click="OpenExternalUrl_Click" />
-                            <Button Content="Get Vortex" Margin="0,0,10,8" Tag="https://www.nexusmods.com/site/about/vortex" Click="OpenExternalUrl_Click" />
-                            <Button Content="Locate manager .exe" Margin="0,0,10,8" Click="LocateModManager_Click" />
+                            <Button Content="Get r2modman" Margin="0,0,10,8" Tag="https://github.com/ebkr/r2modmanPlus/releases" Click="OpenExternalUrl_Click"
+                                    IsVisible="{Binding NoInstalledManagers}" />
+                            <Button Content="Get Thunderstore Mod Manager" Margin="0,0,10,8" Tag="https://www.overwolf.com/apps/mods-managers" Click="OpenExternalUrl_Click"
+                                    IsVisible="{Binding NoInstalledManagers}" />
+                            <Button Content="Get Vortex" Margin="0,0,10,8" Tag="https://www.nexusmods.com/site/about/vortex" Click="OpenExternalUrl_Click"
+                                    IsVisible="{Binding NoInstalledManagers}" />
+                            <Button Content="{Binding LocateManagerText}" Margin="0,0,10,8" Click="LocateModManager_Click" />
+                            <Button Content="Check again" Margin="0,0,10,8" IsVisible="{Binding NoInstalledManagers}"
+                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RefreshCommand}" />
                           </WrapPanel>
                         </StackPanel>
 
                         <StackPanel Spacing="8">
                           <TextBlock Classes="heading" Text="2. Profile for VR + mods" />
-                          <TextBlock Classes="secondary" Text="{Binding VrModIdentityText}" TextWrapping="Wrap" />
-                          <TextBlock Classes="secondary" Text="{Binding VrWithModsManagerInstructions}" TextWrapping="Wrap" />
+                          <TextBlock Classes="secondary" Text="{Binding VrModIdentityText}" TextWrapping="Wrap"
+                                     IsVisible="{Binding NeedsVrProfileHelp}" />
+                          <TextBlock Classes="secondary" Text="{Binding VrWithModsManagerInstructions}" TextWrapping="Wrap"
+                                     IsVisible="{Binding NeedsVrProfileHelp}" />
                           <TextBlock Text="No profiles found for this game yet. Create one in your mod manager, then press Reread profiles."
                                      TextWrapping="Wrap" FontSize="13" IsVisible="{Binding NoProfiles}" />
                           <StackPanel Orientation="Horizontal" Spacing="10">
@@ -406,7 +412,8 @@
 
                         <StackPanel Spacing="8">
                           <TextBlock Classes="heading" Text="3. Profile for Mods, no VR" />
-                          <TextBlock Classes="secondary" Text="{Binding FlatModeInstructions}" TextWrapping="Wrap" />
+                          <TextBlock Classes="secondary" Text="{Binding FlatModeInstructions}" TextWrapping="Wrap"
+                                     IsVisible="{Binding NeedsFlatProfileHelp}" />
                           <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasProfiles}">
                             <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedFlatProfile, Mode=TwoWay}"
                                       PlaceholderText="Choose a profile without the VR mod" MinHeight="40" Width="340">
@@ -482,7 +489,8 @@
                         <Button Classes="outline" Content="Open mod manager" Margin="0,0,10,8"
                                 Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGameModManagerCommand}"
                                 IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanOpenGameModManager}" />
-                        <Button Content="Choose your manager" Margin="0,0,10,8" Click="SelectGameModManager_Click" />
+                        <Button Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GameManagerChooserText}"
+                                Margin="0,0,10,8" Click="SelectGameModManager_Click" />
                         <Button Content="Open game folder" Margin="0,0,10,8"
                                 Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGameFolderCommand}" />
                         <Button Content="Manage mods in Vortex inside AVRcade" Margin="0,0,10,8"
@@ -507,9 +515,12 @@
                       <WrapPanel>
                         <Button Classes="outline" Content="Open mod manager" Margin="0,0,10,8"
                                 Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGtaSanAndreasModManagerCommand}" />
-                        <Button Content="Choose your manager" Margin="0,0,10,8" Click="SelectGtaModManager_Click" />
-                        <Button Content="Get GGMM" Margin="0,0,10,8" Tag="https://www.gtagarage.com/mods/show.php?id=434" Click="OpenExternalUrl_Click" />
-                        <Button Content="Get SAMI" Margin="0,0,10,8" Tag="https://www.gtainside.com/sanandreas/tools/5604-san-andreas-mod-installer/" Click="OpenExternalUrl_Click" />
+                        <Button Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaManagerChooserText}"
+                                Margin="0,0,10,8" Click="SelectGtaModManager_Click" />
+                        <Button Content="Get GGMM" Margin="0,0,10,8" Tag="https://www.gtagarage.com/mods/show.php?id=434" Click="OpenExternalUrl_Click"
+                                IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowGtaManagerDownloads}" />
+                        <Button Content="Get SAMI" Margin="0,0,10,8" Tag="https://www.gtainside.com/sanandreas/tools/5604-san-andreas-mod-installer/" Click="OpenExternalUrl_Click"
+                                IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowGtaManagerDownloads}" />
                       </WrapPanel>
                       <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaVrGameFolderText}"
                                  TextWrapping="Wrap" FontSize="13" />
@@ -519,7 +530,8 @@
                       <TextBlock Classes="secondary" TextWrapping="Wrap"
                                  Text="Mods written into game files cannot be switched off, so Vanilla plays a separate, unmodded copy of the game. Choose it once." />
                       <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Choose clean game folder" Click="SelectGtaVanillaFolder_Click" />
+                        <Button Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaCleanFolderChooserText}"
+                                Click="SelectGtaVanillaFolder_Click" />
                       </StackPanel>
                       <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaVanillaFolderText}"
                                  TextWrapping="Wrap" FontSize="13" />

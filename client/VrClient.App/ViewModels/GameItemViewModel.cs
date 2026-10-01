@@ -162,9 +162,16 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     public string ControllerGuidance => ControllerReference?.Guidance ?? string.Empty;
     /// Unity games carry their runtime notice on the mod itself; only the UEVR route needs this one.
     public bool ShowStandaloneRuntimeNotice => IsRvThereYet;
-    public string RuntimeNoticeTitle => "OpenXR runtime required";
-    public string RuntimeNoticeText =>
-        "Experimental, unverified UEVR route for the flat game. Connect a headset through VDXR or SteamVR/OpenXR. Controller-driven local hands are opt-in and have not passed a headset test.";
+    public string RuntimeNoticeTitle => _runtimeDetected ? "Experimental VR route" : "OpenXR runtime required";
+    public string RuntimeNoticeText => "Experimental, unverified UEVR route for the flat game. " +
+        (_runtimeDetected ? "" : "Connect a headset through VDXR or SteamVR/OpenXR. ") +
+        "Controller-driven local hands are opt-in and have not passed a headset test.";
+    public string CyberpunkBackendNoteText => View.ModInstalled
+        ? "The VR backend is installed in the game folder, matched to this exact game build. AVRcade checks that its files are present before every VR launch."
+        : "VR needs a set of RED4ext plugins in the game folder, matched to one exact game build. Install VR backend copies AVRcade's VR plugins there and downloads the modding frameworks they need from their official releases, checking every hash. The monitor modes work without them.";
+    public string CyberpunkBackendCareText => View.ModInstalled
+        ? "Removing the VR backend takes out only AVRcade's own VR files; the modding frameworks stay for your other mods."
+        : "Frameworks you already have are never overwritten. Cyber Engine Tweaks asks you to pick an overlay key the first time the game starts, so do one monitor launch first.";
     public bool HasConversionCredit => ControllerReference?.ConversionCredit is not null;
     public string ConversionCreditText => ControllerReference?.ConversionCredit is { } credit
         ? $"{credit.Project} by {credit.Creator}"
@@ -333,9 +340,12 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     };
     public bool IsCyberpunkRedmodMissing => IsCyberpunk && View.InstallDir is { } installDir &&
         !File.Exists(Path.Combine(installDir, "tools", "redmod", "bin", "redmod.exe"));
+    /// UEVR, its runtime and (where one is required) the game's VR profile are all in place.
+    private bool UnrealVrSetupReady =>
+        View.ModInstalled && (!View.ProfileImportRequired || View.ProfileImported);
     public bool CanPrepare => IsInstalled && (HasModded
         ? Modded!.CanPrepareManaged
-        : (IsRvThereYet && View.Readiness is not GameReadiness.Blocked) ||
+        : (IsRvThereYet && View.Readiness is not GameReadiness.Blocked && !UnrealVrSetupReady) ||
           View.Readiness is GameReadiness.NeedsVrMod or GameReadiness.NeedsUevr ||
           (IsGtaSanAndreas && View.Readiness is GameReadiness.ProfileUnverified));
     public bool CanConfigureFalloutNewVegas => IsFalloutNewVegas && IsInstalled;

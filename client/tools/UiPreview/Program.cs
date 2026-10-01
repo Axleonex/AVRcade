@@ -43,6 +43,15 @@ var viewModel = args.Contains("--no-covers")
 var window = new MainWindow { DataContext = viewModel, Width = width, Height = height };
 window.Show();
 
+// --time-refresh: how long one library re-detection takes on this PC.
+if (args.Contains("--time-refresh"))
+    for (var run = 1; run <= 3; run++)
+    {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        viewModel.RefreshCommand.Execute(null);
+        Console.WriteLine($"refresh {run}: {watch.ElapsedMilliseconds} ms");
+    }
+
 void Capture(string name)
 {
     for (var pass = 0; pass < 3; pass++)

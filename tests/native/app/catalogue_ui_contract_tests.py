@@ -104,6 +104,12 @@ def main() -> int:
     require("LocateFriendslopGame_Click" in view and "LocateModManager_Click" in view and
             "Open in Steam" in view and 'Content="Get r2modman"' in view and 'Content="Get Vortex"' in view,
             "first-run setup must offer official downloads and validated manual locations")
+    # A setup prompt goes away once its step is done, found by detection or entered by hand.
+    require(view.count('IsVisible="{Binding NoInstalledManagers}"') >= 3 and
+            "NeedsVrProfileHelp" in view and "NeedsFlatProfileHelp" in view,
+            "manager download links and profile how-to text must hide once they are no longer needed")
+    require("RedetectAfterReturning" in code_behind and "HasPendingSetup" in main_vm,
+            "open setup steps must be rechecked when the player returns to the window")
     require("OpenFriendslopManager_Click" in view and "FriendslopModManagerDialog" in code_behind and
             "Reread profiles" in view,
             "the manager must open inside AVRcade and its profiles must be re-readable")
