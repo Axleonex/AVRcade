@@ -1,6 +1,6 @@
 # AVRcade
 
-Play the flat PC games you already own in VR, with or without mods, from one library.
+Play the PC games you already own in VR from one library.
 
 AVRcade finds your Steam games, sets up each game's VR conversion for you, and gives every game the same four launch buttons.
 
