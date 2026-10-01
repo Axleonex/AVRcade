@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>VrClient.UnityVR</AssemblyName>
+    <RootNamespace>VrClient.UnityVR</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <Target Name="RequireLocalUnityReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(BepInExCoreDir)' == ''" Text="BepInExCoreDir is unset; run unity-vr/build-plugin.ps1 or create references.local.props." />
+    <Error Condition="'$(GameManagedDir)' == ''" Text="GameManagedDir is unset; run unity-vr/build-plugin.ps1 or create references.local.props." />
+    <Error Condition="!Exists('$(BepInExCoreDir)\BepInEx.dll')" Text="BepInEx.dll not found under $(BepInExCoreDir)." />
+    <Error Condition="!Exists('$(GameManagedDir)\UnityEngine.CoreModule.dll')" Text="UnityEngine.CoreModule.dll not found under $(GameManagedDir)." />
+    <Error Condition="!Exists('$(GameManagedDir)\UnityEngine.XRModule.dll')" Text="UnityEngine.XRModule.dll not found under $(GameManagedDir)." />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VrClient.UnityVR.Logic\VrClient.UnityVR.Logic.csproj" />
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>$(GameManagedDir)\UnityEngine.XRModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

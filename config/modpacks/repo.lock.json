@@ -1,0 +1,32 @@
+{
+  "schema": "modpack-lock/1",
+  "game_slug": "repo",
+  "community": "repo",
+  "resolved_at_utc": "2026-07-07T22:15:14Z",
+  "packages": [
+    {
+      "namespace": "BepInEx",
+      "name": "BepInExPack",
+      "version": "5.4.2305",
+      "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack/5.4.2305/",
+      "sha256": "f99b6302b6bdca5bab26f275c261cca448b29bbac34eaa5cbebb42c4246fb244",
+      "size_bytes": 669238
+    },
+    {
+      "namespace": "DaXcess",
+      "name": "FixPluginTypesSerialization",
+      "version": "1.1.1",
+      "download_url": "https://thunderstore.io/package/download/DaXcess/FixPluginTypesSerialization/1.1.1/",
+      "sha256": "aca18b08f7f092538fe6fb22755c6ca00514c50380875ced0c1e8e3d9b0f4ff7",
+      "size_bytes": 113329
+    },
+    {
+      "namespace": "DaXcess",
+      "name": "RepoXR",
+      "version": "1.2.3",
+      "download_url": "https://thunderstore.io/package/download/DaXcess/RepoXR/1.2.3/",
+      "sha256": "bc6459b97a7663d25059fc7d8c362bbd42d5159b12c5969ad1448a498f77f35e",
+      "size_bytes": 4688311
+    }
+  ]
+}

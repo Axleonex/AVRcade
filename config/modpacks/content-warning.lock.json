@@ -1,0 +1,24 @@
+{
+  "schema": "modpack-lock/1",
+  "game_slug": "content-warning",
+  "community": "content-warning",
+  "resolved_at_utc": "2026-09-23T16:51:03Z",
+  "packages": [
+    {
+      "namespace": "BepInEx",
+      "name": "BepInExPack",
+      "version": "5.4.2304",
+      "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack/5.4.2304/",
+      "sha256": "c05e6af954bd1c6385ef85c9f0e6ce1e1eb50f8acf628092f84dd8a889b1760a",
+      "size_bytes": 669109
+    },
+    {
+      "namespace": "DaXcess",
+      "name": "CWVR",
+      "version": "1.2.0",
+      "download_url": "https://thunderstore.io/package/download/DaXcess/CWVR/1.2.0/",
+      "sha256": "f710e7f5b33fbeef707963b633317cf9804275a01dc76d33f78a6ccbbd4d6a82",
+      "size_bytes": 2882295
+    }
+  ]
+}

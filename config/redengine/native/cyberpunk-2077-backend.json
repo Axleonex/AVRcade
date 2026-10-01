@@ -1,0 +1,85 @@
+{
+  "schema": "avrcade-redengine-backend/1",
+  "game_slug": "cyberpunk-2077",
+  "backend": {
+    "name": "CyberpunkVR Port (AVRcade-managed build)",
+    "version": "0.1.2+f5e59d7e81a3.avrcade1",
+    "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+    "license": "MIT",
+    "payload_dir": "native/cyberpunk-2077",
+    "files": [
+      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll", "sha256": "48C79FE01071D18EF0F2140EBBE56DF125D680158CD9CA984522104FD396AD0D" },
+      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil", "sha256": "8AB2E80B42064C2A04695986374FA7F4611B8444AF84E840C98082DEB4239565" },
+      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil", "sha256": "AEA0E213A75B6D921E4D86E267A102D859D0A2609A6F58F500E2F77A523EB12E" },
+      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\LICENSE-CyberpunkVRPort-MIT.txt", "sha256": "A9C100B3B7CB0169E14B1AABE6963F724582A0D40C067ADE516BB12A4BB98E5E" },
+      { "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll", "sha256": "7D5B502F50708404B059ADC7CE872FA107856590B9BFEDAD3A94384282D09144" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua", "sha256": "585F911FBC6591F7D61BE4C5CBA0D8E0C28038B913AFA77920BB09EE64546BA1" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua", "sha256": "58AC23EE406D0701CFCE139655E869D08468F0698AE6DB4A5FFE309E835D8888" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\vrcam.json", "sha256": "BC4B964933471D01A49BB2A2BC9564C1215D7D9E0BFEDE547555B8D9A03DFA1C" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua", "sha256": "42834AEC59E73B451ECA49E2BC73BF37E3B4ACC2AE1F05AB6DF3F30B0592F27A" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua", "sha256": "5199046B8E5A79A613D1535BE8BD930A41FD239584415839CF7A3338D39871E5" },
+      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini", "sha256": "631C6E8E192C2FB60BE037137644A2290C62ED86DEB662A80C9A9D2692FDBB0C" },
+      { "path": "archive\\pc\\mod\\cyberpunkvrport.archive", "sha256": "848AB2743AA0D7E5B243C5E1394990BBC544DAC985B8ADABA5517F046F1B4F37" },
+      { "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds", "sha256": "8C7D407A7EA3D83EB2021908438E9CF1E0C5AAD9277B12DB03536724C8277C0E" }
+    ],
+    "directories": [
+      "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge"
+    ]
+  },
+  "frameworks": [
+    {
+      "name": "RED4ext",
+      "version": "1.30.0",
+      "license": "MIT",
+      "source": "https://github.com/wopss/RED4ext/releases/tag/v1.30.0",
+      "download_url": "https://github.com/wopss/RED4ext/releases/download/v1.30.0/red4ext-1.30.0.zip",
+      "archive_sha256": "3A72225C9D2C46C99F4A4159D952B9D24366357C2423EB7EA255C84E9E11C0B0",
+      "marker": "red4ext\\RED4ext.dll"
+    },
+    {
+      "name": "Cyber Engine Tweaks",
+      "version": "1.37.1",
+      "license": "MIT",
+      "source": "https://github.com/maximegmd/CyberEngineTweaks/releases/tag/v1.37.1",
+      "download_url": "https://github.com/maximegmd/CyberEngineTweaks/releases/download/v1.37.1/cet_1.37.1.zip",
+      "archive_sha256": "1855017796A27F518199F5B7D7210EF1DB7A5C5F0AF468C68E04E6E666AD248C",
+      "marker": "bin\\x64\\plugins\\cyber_engine_tweaks.asi"
+    },
+    {
+      "name": "Codeware",
+      "version": "1.20.3",
+      "license": "MIT",
+      "source": "https://github.com/psiberx/cp2077-codeware/releases/tag/v1.20.3",
+      "download_url": "https://github.com/psiberx/cp2077-codeware/releases/download/v1.20.3/Codeware-1.20.3.zip",
+      "archive_sha256": "9A53E9B368F1603013985ECB6A8D8715501E46D4C2955832446A658A746E3A0E",
+      "marker": "red4ext\\plugins\\Codeware\\Codeware.dll"
+    },
+    {
+      "name": "ArchiveXL",
+      "version": "1.27.1",
+      "license": "MIT",
+      "source": "https://github.com/psiberx/cp2077-archive-xl/releases/tag/v1.27.1",
+      "download_url": "https://github.com/psiberx/cp2077-archive-xl/releases/download/v1.27.1/ArchiveXL-1.27.1.zip",
+      "archive_sha256": "608B7B2FED4C35751CD264A87DCFE9D9074FB6D48458D29BDE955F1C03DC0D5C",
+      "marker": "red4ext\\plugins\\ArchiveXL\\ArchiveXL.dll"
+    },
+    {
+      "name": "TweakXL",
+      "version": "1.11.4",
+      "license": "MIT",
+      "source": "https://github.com/psiberx/cp2077-tweak-xl/releases/tag/v1.11.4",
+      "download_url": "https://github.com/psiberx/cp2077-tweak-xl/releases/download/v1.11.4/TweakXL-1.11.4.zip",
+      "archive_sha256": "13033A1F10CB1DBFA534964B22E3405AA33E8F29145F17164D318B021402883F",
+      "marker": "red4ext\\plugins\\TweakXL\\TweakXL.dll"
+    },
+    {
+      "name": "redscript",
+      "version": "0.5.31",
+      "license": "MIT",
+      "source": "https://github.com/jac3km4/redscript/releases/tag/v0.5.31",
+      "download_url": "https://github.com/jac3km4/redscript/releases/download/v0.5.31/redscript-v0.5.31-windows.zip",
+      "archive_sha256": "799BBD88863F6728616F8D723C941EA15DFF71ED5BBFD50C525F0D39EA0BF46B",
+      "marker": "engine\\tools\\scc.exe"
+    }
+  ]
+}

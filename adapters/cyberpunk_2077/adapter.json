@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-cyberpunk-2077-adapter",
+  "adapter_version": "0.1.0",
+  "display_name": "VRClient Cyberpunk 2077 Adapter",
+  "host_api": {
+    "min": "1.0.0",
+    "max": "1.0.0"
+  },
+  "supported_games": [
+    "cyberpunk-2077"
+  ],
+  "supported_builds": [
+    {
+      "game_id": "cyberpunk-2077",
+      "build_id": "steam-1091500-build-20383525"
+    }
+  ],
+  "activation": "blocked_until_red4ext_bridge_services",
+  "capabilities": [
+    "redengine_bridge",
+    "frame_tick",
+    "config_reload",
+    "fast_restart"
+  ],
+  "required_exports": [
+    "vrclient_get_adapter_abi",
+    "vrclient_get_adapter_metadata",
+    "vrclient_create_adapter",
+    "vrclient_destroy_adapter"
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "profile_id": "no-version-here",
+  "note": "No integer 'version' field. Must REFUSE with reason refuse_invalid_version (never a guessed parse)."
+}

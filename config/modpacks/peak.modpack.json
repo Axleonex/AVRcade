@@ -1,0 +1,9 @@
+{
+  "schema": "modpack-spec/1",
+  "game_slug": "peak",
+  "steam_app_id": "3527290",
+  "community": "peak",
+  "mods": [
+    { "namespace": "Andrey04o", "name": "PeakVR" }
+  ]
+}

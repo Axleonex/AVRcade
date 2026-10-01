@@ -1,0 +1,4 @@
+# Supply-chain fixtures are hashed and signed byte-for-byte. Keep their
+# repository form stable even when a developer has core.autocrlf=true.
+tests/native/supply_chain/fixtures/*.fixture text eol=lf
+tests/native/supply_chain/fixtures/config-bundle.json text eol=lf

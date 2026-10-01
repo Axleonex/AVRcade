@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/supply-chain-manifest.schema.json",
+  "title": "VRClient Supply-Chain Artifact Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "manifest_id",
+    "bundle_version",
+    "artifacts"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bundle_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact_id",
+          "artifact_type",
+          "artifact_version",
+          "relative_path",
+          "sha256",
+          "signatures"
+        ],
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_type": {
+            "enum": [
+              "runtime-dll",
+              "adapter-dll",
+              "config-bundle",
+              "manifest-bundle"
+            ]
+          },
+          "artifact_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relative_path": {
+            "type": "string",
+            "minLength": 1,
+            "not": {
+              "pattern": "^[A-Za-z]:|^/|\\.\\."
+            }
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "key_id",
+                "algorithm",
+                "signature"
+              ],
+              "properties": {
+                "key_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "algorithm": {
+                  "const": "rsa-pkcs1-sha256"
+                },
+                "signature": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]+$",
+                  "minLength": 512,
+                  "maxLength": 512
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

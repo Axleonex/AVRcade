@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "compatibility_set_version": "2026-06-16.1",
+  "variants": [
+    {
+      "game_id": "example-anti-cheat-protected",
+      "build_id": "steam-ac-build-1",
+      "variant_id": "example-ac-launch-only",
+      "variant_type": "external-vr-mod-launch-only",
+      "display_name": "Example AC Protected - Normal Launch",
+      "source": "test-fixture",
+      "launch_mode": "launch_only",
+      "anti_cheat_policy": "launch-only-when-detected",
+      "legitimate_non_injection_path": true,
+      "injection_capable": false,
+      "sanctioned_path_label": "normal-launch",
+      "manager_message_key": "safety.launch.anti_cheat.launch_only",
+      "reason_codes": {
+        "launch_only": "anti_cheat_launch_only_injection_disabled",
+        "block": "anti_cheat_no_sanctioned_launch_path",
+        "injection_disabled": "anti_cheat_injection_disabled",
+        "injector_capable": "injector_capable_no_anti_cheat_detected"
+      }
+    },
+    {
+      "game_id": "example-ac-no-launch-path",
+      "build_id": "*",
+      "variant_id": "example-ac-blocked",
+      "variant_type": "vanilla",
+      "display_name": "Example AC Protected - No Sanctioned Path",
+      "source": "test-fixture",
+      "launch_mode": "blocked",
+      "anti_cheat_policy": "block-when-detected",
+      "legitimate_non_injection_path": false,
+      "injection_capable": false,
+      "sanctioned_path_label": "none",
+      "manager_message_key": "safety.block.anti_cheat.no_sanctioned_launch_path",
+      "reason_codes": {
+        "launch_only": "anti_cheat_launch_only_injection_disabled",
+        "block": "anti_cheat_no_sanctioned_launch_path",
+        "injection_disabled": "anti_cheat_injection_disabled",
+        "injector_capable": "injector_capable_no_anti_cheat_detected"
+      }
+    },
+    {
+      "game_id": "vrclient-smoke-host",
+      "build_id": "smoke-2026-06-11",
+      "variant_id": "smoke-injector-controlled",
+      "variant_type": "vrclient-stable",
+      "display_name": "Controlled Smoke Host - Injector",
+      "source": "test-fixture",
+      "launch_mode": "injector",
+      "anti_cheat_policy": "not-anti-cheat-target",
+      "legitimate_non_injection_path": false,
+      "injection_capable": true,
+      "sanctioned_path_label": "none",
+      "manager_message_key": "safety.launch.injector_capable",
+      "reason_codes": {
+        "launch_only": "launch_only_selected",
+        "block": "no_compatible_launch_variant",
+        "injection_disabled": "anti_cheat_injection_disabled",
+        "injector_capable": "injector_capable_no_anti_cheat_detected"
+      }
+    },
+    {
+      "game_id": "external-vr-profile-example",
+      "build_id": "*",
+      "variant_id": "external-vr-profile-launch-only",
+      "variant_type": "external-vr-mod-launch-only",
+      "display_name": "External VR Profile - Launch Only",
+      "source": "test-fixture",
+      "launch_mode": "launch_only",
+      "anti_cheat_policy": "not-anti-cheat-target",
+      "legitimate_non_injection_path": true,
+      "injection_capable": false,
+      "sanctioned_path_label": "sanctioned-mod-profile",
+      "manager_message_key": "safety.launch.launch_only",
+      "reason_codes": {
+        "launch_only": "launch_only_selected",
+        "block": "no_compatible_launch_variant",
+        "injection_disabled": "anti_cheat_injection_disabled",
+        "injector_capable": "injector_capable_no_anti_cheat_detected"
+      }
+    }
+  ]
+}

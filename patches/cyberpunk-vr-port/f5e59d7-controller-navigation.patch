@@ -1,0 +1,68 @@
+diff --git a/src/vr/openxr/openxr_frameloop.cpp b/src/vr/openxr/openxr_frameloop.cpp
+index 67ee4e0..fee3d54 100644
+--- a/src/vr/openxr/openxr_frameloop.cpp
++++ b/src/vr/openxr/openxr_frameloop.cpp
+@@ -652,6 +652,7 @@ DWORD OpenXRManager::FrameThreadMain() {
+                 // D-PAD chord state (left hand is processed first, right second):
+                 // HOLD the LEFT stick click, pick the direction with the RIGHT stick.
+                 bool leftStickClicked  = false;
++                bool rightStickClicked = false;
+                 bool dpadUsedThisFrame = false;
+ 
+                 std::lock_guard<std::mutex> handLock(m_handMutex);
+@@ -840,5 +841,6 @@ DWORD OpenXRManager::FrameThreadMain() {
+                     constexpr uint16_t XB_DPAD_RIGHT     = 0x0008;
+                     (void)XB_LEFT_THUMB;
++                    (void)XB_RIGHT_THUMB;
+ 
+                     if (i == 0) {
+                         ctrl.leftTrigger = trig;
+@@ -859,7 +861,11 @@ DWORD OpenXRManager::FrameThreadMain() {
+                         ctrl.rightGrip    = grip;
+                         ctrl.rightThumbX  = sx;
+                         ctrl.rightThumbY  = sy;
+-                        if (sclick) ctrl.buttons |= XB_RIGHT_THUMB;
++                        // Defer R3 until both hands have been sampled. A simultaneous
++                        // L3+R3 chord is the controller-profile-independent Hub/Map
++                        // fallback; this matters on Index runtimes that reserve the
++                        // controller's system button from applications.
++                        rightStickClicked = sclick;
+                         if (prim)   ctrl.buttons |= XB_A;
+                         if (sec)    ctrl.buttons |= XB_B;
+ 
+@@ -885,6 +891,17 @@ DWORD OpenXRManager::FrameThreadMain() {
+                     }
+                 }
+ 
++                // NAVIGATION CHORD: Cyberpunk maps Start to Hub/Map, while Back/Select
++                // opens Pause. Keep Start reachable without depending on a runtime-owned
++                // system button. Mark the chord as a modifier use so releasing L3 does
++                // not also synthesize sprint; an ordinary R3 press remains crouch.
++                if (leftStickClicked && rightStickClicked) {
++                    ctrl.buttons |= 0x0010; // XINPUT_GAMEPAD_START
++                    dpadUsedThisFrame = true;
++                } else if (rightStickClicked) {
++                    ctrl.buttons |= 0x0080; // XINPUT_GAMEPAD_RIGHT_THUMB
++                }
++
+                 // DEFERRED L3 (sprint): the left stick click doubles as the D-Pad
+                 // modifier. Emit the vanilla stick-click press only when the click is
+                 // RELEASED without any D-Pad direction having been used during the hold
+@@ -904,14 +921,15 @@ DWORD OpenXRManager::FrameThreadMain() {
+                 }
+ 
+                 if (gameplayInputActive) {
+-                    // Menu button is single (no per-hand binding) on Touch/Index/Vive/WMR.
++                    // Cyberpunk binds Pause to Back/Select (not Start). The OpenXR
++                    // menu action is single (no per-hand binding) on Touch/Index/Vive/WMR.
+                     if (m_menuButtonAction != XR_NULL_HANDLE) {
+                         XrActionStateGetInfo gi{XR_TYPE_ACTION_STATE_GET_INFO};
+                         gi.action = m_menuButtonAction;
+                         gi.subactionPath = XR_NULL_PATH;
+                         XrActionStateBoolean st{XR_TYPE_ACTION_STATE_BOOLEAN};
+                         if (XR_SUCCEEDED(xrGetActionStateBoolean(m_session, &gi, &st)) && st.isActive && st.currentState)
+-                            ctrl.buttons |= 0x0010; // XINPUT_GAMEPAD_START
++                            ctrl.buttons |= 0x0020; // XINPUT_GAMEPAD_BACK
+                     }
+ 
+                     // Publish the snapshot for the XInput hook.

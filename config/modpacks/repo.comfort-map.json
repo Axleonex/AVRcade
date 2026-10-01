@@ -1,0 +1,10 @@
+{
+  "schema": "comfort-map/1",
+  "game_slug": "repo",
+  "cfg_file": "BepInEx/config/io.daxcess.repoxr.cfg",
+  "verified_against_cfg": true,
+  "map": {
+    "snap_turn.degrees": "Input/SnapTurnSize",
+    "vignette.enabled": "Rendering/Vignette"
+  }
+}

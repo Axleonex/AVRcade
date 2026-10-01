@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "game_id": "content-warning",
+  "display_name": "Content Warning",
+  "controlled_smoke_target": false,
+  "executable_names": ["Content Warning.exe"],
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "vr_mod": {
+    "package": "DaXcess-CWVR",
+    "package_deprecated": true,
+    "headset_verified_by_vrclient": false
+  },
+  "builds": []
+}

@@ -1,0 +1,5 @@
+{ "version": 1, "game_id": "demo-coop", "display_name": "Demo Co-op",
+  "controlled_smoke_target": false, "executable_names": ["DemoCoop.exe"],
+  "support_policy": { "allowed_sources": ["steam","manual"], "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe", "online_risk": "private_modded_coop" },
+  "builds": [] }

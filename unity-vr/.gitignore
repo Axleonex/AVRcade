@@ -1,0 +1,5 @@
+bin/
+obj/
+references.local.props
+*.dll
+.cache/

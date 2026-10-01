@@ -1,0 +1,32 @@
+{
+  "schema": "modpack-lock/1",
+  "game_slug": "lethal-company",
+  "community": "lethal-company",
+  "resolved_at_utc": "2026-07-16T15:00:00Z",
+  "packages": [
+    {
+      "namespace": "BepInEx",
+      "name": "BepInExPack",
+      "version": "5.4.2305",
+      "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack/5.4.2305/",
+      "sha256": "f99b6302b6bdca5bab26f275c261cca448b29bbac34eaa5cbebb42c4246fb244",
+      "size_bytes": 669238
+    },
+    {
+      "namespace": "Evaisa",
+      "name": "FixPluginTypesSerialization",
+      "version": "1.1.4",
+      "download_url": "https://thunderstore.io/package/download/Evaisa/FixPluginTypesSerialization/1.1.4/",
+      "sha256": "384860a6d2caa788f75498645527fe9a85f61e45a2c2ac8a7ce034e7b1ad8329",
+      "size_bytes": 110855
+    },
+    {
+      "namespace": "DaXcess",
+      "name": "LethalCompanyVR",
+      "version": "1.5.0",
+      "download_url": "https://thunderstore.io/package/download/DaXcess/LethalCompanyVR/1.5.0/",
+      "sha256": "9c2b4ee636021450ddc341739535300f6ef1a44e79c1d27711983f711af8b5b9",
+      "size_bytes": 2982233
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+LIBRARY fake_openxr_runtime
+EXPORTS
+  xrGetInstanceProcAddr=_xrGetInstanceProcAddr@16
+  xrNegotiateLoaderRuntimeInterface=_xrNegotiateLoaderRuntimeInterface@8
+  xrEnumerateInstanceExtensionProperties=_xrEnumerateInstanceExtensionProperties@16
+  xrCreateInstance=_xrCreateInstance@8

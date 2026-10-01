@@ -1,0 +1,77 @@
+{
+  "schema": "unreal-native/1",
+  "profile_id": "meccha-chameleon-steam-4704690-build-24517175-native",
+  "game": {
+    "slug": "meccha-chameleon",
+    "display_name": "MECCHA CHAMELEON",
+    "steam_app_id": "4704690",
+    "steam_buildid_observed": "24517175",
+    "launcher_executable": "PenguinHotel.exe",
+    "shipping_binary": "Chameleon\\Binaries\\Win64\\PenguinHotel-Win64-Shipping.exe",
+    "executable_sha256_observed": "2192bea467070e9ac051d587a5b2d3afd9fd525580692c361db67a371f0883ce"
+  },
+  "engine": {
+    "family": "unreal",
+    "version_observed": "UE 5.6 (++UE5+Release-5.6-CL-44394996)",
+    "version_source": "shipping executable metadata observed 2026-07-11"
+  },
+  "renderer": {
+    "expected_api": "d3d12",
+    "observed_api": "d3d12",
+    "observation_state": "game_observed"
+  },
+  "conversion": {
+    "runtime_backend": "d3d12",
+    "loading": {
+      "mode": "in_process_adapter",
+      "state": "game_observed"
+    },
+    "ownership": {
+      "stereo": "vrclient",
+      "camera": "vrclient",
+      "input": "vrclient",
+      "submission": "vrclient"
+    },
+    "capabilities": {
+      "graphics_bridge": "planned",
+      "stereo_views": "planned",
+      "head_tracking": "planned",
+      "gamepad_fallback": "planned",
+      "motion_controls": "planned"
+    }
+  },
+  "verification": {
+    "status": "controlled_verified",
+    "external_converter_absent_required": true,
+    "private_room_only": true,
+    "evidence": [
+      "controlled D3D12 prerequisite probe: two distinct render targets, read-back left/right clears, completed GPU fence, one-eye negative control rejected",
+      "2026-07-28 flat Steam launch of build 24411455: shipping process loaded dxgi.dll, d3d12.dll, and D3D12Core.dll; d3d11.dll was absent; external converters, VRClient, and OpenXR modules were absent; user confirmed normal flat output",
+      "2026-07-29 Steam-preserving late attach on build 24411455: exact shipping process retained PenguinHotel.exe as parent and captured a 1920x1080 three-buffer D3D12 swapchain, 60 Present calls, and one ResizeBuffers call; user confirmed valid authentication and unchanged flat output; evidence artifacts/meccha-observer/20260729-023312/session-evidence.json",
+      "2026-07-31 Steam update observed: build 24467457, app state complete (StateFlags 4, UpdateResult 0, StagingSize 0), shipping executable SHA-256 001b329edb0f37b6d3157d8334edbd58a83d092d9748f9439dd1b59f2cace36a",
+      "2026-07-31 Steam rewrote the manifest at game launch from build 24467457 to completed build 24489781 (StateFlags 4, UpdateResult 0, StagingSize 0) without changing the shipping executable; SHA-256 remained 001b329edb0f37b6d3157d8334edbd58a83d092d9748f9439dd1b59f2cace36a",
+      "2026-07-31 controlled VDXR headset bridge on the unchanged pinned binary: preflight observed build 24467457 immediately before launch and the post-launch manifest reported build 24489781; D3D12 game process submitted left-red/right-blue output for 3060 frames with two eyes, valid head orientation and position, runtime_start_result 0, runtime_frame_result 0, unchanged 1920x1080 flat output, responsive game process, and no new crash; user confirmed the expected eye colors, stable head movement, and normal flat monitor; evidence artifacts/meccha-headset/20260731-232804",
+      "2026-08-01 monoscopic live-scene relay on VDXR: real Meccha final backbuffer (1920x1080, three buffers, DXGI format 24 = R10G10B10A2_UNORM) captured and sampled into both OpenXR eyes; session evidence records headset_ready true, 1920 headset frames, two eyes, valid head orientation and position, 4114 live-scene captures, runtime_start_result 0, and runtime_frame_result 0; user confirmed the real Meccha scene in both eyes and a normal flat monitor; evidence artifacts/meccha-scene-relay/20260801-000522",
+      "2026-08-01 Steam update observed: manifest build 24489781 -> 24508135 with a CHANGED shipping binary; SHA-256 changed from 001b329edb0f37b6d3157d8334edbd58a83d092d9748f9439dd1b59f2cace36a to a2910eee862606f20971b62b4fc22cfaa13f84fd4e5aaf77b27dbef3367f041a (preflight reported BuildMismatch before this re-pin)",
+      "2026-08-01 build 24508135 revalidation: observation-only Steam-preserving late attach captured the live 1920x1080 three-buffer D3D12 path and the user confirmed normal flat output; evidence artifacts/meccha-observer/20260801-163707",
+      "2026-08-01 build 24508135 red/blue VDXR revalidation: 1500 headset frames, two eyes, valid orientation and position, successful runtime start/frame submission, user-confirmed left-red/right-blue output; evidence artifacts/meccha-headset/20260801-163923",
+      "2026-08-01 build 24508135 monoscopic scene-relay revalidation: 1260 headset frames, two eyes, valid orientation and position, 2757 live-scene captures with zero capture failures, user-confirmed scene in headset and normal physical monitor, clean game exit; evidence artifacts/meccha-scene-relay/20260801-164124",
+      "2026-08-01 exact-build observation-only FSceneView camera provider: SHA/RVA/64-byte prologue/two anchors/12 callers verified before a read-only hardware breakpoint armed 90 threads; one stable scene-view-state identity reached camera_ready with 13,360 decoded samples, zero rejected samples, zero capture faults, and zero ambiguous observations; user confirmed normal flat output and closed Meccha normally; evidence artifacts/meccha-camera-observer/20260801-180847",
+      "2026-08-01 controlled orientation-only payload: separate scene-relay DLL repeats the exact build/seam pin, requires 30 consecutive samples from one scene-view-state identity, publishes a lock-free relative OpenXR orientation, changes only the 3x3 FSceneViewInitOptions rotation matrix, rejects pose older than 100 ms, and leaves the full input untouched on missing/stale pose; controlled tests and all three shared transport payload builds pass",
+      "2026-08-01 first live orientation-only gate failed: headset showed the expected monoscopic Meccha scene but the user reported the physical desktop game window blinking; final evidence recorded 5182 applied orientations interleaved with 4770 stale and 2875 missing-pose skips; game was stopped and head tracking remains planned; controlled hardening now requires 60 continuous fresh poses before the first write and latches writes off for the launch after any post-activation tracking freshness fault",
+      "2026-08-01 hardened orientation safety retest: 1440 valid two-eye frames with a stable camera and zero camera writes because continuous pose freshness did not complete; user confirmed normal non-blinking flat output; evidence artifacts/meccha-orientation/20260801-221129; this passes the fail-safe gate only and does not promote head tracking",
+      "2026-08-01 controlled pose-cadence fix: public vr_runtime_sample_head_pose converts current QPC to XrTime with XR_KHR_win32_convert_performance_counter_time and locates tracked orientation independently of eye swapchain waits on a dedicated nominal-100 Hz thread; the sampler must join before runtime teardown, runner telemetry requires 60 successful samples, all focused native/runtime/static/GPU checks pass",
+      "2026-08-01 orientation human gate artifacts/meccha-orientation/20260801-224652: automated readiness passed and the user confirmed head rotation moved the live Meccha camera, proving the pinned write reaches the game; after roughly three seconds the view reset and desktop movement occurred in intervals; final evidence had 13223 successful pose samples, 7447 orientation applications, zero missing/stale/write/camera rejections, but tracking_fault_latched true, uniquely identifying normal tracking-lock contention as a false permanent fault; head tracking remains planned",
+      "2026-08-01 controlled tracking-contention correction: MecchaOrientationTrackingState gives the sampler exclusive ownership of warm-up state while publishing atomic readiness/fault flags to the camera hook; camera-detected missing/stale poses still latch irreversibly and later pose publications cannot re-enable writes; the camera hot path no longer acquires the tracking lock; concurrency regression passed 50 repeated native test runs",
+      "2026-08-02 normal-evidence orientation run artifacts/meccha-orientation/20260802-020822: 8373 consecutive camera applications with zero missing/stale/fault/rejection telemetry while the user still observed a roughly five-second reset, ruling out the tracking gate as the remaining interruption source",
+      "2026-08-02 local-evidence isolation run artifacts/meccha-orientation/20260802-021633: 13701 consecutive applications, 22316 successful pose samples, zero missing/stale/write/camera rejections, tracking_fault_latched false, and user-confirmed continuous motion without reset; this isolates synchronous SMB evidence persistence on the OpenXR frame thread as the reset source",
+      "2026-08-02 controlled asynchronous evidence correction: process-lifetime generation-acknowledged dispatcher performs checked persistence, bounded retry, coherent launcher-sensitive result publication, and bounded terminal flush while render producers perform no file/network I/O; all three payloads build, 12/12 broader gates pass, dispatcher regression passes 50 repeated runs",
+      "2026-08-02 normal G:-evidence stability gate artifacts/meccha-orientation/20260802-061542: 7150 consecutive orientation applications, zero missing/stale/write/camera rejections, tracking fault false, and user-confirmed seamless motion without reset; asynchronous evidence persistence is live-verified, but user reported yaw inverted",
+      "2026-08-02 controlled camera-local direction correction: pinned view composition uses V * (A^T * D * A) to preserve R * D * A across nonzero game-camera pitch/roll; OpenXR +X/+Y/+Z direction tests require Unreal +pitch/-yaw/-roll and two noncommuting base rotations compare full matrices; all three payloads and 12/12 broader gates pass",
+      "2026-08-02 live yaw-sign diagnostic artifacts/meccha-orientation/20260802-065232: broad-tolerance measurements recorded center about -4 degrees, right about +32 degrees, and left clearly negative, proving correct runtime/camera yaw sign; user reported good pitch and disabled translation but weaker horizontal quality and UI at the Quest 2 edges; same full 1920x1080 texture is currently sampled across both complete eye targets, identifying monoscopic FOV/stereo relay as the remaining quality boundary; one stale skip latched writes off at 1316 applications as designed",
+      "2026-08-02 GSD code-review/fix convergence: the original orientation/runtime, coherent telemetry, dispatcher reliability, deterministic test, and camera-local matrix-order findings were resolved through eight convergence iterations; final review status clean with zero findings; reports .planning/phases/10-native-unreal-conversion/10-REVIEW.md and 10-REVIEW-FIX.md; no commits created",
+      "2026-08-02 controlled experimental stereo bootstrap: separate build-pinned payload launches through Steam with temporary Unreal fake-stereo/FOV/IPD arguments, requires exactly two stable scene-view-state identities plus decoded 110+/-2 degree source FOV, captures packed left/right views into distinct OpenXR eyes, derives eye aspect from half the actual backbuffer, maps asymmetric runtime FOV, and restores the left eye on the flat monitor; focused GPU/native/evidence/delayed-attach gates pass; no live Meccha/headset claim and stereo/head-tracking capabilities remain planned",
+      "2026-08-02 Steam updated Meccha during the first stereo launch attempt from build 24508135 to completed build 24517175 (StateFlags 4, UpdateResult 0, StagingSize 0); shipping SHA-256 changed to 2192bea467070e9ac051d587a5b2d3afd9fd525580692c361db67a371f0883ce; no payload attached; independent PE analysis found the unique constructor at RVA 0x041A9610 (-0x5C0), the same 64-byte instruction shape with only two relocation displacements changed, unchanged RDX+0x158 and RDX+0x160 identity accesses, both unique anchors, and exactly 12 direct callers; controlled re-pin only, new-build flat/headset human gates remain pending"
+    ]
+  }
+}

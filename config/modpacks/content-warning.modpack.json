@@ -1,0 +1,9 @@
+{
+  "schema": "modpack-spec/1",
+  "game_slug": "content-warning",
+  "steam_app_id": "2881650",
+  "community": "content-warning",
+  "mods": [
+    { "namespace": "DaXcess", "name": "CWVR" }
+  ]
+}

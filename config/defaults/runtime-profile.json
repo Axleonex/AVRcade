@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "target_refresh_mode": "system_default",
+  "dynamic_resolution": {
+    "enabled": true,
+    "min_scale": 0.7,
+    "max_scale": 1.0,
+    "initial_scale": 0.85,
+    "step_scale": 0.05,
+    "frame_time_budget_ms": 11.1
+  },
+  "foveation": {
+    "enabled": true,
+    "preset": "medium",
+    "inner_radius": 0.45,
+    "outer_radius": 0.85
+  },
+  "frame_pacing": {
+    "max_missed_frames": 2,
+    "cpu_guard_ms": 1.0,
+    "gpu_guard_ms": 1.5,
+    "recovery_frames": 45
+  },
+  "debug_validation": {
+    "openxr": false,
+    "renderdoc_markers": false,
+    "assert_on_contract_violation": false
+  },
+  "lifecycle": {
+    "startup_timeout_ms": 15000,
+    "loss_recovery_timeout_ms": 30000
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "game_id": "lethal-company",
+  "display_name": "Lethal Company",
+  "controlled_smoke_target": false,
+  "executable_names": [
+    "Lethal Company.exe"
+  ],
+  "support_policy": {
+    "allowed_sources": [
+      "steam",
+      "manual"
+    ],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "runtime": {
+    "path": "BepInEx/plugins/LCVR/LCVR.dll",
+    "sha256": "4bc8c09dc4339b42495640d86a1efe1e4fdd3ceb3bca2cf004ca69b0df9ccfdb",
+    "architecture": "x64"
+  },
+  "builds": [
+    {
+      "build_id": "steam-1966720-v81-lcvr-1.5.0",
+      "support": "supported",
+      "confidence_threshold": 80,
+      "file_hashes": [],
+      "product_versions": [
+        "Lethal Company V81",
+        "LCVR 1.5.0"
+      ],
+      "signatures": [
+        {
+          "id": "lcvr-supported-game-version",
+          "pattern": "steam-appid=1966720;game-version=V81;lcvr=1.5.0",
+          "confidence": 90
+        }
+      ],
+      "offsets": []
+    }
+  ]
+}

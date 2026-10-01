@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "game_id": "repo",
+  "build_id": "steam-3241660-build-23363152",
+  "generated_by": "bolt-on-b2-hook-discovery static candidate import from docs/adapters/repo-adapter-notes.md Static Hook Map",
+  "generated_at": "2026-06-12T23:42:12Z",
+  "hooks": [
+    {
+      "name": "MainCamera",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MainCamera",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraAim",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraAim",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraTransform",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraTransform",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraUpdate",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraUpdate",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraPosition",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraPosition",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraZoom",
+      "area": "projection",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraZoom",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "CameraOverlay",
+      "area": "camera",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "CameraOverlay",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "HUDCanvas",
+      "area": "hud",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "HUDCanvas",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "HealthUI",
+      "area": "hud",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "HealthUI",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "SemiUI",
+      "area": "hud",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "SemiUI",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "ChatUI",
+      "area": "hud",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "ChatUI",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MapToolController",
+      "area": "hud",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MapToolController",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "InputMovement",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "InputMovement",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "InputMovementX",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "InputMovementX",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "InputMovementY",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "InputMovementY",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "GetRotationInput",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "GetRotationInput",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "InputMouseX",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "InputMouseX",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "InputMouseY",
+      "area": "input",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "InputMouseY",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "Grab",
+      "area": "interaction",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "Grab",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "GrabBeamLogic",
+      "area": "interaction",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "GrabBeamLogic",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "ForceGrabPhysObject",
+      "area": "interaction",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "ForceGrabPhysObject",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "GetItemPlayerIsHolding",
+      "area": "interaction",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "GetItemPlayerIsHolding",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MenuActionSingleplayerGame",
+      "area": "mode_state",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MenuActionSingleplayerGame",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MainMenuIsSingleplayer",
+      "area": "mode_state",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MainMenuIsSingleplayer",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MainMenuSetSingleplayer",
+      "area": "mode_state",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MainMenuSetSingleplayer",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MainMenuIsMultiplayer",
+      "area": "network_block_marker",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MainMenuIsMultiplayer",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "MenuActionRandomMatchmaking",
+      "area": "network_block_marker",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "MenuActionRandomMatchmaking",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "PhotonNetwork",
+      "area": "network_block_marker",
+      "module": "PhotonUnityNetworking.dll",
+      "symbol": "PhotonNetwork",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "PhotonView",
+      "area": "network_block_marker",
+      "module": "PhotonUnityNetworking.dll",
+      "symbol": "PhotonView",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "PhotonVoice",
+      "area": "network_block_marker",
+      "module": "unknown",
+      "symbol": "PhotonVoice",
+      "status": "candidate",
+      "confidence": "low"
+    },
+    {
+      "name": "LeavePhotonRoom",
+      "area": "network_block_marker",
+      "module": "Assembly-CSharp.dll",
+      "symbol": "LeavePhotonRoom",
+      "status": "candidate",
+      "confidence": "low"
+    }
+  ]
+}

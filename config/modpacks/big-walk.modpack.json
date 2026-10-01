@@ -1,0 +1,9 @@
+{
+  "schema": "modpack-spec/1",
+  "game_slug": "big-walk",
+  "steam_app_id": "1478500",
+  "community": "big-walk",
+  "mods": [
+    { "namespace": "CircuitLord", "name": "Big_Walk_VR" }
+  ]
+}

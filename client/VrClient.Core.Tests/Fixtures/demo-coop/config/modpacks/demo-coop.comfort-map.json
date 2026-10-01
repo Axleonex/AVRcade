@@ -1,0 +1,3 @@
+{ "schema": "comfort-map/1", "game_slug": "demo-coop",
+  "cfg_file": "BepInEx/config/demoauthor.demovr.cfg", "verified_against_cfg": false,
+  "map": { "turn_mode": "Comfort/TurnProvider", "vignette": "Comfort/Vignette" } }

@@ -1,0 +1,4 @@
+LIBRARY vrclient_fnv_stereo
+EXPORTS
+    FnvStart=_FnvStart@4
+    FnvStop=_FnvStop@4

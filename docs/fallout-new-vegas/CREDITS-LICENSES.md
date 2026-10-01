@@ -1,0 +1,18 @@
+# Credits, licenses, and download policy
+
+Evidence retrieval date: 2026-09-21. Machine-readable details live in `config/modpacks/fallout-new-vegas.dependencies.json`. VRClient links to official downloads and incorporates none of the listed binaries or game assets.
+
+- Fallout: New Vegas — developed by Obsidian Entertainment and published by Bethesda Softworks. Proprietary commercial game; users must supply a legitimate Steam or GOG installation. Fallout and related marks/assets belong to their respective owners.
+- FNV 4GB Patcher 1.5 — Roy Batty and LuthienAnarion. [Official Nexus page](https://www.nexusmods.com/newvegas/mods/62552). Custom permissions require credit and prohibit mod-pack inclusion/re-upload while the author is active. VRClient links only.
+- xNVSE — original NVSE by Ian Patterson, Stephen Abel, Paul Connelly, and Hugues LE PORS; xNVSE by korri123, cnf13, jazzisparis, Demorome, and contributors. [Official source/releases](https://github.com/xNVSE/NVSE). GPL-3.0; VRClient does not bundle it.
+- JIP PP LN 57.54 — PistolPayback, jazzisparis, LuthienAnarion, and contributors. This maintained JIP LN fork is the dependency linked by FNVR V2. [Official Nexus page](https://www.nexusmods.com/newvegas/mods/88687) and [GPL-3.0 source repository](https://github.com/Pistol-Payback/JIP-PP-LN). Link-only acquisition.
+- ShowOff xNVSE Plugin — Demorome and contributors, with code credited upstream to several NVSE plugin authors. [Official Nexus page](https://www.nexusmods.com/newvegas/mods/72541). Custom attribution permission and inherited-code caveat; link only.
+- Fallout: New Virtual Reality / FNVR Tracker V2 — iloveusername. [Official GitHub repository](https://github.com/iloveusername/Fallout-New-Virtual-Reality) and [Nexus release](https://www.nexusmods.com/newvegas/mods/91589). MIT source license (copyright 2025 iloveusername); upstream also asks that use/modifications stay open source and retain credit, while Nexus distribution permissions may add non-commercial conditions. VRClient keeps credit, preserves both boundaries, and defaults to official links rather than redistribution.
+- OpenXR — Khronos Group and OpenXR contributors. [OpenXR Registry](https://registry.khronos.org/OpenXR/). Apache-2.0 specification/header licensing as distributed upstream. VRClient uses the open standard through the user's active runtime and packages the open-source loader with the native build.
+- Mod Organizer 2 — ModOrganizer2 contributors. [Official releases](https://github.com/ModOrganizer2/modorganizer/releases). GPL-3.0. Version 2.5.2 was current in retrieved evidence.
+- SteamVR — Valve Corporation. [Official Steam page](https://store.steampowered.com/app/250820/SteamVR/), AppID 250820. Proprietary Steam software; install through Steam without credential automation.
+- Virtual Desktop — Guy Godin / Virtual Desktop. [Official site](https://www.vrdesktop.net/). Proprietary software; the official page documented SteamVR game streaming and Streamer 1.34.22 on the retrieval date.
+
+No reliable authoritative release hashes were published on the inspected public pages for the user-downloadable archives/installers. The manifest records `sha256: null` with a reason instead of inventing a value. VRClient records the installed `FalloutNV.exe` SHA-256 as local build identity and expects future download handling to verify a hash supplied by an authoritative source or computed from the user's selected file.
+
+vorpX is intentionally not part of this integration. The native OpenXR adapter replaces its former rendering role and neither requires nor launches paid VR middleware.

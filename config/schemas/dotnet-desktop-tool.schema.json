@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/dotnet-desktop-tool.schema.json",
+  "title": "VRClient App-local .NET Desktop Tool Pin",
+  "type": "object",
+  "required": [
+    "schema", "version", "release_date", "support_phase", "eol_date",
+    "runtime_download_url", "runtime_sha512",
+    "desktop_download_url", "desktop_sha512"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "dotnet-desktop-tool/1" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "release_date": { "type": "string", "format": "date" },
+    "support_phase": { "enum": ["active", "maintenance"] },
+    "eol_date": { "type": "string", "format": "date" },
+    "runtime_download_url": { "type": "string", "pattern": "^https://builds\\.dotnet\\.microsoft\\.com/dotnet/Runtime/" },
+    "runtime_sha512": { "type": "string", "pattern": "^[0-9a-f]{128}$" },
+    "desktop_download_url": { "type": "string", "pattern": "^https://builds\\.dotnet\\.microsoft\\.com/dotnet/WindowsDesktop/" },
+    "desktop_sha512": { "type": "string", "pattern": "^[0-9a-f]{128}$" }
+  }
+}

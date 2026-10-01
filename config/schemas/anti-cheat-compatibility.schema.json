@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/anti-cheat-compatibility.schema.json",
+  "title": "VRClient Anti-Cheat Compatibility Launch Routing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "compatibility_set_version",
+    "variants"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "compatibility_set_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Independently deliverable content version for AC-aware launch compatibility data."
+    },
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "game_id",
+          "build_id",
+          "variant_id",
+          "variant_type",
+          "display_name",
+          "source",
+          "launch_mode",
+          "anti_cheat_policy",
+          "legitimate_non_injection_path",
+          "injection_capable",
+          "sanctioned_path_label",
+          "manager_message_key",
+          "reason_codes"
+        ],
+        "allOf": [
+          {
+            "description": "A launch-only anti-cheat variant must be structurally non-injectable.",
+            "if": {
+              "properties": {
+                "launch_mode": {
+                  "const": "launch_only"
+                }
+              },
+              "required": ["launch_mode"]
+            },
+            "then": {
+              "properties": {
+                "legitimate_non_injection_path": {
+                  "const": true
+                },
+                "injection_capable": {
+                  "const": false
+                }
+              },
+              "required": [
+                "legitimate_non_injection_path",
+                "injection_capable"
+              ]
+            }
+          },
+          {
+            "description": "A block-only anti-cheat entry cannot be injection capable.",
+            "if": {
+              "properties": {
+                "launch_mode": {
+                  "const": "blocked"
+                }
+              },
+              "required": ["launch_mode"]
+            },
+            "then": {
+              "properties": {
+                "legitimate_non_injection_path": {
+                  "const": false
+                },
+                "injection_capable": {
+                  "const": false
+                }
+              },
+              "required": [
+                "legitimate_non_injection_path",
+                "injection_capable"
+              ]
+            }
+          },
+          {
+            "description": "The AC launch-only policy may only point at launch-only records.",
+            "if": {
+              "properties": {
+                "anti_cheat_policy": {
+                  "const": "launch-only-when-detected"
+                }
+              },
+              "required": ["anti_cheat_policy"]
+            },
+            "then": {
+              "properties": {
+                "launch_mode": {
+                  "const": "launch_only"
+                },
+                "legitimate_non_injection_path": {
+                  "const": true
+                },
+                "injection_capable": {
+                  "const": false
+                }
+              },
+              "required": [
+                "launch_mode",
+                "legitimate_non_injection_path",
+                "injection_capable"
+              ]
+            }
+          }
+        ],
+        "properties": {
+          "game_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "build_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Exact build id, or '*' for a compatibility record that applies to every build until narrowed."
+          },
+          "variant_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "variant_type": {
+            "enum": [
+              "vanilla",
+              "vrclient-stable",
+              "vrclient-nightly",
+              "user-modded-install",
+              "approved-mod-loader-profile",
+              "external-vr-mod-launch-only"
+            ]
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "enum": [
+              "manifest",
+              "detected",
+              "manual",
+              "test-fixture"
+            ]
+          },
+          "launch_mode": {
+            "enum": [
+              "injector",
+              "launch_only",
+              "blocked"
+            ]
+          },
+          "anti_cheat_policy": {
+            "enum": [
+              "launch-only-when-detected",
+              "block-when-detected",
+              "not-anti-cheat-target"
+            ]
+          },
+          "legitimate_non_injection_path": {
+            "type": "boolean"
+          },
+          "injection_capable": {
+            "type": "boolean"
+          },
+          "sanctioned_path_label": {
+            "enum": [
+              "normal-launch",
+              "official-vr-mode",
+              "sanctioned-mod-profile",
+              "none"
+            ]
+          },
+          "manager_message_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_codes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "launch_only",
+              "block",
+              "injection_disabled",
+              "injector_capable"
+            ],
+            "properties": {
+              "launch_only": {
+                "type": "string",
+                "minLength": 1
+              },
+              "block": {
+                "type": "string",
+                "minLength": 1
+              },
+              "injection_disabled": {
+                "type": "string",
+                "minLength": 1
+              },
+              "injector_capable": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VrClient.App.Views.ConfirmSafetyWarningDialog"
+        Width="500" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="Review safety warning">
+  <Border Margin="24" Padding="24" Background="{DynamicResource SurfaceBrush}"
+          BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+          CornerRadius="10">
+    <StackPanel Spacing="24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="eyebrow" Text="BEFORE YOU LAUNCH" />
+        <TextBlock Text="Review this game's safety limits" FontSize="23" FontWeight="SemiBold" />
+        <TextBlock Name="GameNameText" FontSize="16" FontWeight="Medium" />
+        <Border Background="{DynamicResource GroundBrush}" CornerRadius="6" Padding="12">
+          <TextBlock Name="WarningText" TextWrapping="Wrap" MaxWidth="420" />
+        </Border>
+        <TextBlock Classes="secondary" TextWrapping="Wrap" MaxWidth="420"
+                   Text="Continue only for the supported private or offline scenario described above. AVRcade will still run its launch-time safety checks." />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+        <Button Content="Cancel" Click="Cancel_Click" />
+        <Button Classes="primary" Content="Acknowledge and launch" Click="Confirm_Click" />
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

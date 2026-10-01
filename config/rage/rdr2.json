@@ -1,0 +1,32 @@
+{
+  "$schema": "../schemas/rdr2-native-profile.schema.json",
+  "schema": "rdr2-native/1",
+  "game": {
+    "slug": "red-dead-redemption-2",
+    "display_name": "Red Dead Redemption 2",
+    "steam_app_id": "1174180",
+    "launcher_executable": "RDR2.exe",
+    "steam_buildid_observed": "13773296",
+    "executable_sha256_observed": "b56c9548f670654a9b73bf25def3cd73af12e269f6e47dba28a34079adaf465e"
+  },
+  "renderer": { "observation_state": "game_observed" },
+  "loading": {
+    "mode": "steam_owned_launch",
+    "direct_executable_launch": false,
+    "online_mode_blocked": true
+  },
+  "safety": {
+    "supported_source": "steam",
+    "ownership_chain": ["steam", "rockstar_games_launcher"],
+    "allowed_mode": "story",
+    "review_status": "reviewed_story_mode"
+  },
+  "mod_profiles": {
+    "storage": "external_local_app_data",
+    "transactional_restore": true
+  },
+  "verification": {
+    "status": "preflight_ready",
+    "evidence": ["phase12-static-renderer-v2", "cli-check", "x9-static-20260826"]
+  }
+}

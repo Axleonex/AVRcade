@@ -1,0 +1,47 @@
+diff --git a/src/vr/openxr/openxr_manager.cpp b/src/vr/openxr/openxr_manager.cpp
+index 5151476..c345091 100644
+--- a/src/vr/openxr/openxr_manager.cpp
++++ b/src/vr/openxr/openxr_manager.cpp
+@@ -525,13 +525,40 @@ bool OpenXRManager::Init() {
+ 
+     XrSystemGetInfo systemInfo{XR_TYPE_SYSTEM_GET_INFO};
+     systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
+-    res = xrGetSystem(m_instance, &systemInfo, &m_systemId);
++    // Virtual Desktop can accept xrCreateInstance a little before the streamed
++    // headset is exposed as an OpenXR system.  A single early xrGetSystem call
++    // then returns XR_ERROR_FORM_FACTOR_UNAVAILABLE and used to disable XR for
++    // the entire game run.  Retry only that transient result; all other runtime
++    // errors still fail immediately.
++    constexpr uint32_t kSystemReadyAttempts = 60;
++    constexpr DWORD kSystemReadyDelayMs = 500;
++    uint32_t systemAttempt = 0;
++    do {
++        ++systemAttempt;
++        res = xrGetSystem(m_instance, &systemInfo, &m_systemId);
++        if (XR_SUCCEEDED(res) || res != XR_ERROR_FORM_FACTOR_UNAVAILABLE) {
++            break;
++        }
++
++        if (systemAttempt == 1) {
++            Log("OpenXRManager: HMD is not ready yet; waiting up to %u ms for the runtime...\n",
++                (kSystemReadyAttempts - 1) * kSystemReadyDelayMs);
++        }
++        if (systemAttempt < kSystemReadyAttempts) {
++            Sleep(kSystemReadyDelayMs);
++        }
++    } while (systemAttempt < kSystemReadyAttempts);
++
+     if (XR_FAILED(res)) {
+-        Log("OpenXRManager: Failed to get XrSystemId (res=%d)\n", res);
++        Log("OpenXRManager: Failed to get XrSystemId after %u attempt(s) (res=%d)\n",
++            systemAttempt, res);
+         xrDestroyInstance(m_instance);
+         m_instance = XR_NULL_HANDLE;
+         return false;
+     }
++    if (systemAttempt > 1) {
++        Log("OpenXRManager: HMD became ready on attempt %u.\n", systemAttempt);
++    }
+ 
+     XrSystemProperties systemProps{XR_TYPE_SYSTEM_PROPERTIES};
+     if (XR_SUCCEEDED(xrGetSystemProperties(m_instance, m_systemId, &systemProps))) {

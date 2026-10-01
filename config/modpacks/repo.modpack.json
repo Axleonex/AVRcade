@@ -1,0 +1,10 @@
+{
+  "schema": "modpack-spec/1",
+  "game_slug": "repo",
+  "steam_app_id": "3241660",
+  "community": "repo",
+  "mods": [
+    { "namespace": "BepInEx", "name": "BepInExPack" },
+    { "namespace": "DaXcess", "name": "RepoXR" }
+  ]
+}

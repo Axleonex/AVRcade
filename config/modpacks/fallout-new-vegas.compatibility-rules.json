@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "game": "fallout-new-vegas",
+  "rules": [
+    {
+      "pattern": "^(xNVSE|JIP PP LN|JIP LN NVSE Plugin|ShowOff xNVSE Plugin|Fallout[: -] New Virtual Reality)$",
+      "status": "verified",
+      "category": "required_stack",
+      "explanation": "This component is part of the documented FNVR V2 prerequisite stack.",
+      "suggested_action": "Keep it enabled in the isolated VR profile and validate its exact version in preflight."
+    },
+    {
+      "pattern": "(HUD|UIO|Darn|oHUD|iHUD|Pip[- ]?Boy|dialogue)",
+      "status": "warned",
+      "category": "hud_or_ui",
+      "explanation": "HUD, dialogue, and Pip-Boy layout changes can be difficult to read or interact with in stereo VR.",
+      "suggested_action": "Retain the mod, test every relevant surface in-headset, and use a VR-specific patch when available."
+    },
+    {
+      "pattern": "(camera|first person|third person|FOV)",
+      "status": "warned",
+      "category": "camera",
+      "explanation": "Camera/FOV overrides can fight FNVR aiming or VRClient's native head tracking.",
+      "suggested_action": "Test in isolation and disable only by explicit user choice if tracking or projection breaks."
+    },
+    {
+      "pattern": "(animation|skeleton|B42|weapon position|weapon offset|inertia)",
+      "status": "warned",
+      "category": "animation_skeleton_weapon",
+      "explanation": "Animation, skeleton, inertia, and weapon-position mods can alter the transforms FNVR uses for hand aiming.",
+      "suggested_action": "Check weapon pose and shot direction with representative weapons; prefer an explicit compatibility patch."
+    },
+    {
+      "pattern": "\\bVATS\\b",
+      "status": "incompatible",
+      "category": "vats",
+      "explanation": "FNVR V2 upstream explicitly states that VATS is not supported by the motion-control mod.",
+      "suggested_action": "Keep the original non-VR profile for VATS play; in the isolated VR profile, choose a separately verified bullet-time alternative if desired. VRClient will not disable the mod automatically."
+    },
+    {
+      "pattern": "(input|controller|gamepad|hotkey|gesture|VATS|bullet time)",
+      "status": "warned",
+      "category": "input_vats_gesture",
+      "explanation": "Input, VATS, hotkey, and gesture mods can conflict with FNVR controller mappings; FNVR upstream states VATS is not supported.",
+      "suggested_action": "Use a bullet-time alternative only by user choice and validate every controller action."
+    },
+    {
+      "pattern": "(ENB|ReShade|New Vegas Reloaded|DXVK|post[- ]?process|blur|depth of field)",
+      "status": "warned",
+      "category": "renderer_post_processing",
+      "explanation": "Graphics wrappers and post-processing can conflict with VRClient's native render hook, stereo submission, or comfort.",
+      "suggested_action": "Identify root DLL ownership and test without automatic deletion; prefer a VR-safe preset or patch."
+    },
+    {
+      "pattern": "(NVSE plugin|xNVSE plugin|DLL)",
+      "status": "warned",
+      "category": "native_plugin",
+      "explanation": "Unknown native plugins may be build-specific or hook the same engine surfaces as FNVR prerequisites.",
+      "suggested_action": "Verify its current xNVSE compatibility and inspect logs after launch."
+    }
+  ]
+}

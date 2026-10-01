@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/supply-chain-trust-root.schema.json",
+  "title": "VRClient Supply-Chain Trust Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "root_id",
+    "root_version",
+    "trusted_keys"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "root_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "root_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trusted_keys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key_id",
+          "algorithm",
+          "issuer_root_id",
+          "rsa_modulus_hex",
+          "rsa_public_exponent_hex",
+          "usage"
+        ],
+        "properties": {
+          "key_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "algorithm": {
+            "const": "rsa-pkcs1-sha256"
+          },
+          "issuer_root_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rsa_modulus_hex": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+$",
+            "minLength": 512,
+            "maxLength": 512
+          },
+          "rsa_public_exponent_hex": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+$",
+            "minLength": 2
+          },
+          "usage": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "enum": [
+                "artifact-signing"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

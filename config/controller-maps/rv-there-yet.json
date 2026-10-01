@@ -1,0 +1,49 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "source_verified",
+  "game_slug": "rv-there-yet",
+  "title": "RV There Yet? — Quest and Index controls",
+  "note": "These are UEVR's default gamepad translations, not tracked-hand controls. Follow the game's Xbox button prompts. Game-specific actions and both controller families still need headset testing. Custom SteamVR or Steam Input bindings take precedence. Click both sticks together to open UEVR; the installed VRClient guide is in its Script UI section.",
+  "conversion_credit": {
+    "creator": "praydog; community profile by d_rey86",
+    "project": "UEVR",
+    "project_url": "https://github.com/praydog/UEVR",
+    "controls_url": "https://docs.uevr.io/usage/vr_controller_bindings.html"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick / click", "action": "Move / L3 prompt" },
+        { "slot": "right_stick", "control": "Right stick / click", "action": "Turn / R3 prompt", "note": "Head movement looks around; stick turning follows your UEVR comfort settings." },
+        { "slot": "left_primary", "control": "X", "action": "Xbox B prompt" },
+        { "slot": "left_secondary", "control": "Y", "action": "Xbox Y prompt" },
+        { "slot": "right_primary", "control": "A", "action": "Xbox A prompt" },
+        { "slot": "right_secondary", "control": "B", "action": "Xbox X prompt" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Xbox LT prompt" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Xbox RT prompt" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Xbox LB prompt" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Xbox RB prompt" },
+        { "slot": "both_sticks", "control": "Both stick clicks", "action": "UEVR menu" }
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick / click", "action": "Move / L3 prompt" },
+        { "slot": "right_stick", "control": "Right stick / click", "action": "Turn / R3 prompt", "note": "Head movement looks around; stick turning follows your UEVR comfort settings." },
+        { "slot": "left_primary", "control": "Left A", "action": "Xbox B prompt" },
+        { "slot": "left_secondary", "control": "Left B", "action": "Xbox Y prompt" },
+        { "slot": "right_primary", "control": "Right A", "action": "Xbox A prompt" },
+        { "slot": "right_secondary", "control": "Right B", "action": "Xbox X prompt" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Xbox LT prompt" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Xbox RT prompt" },
+        { "slot": "left_grip", "control": "Squeeze left grip", "action": "Xbox LB prompt" },
+        { "slot": "right_grip", "control": "Squeeze right grip", "action": "Xbox RB prompt" },
+        { "slot": "both_sticks", "control": "Both stick clicks", "action": "UEVR menu" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,826 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VrClient.App.ViewModels"
+        xmlns:services="using:VrClient.App.Services"
+        xmlns:config="using:VrClient.Core.Config"
+        xmlns:mod="using:VrClient.Core.ModManagers"
+        x:Class="VrClient.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1240" Height="820" MinWidth="960" MinHeight="640"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="AVRcade">
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- Top bar -->
+    <Border Grid.Row="0" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" Padding="28,14">
+      <Grid ColumnDefinitions="Auto,Auto,20,*,16,Auto,10,Auto,10,Auto">
+        <Button Content="← Library" Margin="0,0,16,0" IsVisible="{Binding ShowBack}"
+                Command="{Binding BackToLibraryCommand}" />
+        <TextBlock Grid.Column="1" FontSize="22" FontWeight="Bold" LetterSpacing="-0.3" VerticalAlignment="Center">
+          <Run Text="A" /><Run Text="VR" Foreground="{DynamicResource AccentBrush}" /><Run Text="cade" />
+        </TextBlock>
+        <TextBox Grid.Column="3" Width="340" MinHeight="40" HorizontalAlignment="Left" VerticalContentAlignment="Center"
+                 IsVisible="{Binding ShowLibrary}" Watermark="Search games"
+                 Text="{Binding SearchText, Mode=TwoWay}" />
+        <Border Grid.Column="5" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1" CornerRadius="20" Padding="14,0" Height="40"
+                ToolTip.Tip="{Binding RuntimeText}">
+          <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+            <Ellipse Width="9" Height="9" Fill="{DynamicResource GoodBrush}" IsVisible="{Binding RuntimeOnline}" />
+            <Ellipse Width="9" Height="9" Fill="{DynamicResource WarningBrush}" IsVisible="{Binding RuntimeOffline}" />
+            <TextBlock Text="{Binding RuntimeIndicatorText}" FontSize="13" VerticalAlignment="Center" />
+          </StackPanel>
+        </Border>
+        <Button Grid.Column="7" Content="Refresh" Command="{Binding RefreshCommand}"
+                ToolTip.Tip="Look again for games, headset software and mod profiles" />
+        <Button Grid.Column="9" Content="Settings" Command="{Binding ShowSettingsPageCommand}" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1">
+
+      <!-- Library -->
+      <ScrollViewer IsVisible="{Binding ShowLibrary}" HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" Margin="28,24,28,24">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Your library" FontSize="30" FontWeight="SemiBold" LetterSpacing="-0.4" />
+              <TextBlock Classes="secondary" FontSize="15"
+                         Text="Pick a game, then choose how to play: in VR, with mods, or as it shipped." />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+              <Button Classes="chip" Classes.selected="{Binding IsFilterAll}" Content="{Binding FilterAllText}"
+                      Command="{Binding SetLibraryFilterCommand}" CommandParameter="all" />
+              <Button Classes="chip" Classes.selected="{Binding IsFilterInstalled}" Content="{Binding FilterInstalledText}"
+                      Command="{Binding SetLibraryFilterCommand}" CommandParameter="installed" />
+              <Button Classes="chip" Classes.selected="{Binding IsFilterReady}" Content="{Binding FilterReadyText}"
+                      Command="{Binding SetLibraryFilterCommand}" CommandParameter="ready" />
+            </StackPanel>
+          </Grid>
+
+          <Border Classes="card" Padding="18,14" IsVisible="{Binding ShowHeadsetHint}">
+            <Grid ColumnDefinitions="Auto,14,*,14,Auto">
+              <Path Width="24" Height="24" Stretch="None" VerticalAlignment="Center"
+                    Stroke="{DynamicResource WarningBrush}" StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round"
+                    Data="M3,9 a3,3 0 0 1 3,-3 h12 a3,3 0 0 1 3,3 v6 a3,3 0 0 1 -3,3 h-3 l-2,-3 h-2 l-2,3 h-3 a3,3 0 0 1 -3,-3 z" />
+              <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="Connect your headset to play in VR" FontWeight="SemiBold" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="Start SteamVR or Virtual Desktop and put the headset on, then press Refresh. Monitor modes work without it." />
+              </StackPanel>
+              <Button Grid.Column="4" Classes="outline" Content="Refresh" Command="{Binding RefreshCommand}" />
+            </Grid>
+          </Border>
+
+          <ItemsControl ItemsSource="{Binding FilteredGames}" IsVisible="{Binding HasFilteredGames}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:GameItemViewModel">
+                <Button Classes="game-card" Width="182" Margin="0,0,18,18"
+                        ToolTip.Tip="Open this game"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGameCommand}"
+                        CommandParameter="{Binding}">
+                  <StackPanel>
+                    <Border Height="273" Background="{Binding CoverBrush}" CornerRadius="9,9,0,0" ClipToBounds="True"
+                            Opacity="{Binding CoverOpacity}">
+                      <Grid>
+                        <Image Source="{Binding CoverImage}" Stretch="UniformToFill"
+                               IsVisible="{Binding HasCoverImage}" />
+                        <Grid Margin="14" RowDefinitions="Auto,*,Auto"
+                              IsVisible="{Binding !HasCoverImage}">
+                          <TextBlock Text="{Binding EngineText}" Foreground="{DynamicResource CoverInkSecondaryBrush}"
+                                     FontSize="10" FontWeight="SemiBold" LetterSpacing="1" />
+                          <TextBlock Grid.Row="1" Classes="cover-mark" Text="{Binding CoverMark}"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          <Border Grid.Row="2" Height="2" Background="{DynamicResource CoverInkBrush}" />
+                        </Grid>
+                      </Grid>
+                    </Border>
+                    <StackPanel Margin="14,12,14,14" Spacing="8">
+                      <TextBlock Text="{Binding DisplayName}" FontSize="15" FontWeight="SemiBold"
+                                 TextWrapping="Wrap" MaxLines="2" MinHeight="38" LineHeight="19" />
+                      <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Ellipse Width="8" Height="8" Fill="{Binding LibraryStatusBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding LibraryStatusText}" FontSize="12" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </StackPanel>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Classes="card" IsVisible="{Binding !HasFilteredGames}" Padding="48">
+            <StackPanel HorizontalAlignment="Center" Spacing="12" MaxWidth="460">
+              <TextBlock Text="{Binding EmptyLibraryTitle}" FontSize="22" FontWeight="SemiBold" TextAlignment="Center" />
+              <TextBlock Classes="secondary" TextAlignment="Center" TextWrapping="Wrap"
+                         Text="{Binding EmptyLibraryText}" />
+              <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                <Button Content="Show all games" Command="{Binding SetLibraryFilterCommand}" CommandParameter="all" />
+                <Button Classes="primary" Content="Refresh library" Command="{Binding RefreshCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Game page -->
+      <ScrollViewer x:Name="GameScroll" IsVisible="{Binding ShowGameDetail}" HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+        <Grid DataContext="{Binding SelectedGame}" ColumnDefinitions="260,32,*" Margin="28,24,28,24">
+
+          <StackPanel Spacing="16">
+            <Border Width="260" Height="390" Background="{Binding CoverBrush}" CornerRadius="10" ClipToBounds="True">
+              <Grid>
+                <Image Source="{Binding CoverImage}" Stretch="UniformToFill"
+                       IsVisible="{Binding HasCoverImage}" />
+                <Grid Margin="20" RowDefinitions="Auto,*,Auto"
+                      IsVisible="{Binding !HasCoverImage}">
+                  <TextBlock Text="{Binding EngineText}" Foreground="{DynamicResource CoverInkSecondaryBrush}"
+                             FontSize="10" FontWeight="SemiBold" LetterSpacing="1" />
+                  <TextBlock Grid.Row="1" Classes="cover-mark" Text="{Binding CoverMark}" FontSize="64"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <Border Grid.Row="2" Height="2" Background="{DynamicResource CoverInkBrush}" />
+                </Grid>
+              </Grid>
+            </Border>
+            <Border Classes="card" Padding="16">
+              <StackPanel Spacing="14">
+                <StackPanel Spacing="3">
+                  <TextBlock Classes="eyebrow" Text="STATUS" />
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <Ellipse Width="8" Height="8" Fill="{Binding LibraryStatusBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding LibraryStatusText}" FontSize="13" />
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel Spacing="3">
+                  <TextBlock Classes="eyebrow" Text="INSTALLED AT" />
+                  <TextBlock Text="{Binding InstallText}" FontSize="12" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Spacing="3" IsVisible="{Binding HasConversionCredit}">
+                  <TextBlock Classes="eyebrow" Text="VR CONVERSION" />
+                  <TextBlock Text="{Binding ConversionCreditText}" FontSize="13" TextWrapping="Wrap" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2" Spacing="22">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{Binding DisplayName}" FontSize="34" FontWeight="SemiBold" LetterSpacing="-0.5"
+                         TextWrapping="Wrap" />
+              <TextBlock Classes="secondary" Text="{Binding RouteText}" FontSize="14" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border Classes="card" Padding="18,14" IsVisible="{Binding NotInstalled}">
+              <Grid ColumnDefinitions="*,14,Auto">
+                <StackPanel Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="This game is not installed yet" FontWeight="SemiBold" />
+                  <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding NotInstalledText}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                  <Button Content="Locate installed game" Click="LocateFriendslopGame_Click"
+                          IsVisible="{Binding CanLocateGame}" />
+                  <Button Classes="primary" Content="Open in Steam" Tag="{Binding SteamStoreUrl}"
+                          Click="OpenExternalUrl_Click" IsVisible="{Binding HasStorePage}" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <!-- The four ways to play: the same block on every game. -->
+            <StackPanel Spacing="12" IsVisible="{Binding HasPlayModes}">
+              <TextBlock Classes="eyebrow" Text="CHOOSE HOW TO PLAY" />
+              <ItemsControl ItemsSource="{Binding PlayModes}" Margin="-7">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:PlayModeViewModel">
+                    <Border Classes="card" Margin="7">
+                      <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                          <Path Width="24" Height="24" Stretch="None" Data="{Binding Icon}"
+                                Stroke="{Binding IconBrush}" StrokeThickness="1.8"
+                                StrokeLineCap="Round" StrokeJoin="Round" />
+                          <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Classes="secondary" Text="{Binding Description}" TextWrapping="Wrap"
+                                   FontSize="14" MinHeight="40" />
+                        <Grid ColumnDefinitions="Auto,8,*" MinHeight="36">
+                          <Ellipse Width="8" Height="8" Fill="{Binding StatusBrush}" VerticalAlignment="Top" Margin="0,5,0,0" />
+                          <TextBlock Grid.Column="2" Text="{Binding Status}" FontSize="13" TextWrapping="Wrap" />
+                        </Grid>
+                        <Button Classes="play" Classes.primary="{Binding IsVrLaunch}" Classes.strong="{Binding IsFlatLaunch}"
+                                Classes.outline="{Binding IsSetup}"
+                                Content="{Binding ActionText}" IsEnabled="{Binding CanAct}"
+                                Tag="{Binding}" Click="PlayMode_Click" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <!-- Deferred engines keep their experimental panels; their games are not
+                 listed in the catalogue yet. -->
+            <Border Classes="card" IsVisible="{Binding IsFalloutNewVegas}">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="heading" Text="Fallout: New Vegas launch options" />
+                <Button Classes="primary" Content="Native VR — experimental" HorizontalAlignment="Left"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LaunchFalloutNewVegasNativeCommand}"
+                        IsVisible="{Binding CanLaunchFalloutNewVegas}" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="Native OpenXR stereo without the Vortex profile. This route refuses detectable Vortex deployment or extra physical plugins; manually installed loose files cannot be ruled out." />
+                <Button Classes="primary" Content="VR with Vortex mods — experimental" HorizontalAlignment="Left"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LaunchFalloutNewVegasVortexCommand}"
+                        IsVisible="{Binding CanLaunchFalloutNewVegas}" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="First deploy New Vegas mods in Vortex and apply the one-way sync in VR setup. AVRcade then checks readiness and launches the isolated MO2 VR profile; Vortex still owns its deployed files." />
+                <Button Content="Set up New Vegas VR and Vortex sync" HorizontalAlignment="Left"
+                        Click="OpenFalloutNewVegasSetup_Click" IsVisible="{Binding CanConfigureFalloutNewVegas}" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="For flat play with your Vortex profile and no VR, use Play in Vortex." />
+              </StackPanel>
+            </Border>
+            <Border Classes="card" IsVisible="{Binding IsFallout3}">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="heading" Text="Fallout 3 launch options" />
+                <Button Classes="primary" Content="Native VR — experimental" HorizontalAlignment="Left"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LaunchFallout3NativeCommand}"
+                        IsVisible="{Binding CanLaunchFallout3}" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="Launches FOSE with VR enabled. It sees the installed game files, including any Vortex mods already deployed there." />
+                <Button Classes="primary" Content="VR with Vortex mods — experimental" HorizontalAlignment="Left"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LaunchFallout3VortexCommand}"
+                        IsVisible="{Binding CanLaunchFallout3}" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap"
+                           Text="First select a Fallout 3 profile and Deploy Mods in Vortex. This launch checks that Vortex is available, then uses the same FOSE VR path; it cannot verify which profile was deployed." />
+                <Button Content="Desktop with deployed mods — VR off" HorizontalAlignment="Left"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LaunchFallout3DesktopCommand}"
+                        IsVisible="{Binding CanLaunchFallout3Desktop}" />
+                <Button Content="Manage Fallout 3 mods in Vortex" HorizontalAlignment="Left"
+                        Click="OpenFallout3Vortex_Click" />
+              </StackPanel>
+            </Border>
+
+            <!-- Everything behind the four buttons, one topic per tab. -->
+            <Border Classes="card" Padding="6,2,6,6">
+              <TabControl SelectedIndex="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).DetailTabIndex, Mode=TwoWay}">
+
+                <TabItem Header="VR setup">
+                  <StackPanel Spacing="16" Margin="6,14,6,8">
+                    <ItemsControl ItemsSource="{Binding SetupSteps}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SetupStepViewModel">
+                          <StackPanel Spacing="6" Margin="0,0,16,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding Mark}" Foreground="{Binding MarkBrush}" FontWeight="Bold" />
+                              <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <TextBlock Classes="secondary" Text="{Binding Detail}" FontSize="13" TextWrapping="Wrap" />
+                          </StackPanel>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Button Classes="primary" Content="{Binding PrepareText}"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}"
+                              IsVisible="{Binding CanPrepare}" />
+                      <Button Content="{Binding UevrProfileImportText}" Click="ImportUevrProfile_Click"
+                              IsVisible="{Binding CanImportUevrProfile}" />
+                      <Button Content="View profile source" Tag="{Binding UevrProfileSourceUrl}"
+                              Click="OpenExternalUrl_Click" IsVisible="{Binding CanImportUevrProfile}" />
+                    </StackPanel>
+                    <TextBlock Classes="secondary" Text="{Binding UevrProfileStatusText}" TextWrapping="Wrap"
+                               IsVisible="{Binding CanImportUevrProfile}" />
+
+                    <Border Classes="inset" IsVisible="{Binding HasModded}">
+                      <StackPanel DataContext="{Binding Modded}" x:DataType="vm:ModdedGameViewModel" Spacing="6">
+                        <TextBlock Classes="secondary" Text="{Binding ManagedInstallLocationText}" TextWrapping="Wrap" />
+                        <TextBlock Classes="secondary" Text="{Binding SteamVrNoticeText}" TextWrapping="Wrap"
+                                   IsVisible="{Binding HasSteamVrNotice}" />
+                        <TextBlock Classes="secondary" Text="{Binding Warning}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+
+                    <Border Classes="inset" IsVisible="{Binding ShowStandaloneRuntimeNotice}">
+                      <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding RuntimeNoticeTitle}" FontWeight="SemiBold" />
+                        <TextBlock Classes="secondary" Text="{Binding RuntimeNoticeText}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+
+                    <Border Classes="inset" IsVisible="{Binding IsCyberpunk}">
+                      <StackPanel Spacing="6">
+                        <TextBlock Text="About the Cyberpunk 2077 VR backend" FontWeight="SemiBold" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="VR needs a set of RED4ext plugins in the game folder, matched to one exact game build. Install VR backend copies AVRcade's VR plugins there and downloads the modding frameworks they need from their official releases, checking every hash. The monitor modes work without them." />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Frameworks you already have are never overwritten. Removing the VR backend takes out only AVRcade's own VR files; the frameworks stay for your other mods. Cyber Engine Tweaks asks you to pick an overlay key the first time the game starts, so do one monitor launch first." />
+                      </StackPanel>
+                    </Border>
+
+                    <Border Classes="inset" IsVisible="{Binding IsRvThereYet}">
+                      <StackPanel Spacing="8">
+                        <TextBlock Text="Controller-driven hands (experimental)" FontWeight="SemiBold" />
+                        <TextBlock Classes="secondary" Text="{Binding RvHandsStatusText}" TextWrapping="Wrap" />
+                        <Button Content="{Binding RvHandsButtonText}" HorizontalAlignment="Left"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleRvHandsCommand}" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                                   Text="Local first-person avatar only; this does not add finger tracking, physical grabbing, or networked hands." />
+                      </StackPanel>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,14,Auto" IsVisible="{Binding CanUninstall}">
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="13"
+                                 Text="Want the untouched game folder back? Removing the VR mod deletes only the files AVRcade added." />
+                      <Button Grid.Column="2" Classes="danger" Content="Remove VR mod" Click="Uninstall_Click" />
+                    </Grid>
+                  </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Mods">
+                  <StackPanel Spacing="16" Margin="6,14,6,8">
+
+                    <!-- Unity games: profiles in r2modman, Thunderstore Mod Manager or Vortex -->
+                    <StackPanel IsVisible="{Binding HasModded}">
+                      <StackPanel DataContext="{Binding Modded}" x:DataType="vm:ModdedGameViewModel" Spacing="16">
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Mods live in your mod manager, not in AVRcade. Keep two profiles there: one with the VR mod for VR + mods, one without it for Mods, no VR. Then pick them here." />
+
+                        <StackPanel Spacing="8">
+                          <TextBlock Classes="heading" Text="1. Your mod manager" />
+                          <TextBlock Classes="secondary" Text="{Binding InstalledManagersText}" TextWrapping="Wrap" />
+                          <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasInstalledManagers}">
+                            <ComboBox ItemsSource="{Binding InstalledManagers}" MinHeight="40" Width="260"
+                                      SelectedItem="{Binding SelectedManager, Mode=TwoWay}">
+                              <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="mod:ModManagerInstall">
+                                  <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                              </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button Classes="outline" Content="Open mod manager" Click="OpenFriendslopManager_Click" />
+                            <Button Content="Reread profiles"
+                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RefreshCommand}" />
+                          </StackPanel>
+                          <WrapPanel>
+                            <Button Content="Get r2modman" Margin="0,0,10,8" Tag="https://github.com/ebkr/r2modmanPlus/releases" Click="OpenExternalUrl_Click" />
+                            <Button Content="Get Thunderstore Mod Manager" Margin="0,0,10,8" Tag="https://www.overwolf.com/apps/mods-managers" Click="OpenExternalUrl_Click" />
+                            <Button Content="Get Vortex" Margin="0,0,10,8" Tag="https://www.nexusmods.com/site/about/vortex" Click="OpenExternalUrl_Click" />
+                            <Button Content="Locate manager .exe" Margin="0,0,10,8" Click="LocateModManager_Click" />
+                          </WrapPanel>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                          <TextBlock Classes="heading" Text="2. Profile for VR + mods" />
+                          <TextBlock Classes="secondary" Text="{Binding VrModIdentityText}" TextWrapping="Wrap" />
+                          <TextBlock Classes="secondary" Text="{Binding VrWithModsManagerInstructions}" TextWrapping="Wrap" />
+                          <TextBlock Text="No profiles found for this game yet. Create one in your mod manager, then press Reread profiles."
+                                     TextWrapping="Wrap" FontSize="13" IsVisible="{Binding NoProfiles}" />
+                          <StackPanel Orientation="Horizontal" Spacing="10">
+                            <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile, Mode=TwoWay}"
+                                      IsVisible="{Binding HasProfiles}"
+                                      PlaceholderText="Choose a profile with the VR mod" MinHeight="40" Width="340">
+                              <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="mod:ModManagerProfile">
+                                  <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                              </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button Content="Clear" IsVisible="{Binding HasSelectedProfile}"
+                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ClearVrProfileCommand}" />
+                            <Button Content="VR mod page" Tag="{Binding OriginalPageUrl}" Click="OpenExternalUrl_Click" />
+                          </StackPanel>
+                          <TextBlock Text="{Binding VrProfileStatusText}" TextWrapping="Wrap" FontSize="13"
+                                     IsVisible="{Binding HasProfiles}" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                          <TextBlock Classes="heading" Text="3. Profile for Mods, no VR" />
+                          <TextBlock Classes="secondary" Text="{Binding FlatModeInstructions}" TextWrapping="Wrap" />
+                          <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasProfiles}">
+                            <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedFlatProfile, Mode=TwoWay}"
+                                      PlaceholderText="Choose a profile without the VR mod" MinHeight="40" Width="340">
+                              <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="mod:ModManagerProfile">
+                                  <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                              </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button Content="Clear" IsVisible="{Binding HasSelectedFlatProfile}"
+                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ClearFlatProfileCommand}" />
+                          </StackPanel>
+                          <TextBlock Text="{Binding FlatProfileStatusText}" TextWrapping="Wrap" FontSize="13"
+                                     IsVisible="{Binding HasProfiles}" />
+                        </StackPanel>
+
+                        <TextBlock Classes="secondary" Text="{Binding GameDirectoryConflictText}" FontSize="13"
+                                   TextWrapping="Wrap" IsVisible="{Binding HasGameDirectoryConflict}" />
+
+                        <Expander Header="Advanced: profile contents, launch arguments, moved data folders" IsExpanded="False">
+                          <StackPanel Spacing="10" Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                              <Border Width="64" Height="64" Background="{DynamicResource GroundBrush}" CornerRadius="8">
+                                <Image Source="{Binding PreviewImage}" Stretch="Uniform" IsVisible="{Binding HasPreviewImage}" />
+                              </Border>
+                              <StackPanel Spacing="2" VerticalAlignment="Center" MaxWidth="560">
+                                <TextBlock Text="{Binding CreatorText}" FontWeight="SemiBold" />
+                                <TextBlock Classes="secondary" Text="{Binding Summary}" TextWrapping="Wrap" />
+                              </StackPanel>
+                            </StackPanel>
+                            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                       Text="Packages the VR mod depends on (reference list; the manager resolves current versions):" />
+                            <TextBlock Text="{Binding DependenciesText}" TextWrapping="Wrap" FontSize="13" />
+                            <TextBlock Text="Mods in the VR profile (read only)" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding VrModsText}" TextWrapping="Wrap" FontSize="13" />
+                            <TextBlock Text="Mods in the flat profile (read only)" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding FlatModsText}" TextWrapping="Wrap" FontSize="13" />
+                            <StackPanel IsVisible="{Binding IsR2Profile}" Spacing="8">
+                              <TextBlock Text="Custom r2modman launch arguments (optional)" FontWeight="SemiBold" />
+                              <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                         Text="AVRcade builds the standard arguments from the profile's mod loader. Only paste your own if the game needs them." />
+                              <TextBox Text="{Binding R2LaunchArguments, Mode=TwoWay}" Watermark="Leave blank for automatic launch" TextWrapping="Wrap" />
+                              <Button Content="Save launch arguments" HorizontalAlignment="Left"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SaveManagerLaunchArgumentsCommand}" />
+                            </StackPanel>
+                            <StackPanel IsVisible="{Binding CanFindMovedProfiles}" Spacing="8">
+                              <TextBlock Text="Moved a manager's data folder?" FontWeight="SemiBold" />
+                              <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                         Text="Choose the manager and enter its data folder from the manager's settings. AVRcade only reads it." />
+                              <ComboBox ItemsSource="{Binding ManagersWithDataRoots}" SelectedItem="{Binding ManagerForMovedProfiles, Mode=TwoWay}"
+                                        MinWidth="260" MinHeight="40" HorizontalAlignment="Left">
+                                <ComboBox.ItemTemplate>
+                                  <DataTemplate x:DataType="mod:ModManagerInstall"><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                              </ComboBox>
+                              <TextBox Text="{Binding MovedProfileRoot, Mode=TwoWay}" Watermark="Manager data folder" />
+                              <Button Content="Use this data folder" HorizontalAlignment="Left"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SaveMovedProfileRootCommand}" />
+                            </StackPanel>
+                          </StackPanel>
+                        </Expander>
+                      </StackPanel>
+                    </StackPanel>
+
+                    <!-- Cyberpunk 2077 and Unreal games: mods deployed into the game folder -->
+                    <StackPanel Spacing="12" IsVisible="{Binding UsesFolderMods}">
+                      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                 Text="This game loads mods from its own folder, so any mod manager works. Install or deploy your mods with it, then use VR + mods or Mods, no VR here." />
+                      <TextBlock Classes="heading" Text="Your mod manager" />
+                      <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GameModManagerText}"
+                                 Classes="secondary" TextWrapping="Wrap" />
+                      <WrapPanel>
+                        <Button Classes="outline" Content="Open mod manager" Margin="0,0,10,8"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGameModManagerCommand}"
+                                IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanOpenGameModManager}" />
+                        <Button Content="Choose your manager" Margin="0,0,10,8" Click="SelectGameModManager_Click" />
+                        <Button Content="Open game folder" Margin="0,0,10,8"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGameFolderCommand}" />
+                        <Button Content="Manage mods in Vortex inside AVRcade" Margin="0,0,10,8"
+                                Click="OpenCyberpunkVortex_Click" IsVisible="{Binding IsCyberpunk}" />
+                      </WrapPanel>
+                      <TextBlock Text="{Binding UnrealModsText}" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsUnreal}" />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsUnreal}"
+                                 Text="Unreal has no per-launch switch for mods. While mods are in the game folder, VR only and Vanilla are unavailable; with none there, the two modded modes are. Refresh after changing mods." />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsCyberpunk}"
+                                 Text="The two modded modes start the game with REDmod's -modded argument. Mods copied straight into the archive folder load in every mode; AVRcade cannot verify which mods were deployed or that each one works in VR." />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsCyberpunkRedmodMissing}"
+                                 Text="REDmod is not installed. Add the free Cyberpunk 2077 REDmod DLC in Steam to use REDmod-packaged mods." />
+                    </StackPanel>
+
+                    <!-- GTA San Andreas: mods edit the shared game folder -->
+                    <StackPanel Spacing="12" IsVisible="{Binding IsGtaSanAndreas}">
+                      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                 Text="San Andreas mods are installed into the game folder itself. Use any manager you like to add them, then launch from AVRcade so the VR bridge and headset settings apply." />
+                      <TextBlock Classes="heading" Text="Your mod manager" />
+                      <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaModManagerText}"
+                                 Classes="secondary" TextWrapping="Wrap" />
+                      <WrapPanel>
+                        <Button Classes="outline" Content="Open mod manager" Margin="0,0,10,8"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenGtaSanAndreasModManagerCommand}" />
+                        <Button Content="Choose your manager" Margin="0,0,10,8" Click="SelectGtaModManager_Click" />
+                        <Button Content="Get GGMM" Margin="0,0,10,8" Tag="https://www.gtagarage.com/mods/show.php?id=434" Click="OpenExternalUrl_Click" />
+                        <Button Content="Get SAMI" Margin="0,0,10,8" Tag="https://www.gtainside.com/sanandreas/tools/5604-san-andreas-mod-installer/" Click="OpenExternalUrl_Click" />
+                      </WrapPanel>
+                      <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaVrGameFolderText}"
+                                 TextWrapping="Wrap" FontSize="13" />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                                 Text="GGMM needs ggmm.exe and gtainterface.dll beside gta_sa.exe; for SAMI choose the installed sami.exe, not its setup file. VR only switches ModLoader add-ons off for that launch; mods copied over game files load in every mode." />
+                      <TextBlock Classes="heading" Text="Clean folder for Vanilla" />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                 Text="Mods written into game files cannot be switched off, so Vanilla plays a separate, unmodded copy of the game. Choose it once." />
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Choose clean game folder" Click="SelectGtaVanillaFolder_Click" />
+                      </StackPanel>
+                      <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GtaVanillaFolderText}"
+                                 TextWrapping="Wrap" FontSize="13" />
+                    </StackPanel>
+                  </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Controls">
+                  <StackPanel Spacing="16" Margin="6,14,6,8">
+
+                    <StackPanel Spacing="10" IsVisible="{Binding IsCyberpunk}">
+                      <TextBlock Classes="heading" Text="VR turning" />
+                      <Border Classes="inset">
+                        <StackPanel Spacing="8">
+                          <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="Snap" VerticalAlignment="Center" />
+                            <ToggleSwitch IsChecked="{Binding IsCyberpunkSmoothTurn, Mode=OneWay}" OnContent="" OffContent=""
+                                          CommandParameter="toggle"
+                                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkTurnModeCommand}" />
+                            <TextBlock Text="Smooth" VerticalAlignment="Center" />
+                          </StackPanel>
+                          <StackPanel Spacing="6" IsVisible="{Binding IsCyberpunkSnapTurn}">
+                            <TextBlock Text="{Binding CyberpunkSnapAngleText}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <Button Content="15°" CommandParameter="15"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkSnapTurnAngleCommand}" />
+                              <Button Content="30°" CommandParameter="30"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkSnapTurnAngleCommand}" />
+                              <Button Content="45°" CommandParameter="45"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkSnapTurnAngleCommand}" />
+                              <Button Content="60°" CommandParameter="60"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkSnapTurnAngleCommand}" />
+                              <Button Content="90°" CommandParameter="90"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetCyberpunkSnapTurnAngleCommand}" />
+                            </StackPanel>
+                          </StackPanel>
+                          <TextBlock Classes="secondary" IsVisible="{Binding IsCyberpunkSmoothTurn}"
+                                     TextWrapping="Wrap" Text="Smooth turn speed follows Cyberpunk's controller sensitivity." />
+                          <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                                     Text="Right stick turns; headset tracking stays smooth. Applies to both VR modes." />
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+
+                    <StackPanel Spacing="10" IsVisible="{Binding HasHudModes}">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="heading" Text="VR HUD" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="{Binding HudModeText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Compact"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetHudModeCommand}"
+                                CommandParameter="Compact" />
+                        <Button Content="Comfortable"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetHudModeCommand}"
+                                CommandParameter="Comfortable" />
+                        <Button Content="Hide HUD"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetHudModeCommand}"
+                                CommandParameter="Hidden" />
+                      </StackPanel>
+                      <TextBlock Classes="secondary" FontSize="13" TextWrapping="Wrap"
+                                 Text="Changes VR gameplay only. Monitor play and Cyberpunk's pause, inventory and map screens are left alone." />
+                    </StackPanel>
+
+                    <StackPanel Spacing="10" IsVisible="{Binding IsGtaSanAndreas}">
+                      <TextBlock Classes="heading" Text="VR turning" />
+                      <Border Classes="inset">
+                        <StackPanel Spacing="8">
+                          <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="Snap" VerticalAlignment="Center" />
+                            <ToggleSwitch IsChecked="{Binding IsGtaSmoothTurn, Mode=OneWay}" OnContent="" OffContent=""
+                                          CommandParameter="toggle"
+                                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaTurnModeCommand}" />
+                            <TextBlock Text="Smooth" VerticalAlignment="Center" />
+                          </StackPanel>
+                          <StackPanel Spacing="6" IsVisible="{Binding IsGtaSnapTurn}">
+                            <TextBlock Text="{Binding GtaSnapAngleText}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <Button Content="15°" CommandParameter="15"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSnapTurnAngleCommand}" />
+                              <Button Content="30°" CommandParameter="30"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSnapTurnAngleCommand}" />
+                              <Button Content="45°" CommandParameter="45"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSnapTurnAngleCommand}" />
+                              <Button Content="60°" CommandParameter="60"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSnapTurnAngleCommand}" />
+                              <Button Content="90°" CommandParameter="90"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSnapTurnAngleCommand}" />
+                            </StackPanel>
+                          </StackPanel>
+                          <StackPanel Spacing="6" IsVisible="{Binding IsGtaSmoothTurn}">
+                            <TextBlock Text="{Binding GtaSmoothSpeedText}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <Button Content="45°/s" CommandParameter="45"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSmoothTurnSpeedCommand}" />
+                              <Button Content="90°/s" CommandParameter="90"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSmoothTurnSpeedCommand}" />
+                              <Button Content="135°/s" CommandParameter="135"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSmoothTurnSpeedCommand}" />
+                              <Button Content="180°/s" CommandParameter="180"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetGtaSmoothTurnSpeedCommand}" />
+                            </StackPanel>
+                          </StackPanel>
+                          <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                                     Text="Snap turns by the chosen angle on each right-stick push; Smooth turns while held. Applies to both VR modes on the next launch." />
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+
+                    <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding NoControllerReference}"
+                               Text="No controller map for this game yet. The VR conversion's own page lists its controls." />
+
+                    <StackPanel Spacing="14" IsVisible="{Binding HasControllerReference}">
+                      <TextBlock Classes="heading" Text="{Binding ControllerReferenceTitle}" />
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding ControllerGuidance}" />
+                      <TabControl ItemsSource="{Binding ControllerDevices}">
+                        <TabControl.ItemTemplate>
+                          <DataTemplate x:DataType="config:ControllerDeviceReference">
+                            <TextBlock Text="{Binding DisplayName}" />
+                          </DataTemplate>
+                        </TabControl.ItemTemplate>
+                        <TabControl.ContentTemplate>
+                          <DataTemplate x:DataType="config:ControllerDeviceReference">
+                            <StackPanel Spacing="14" Margin="0,14,0,8">
+                              <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <Border Background="#0E1B24" CornerRadius="10" Padding="8" HorizontalAlignment="Left">
+                                  <Canvas Width="650" Height="340">
+                                    <Image Canvas.Left="176" Canvas.Top="38" Width="298" Height="205"
+                                           Source="{Binding DiagramAssetUri, Converter={StaticResource ControllerDiagramConverter}}" Stretch="Uniform" />
+                                    <Line IsVisible="{Binding LeftTrigger.IsAssigned}" StartPoint="160,31" EndPoint="220,69" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding LeftSecondary.IsAssigned}" StartPoint="160,91" EndPoint="240,89" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding LeftPrimary.IsAssigned}" StartPoint="160,151" EndPoint="257,110" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding LeftStick.IsAssigned}" StartPoint="160,211" EndPoint="232,143" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding LeftGrip.IsAssigned}" StartPoint="160,271" EndPoint="220,196" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding RightTrigger.IsAssigned}" StartPoint="490,31" EndPoint="430,69" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding RightSecondary.IsAssigned}" StartPoint="490,91" EndPoint="410,89" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding RightPrimary.IsAssigned}" StartPoint="490,151" EndPoint="393,110" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding RightStick.IsAssigned}" StartPoint="490,211" EndPoint="417,143" Stroke="#65CDE8" StrokeThickness="1" />
+                                    <Line IsVisible="{Binding RightGrip.IsAssigned}" StartPoint="490,271" EndPoint="430,196" Stroke="#65CDE8" StrokeThickness="1" />
+
+                                    <Border IsVisible="{Binding LeftTrigger.IsAssigned}" Canvas.Left="0" Canvas.Top="5" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding LeftTrigger.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftTrigger.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding LeftSecondary.IsAssigned}" Canvas.Left="0" Canvas.Top="65" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding LeftSecondary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftSecondary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding LeftPrimary.IsAssigned}" Canvas.Left="0" Canvas.Top="125" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding LeftPrimary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftPrimary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding LeftStick.IsAssigned}" Canvas.Left="0" Canvas.Top="185" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding LeftStick.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftStick.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding LeftGrip.IsAssigned}" Canvas.Left="0" Canvas.Top="245" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding LeftGrip.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftGrip.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding RightTrigger.IsAssigned}" Canvas.Left="490" Canvas.Top="5" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding RightTrigger.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightTrigger.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding RightSecondary.IsAssigned}" Canvas.Left="490" Canvas.Top="65" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding RightSecondary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightSecondary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding RightPrimary.IsAssigned}" Canvas.Left="490" Canvas.Top="125" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding RightPrimary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightPrimary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding RightStick.IsAssigned}" Canvas.Left="490" Canvas.Top="185" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding RightStick.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightStick.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding RightGrip.IsAssigned}" Canvas.Left="490" Canvas.Top="245" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
+                                      <StackPanel><TextBlock Text="{Binding RightGrip.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightGrip.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
+                                    </Border>
+                                    <TextBlock Canvas.Left="275" Canvas.Top="15" Width="100" TextAlignment="Center" Foreground="White"
+                                               Text="{Binding DisplayName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                    <Border IsVisible="{Binding Menu.IsAssigned}" Canvas.Left="180" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
+                                      <StackPanel><TextBlock Text="{Binding Menu.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding Menu.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding BothSticks.IsAssigned}" Canvas.Left="279" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
+                                      <StackPanel><TextBlock Text="{Binding BothSticks.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding BothSticks.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
+                                    </Border>
+                                    <Border IsVisible="{Binding BothGrips.IsAssigned}" Canvas.Left="378" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
+                                      <StackPanel><TextBlock Text="{Binding BothGrips.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding BothGrips.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
+                                    </Border>
+                                  </Canvas>
+                                </Border>
+                              </ScrollViewer>
+                              <ItemsControl ItemsSource="{Binding Bindings}">
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate x:DataType="config:ControllerBindingReference">
+                                    <Grid ColumnDefinitions="150,16,*,Auto" Margin="2,5">
+                                      <TextBlock Text="{Binding Control}" FontWeight="SemiBold" />
+                                      <TextBlock Grid.Column="2" Text="{Binding Action}" TextWrapping="Wrap" />
+                                      <TextBlock Grid.Column="3" Text="{Binding Note}" Classes="secondary"
+                                                 FontSize="11" Margin="12,0,0,0" />
+                                    </Grid>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                            </StackPanel>
+                          </DataTemplate>
+                        </TabControl.ContentTemplate>
+                      </TabControl>
+                    </StackPanel>
+                  </StackPanel>
+                </TabItem>
+
+                <TabItem Header="About">
+                  <StackPanel Spacing="16" Margin="6,14,6,8">
+                    <Grid ColumnDefinitions="140,16,*" RowDefinitions="Auto,12,Auto,12,Auto,12,Auto">
+                      <TextBlock Classes="secondary" Text="VR status" />
+                      <StackPanel Grid.Column="2" Spacing="4">
+                        <Border Background="{Binding BadgeBrush}" CornerRadius="4" Padding="8,3" HorizontalAlignment="Left">
+                          <TextBlock Text="{Binding BadgeText}" Foreground="{DynamicResource GroundBrush}" FontSize="12" FontWeight="SemiBold" />
+                        </Border>
+                        <TextBlock Text="{Binding ReadinessDetail}" TextWrapping="Wrap" />
+                      </StackPanel>
+                      <TextBlock Grid.Row="2" Classes="secondary" Text="Play safely" />
+                      <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SafetyText}" TextWrapping="Wrap" />
+                      <TextBlock Grid.Row="4" Classes="secondary" Text="How it works" />
+                      <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding RouteText}" TextWrapping="Wrap" />
+                      <TextBlock Grid.Row="6" Classes="secondary" Text="Installed at" />
+                      <TextBlock Grid.Row="6" Grid.Column="2" Text="{Binding InstallText}" TextWrapping="Wrap" />
+                    </Grid>
+                    <Border Classes="inset" IsVisible="{Binding HasConversionCredit}">
+                      <Grid ColumnDefinitions="*,14,Auto">
+                        <StackPanel Spacing="4">
+                          <TextBlock Classes="eyebrow" Text="COMMUNITY VR CONVERSION" />
+                          <TextBlock Text="{Binding ConversionCreditText}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+                          <TextBlock Classes="secondary" Text="{Binding ConversionCreditDescription}" TextWrapping="Wrap" FontSize="13" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <Button Content="Official project" Tag="{Binding ConversionProjectUrl}"
+                                  Click="OpenExternalUrl_Click" />
+                          <Button Content="Controller guide" Tag="{Binding ControllerGuideUrl}"
+                                  Click="OpenExternalUrl_Click" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+                </TabItem>
+              </TabControl>
+            </Border>
+          </StackPanel>
+        </Grid>
+      </ScrollViewer>
+
+      <!-- Settings -->
+      <ScrollViewer IsVisible="{Binding ShowSettings}" HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Left" Margin="28,24,28,24">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Settings" FontSize="30" FontWeight="SemiBold" LetterSpacing="-0.4" />
+            <TextBlock Classes="secondary" FontSize="15" Text="Headset connection and how AVRcade looks." />
+          </StackPanel>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="eyebrow" Text="HEADSET" />
+              <TextBlock Text="{Binding RuntimeIndicatorText}" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Classes="secondary" Text="{Binding RuntimeText}" TextWrapping="Wrap" />
+              <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                         Text="AVRcade looks for SteamVR and Virtual Desktop. If both run, VR games are sent to SteamVR, because its compositor owns the headset display. Other OpenXR runtimes still work for games that use the system default." />
+              <Button Content="Check again" HorizontalAlignment="Left" Command="{Binding RefreshCommand}" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="eyebrow" Text="APPEARANCE" />
+                  <TextBlock Text="{Binding ThemePaletteText}" FontSize="18" FontWeight="SemiBold" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="{Binding ThemeModeText}" Command="{Binding ToggleThemeCommand}" />
+              </Grid>
+              <ItemsControl ItemsSource="{Binding ThemePalettes}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="services:LauncherPalette">
+                    <Button Content="{Binding Name}" ToolTip.Tip="{Binding Description}" MinWidth="120" Margin="0,0,10,10"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectPaletteCommand}"
+                            CommandParameter="{Binding Id}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+          <Expander Header="Diagnostics">
+            <StackPanel Spacing="6" Margin="0,8,0,0">
+              <TextBlock Text="{Binding ReleaseToolingText}" FontWeight="SemiBold" />
+              <TextBlock Classes="secondary" Text="{Binding ReleaseToolingDetail}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Expander>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+
+    <!-- Status line -->
+    <Border Grid.Row="2" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="28,10">
+      <Grid ColumnDefinitions="*,16,Auto">
+        <TextBlock Classes="secondary" Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center" />
+        <ProgressBar Grid.Column="2" Width="120" Height="4" IsIndeterminate="True" IsVisible="{Binding Busy}" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

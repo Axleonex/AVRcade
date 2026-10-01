@@ -1,0 +1,31 @@
+# Injection Authorization (Cyber Verification Gate) — TEMPLATE
+
+**This is a template. Half B of M6 (real native injection into a game) will NOT
+run until you authorize it.**
+
+M6 has two halves:
+
+- **Half A — managed hook DISCOVERY (read-only, safe).** Enumerates Mono/IL2CPP
+  methods to LIST candidate hook points. It patches nothing, injects nothing,
+  evades nothing. This runs freely.
+- **Half B — real native INJECTION.** Loading the VRClient runtime into a real
+  game via the Phase 3 injector. This is policy-deferred pending your **Cyber
+  Verification Program** clearance.
+
+## To authorize Half B
+
+1. Complete your Cyber Verification Program review for the specific target game
+   and the injection primitive.
+2. Copy THIS file to `docs/native-m6/INJECTION-AUTHORIZATION.md` (drop the
+   `.template` suffix).
+3. Add this exact line to that file (nothing else authorizes it):
+
+```
+CYBER-VERIFICATION: CLEARED
+```
+
+Until `docs/native-m6/INJECTION-AUTHORIZATION.md` exists AND contains that
+literal line, every Phase 3+ task in the M6 plan refuses with
+`RESULT: injection-gated` and stops. The gate is absolute (§9 rule 9).
+
+Removing the line (or the file) re-closes the gate.

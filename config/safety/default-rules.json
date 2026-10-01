@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "rule_set_version": "2026-07-16.1",
+  "anti_cheat_indicators": [
+    "EasyAntiCheat",
+    "EAC",
+    "BattlEye",
+    "BEService",
+    "Vanguard",
+    "vgk.sys",
+    "nProtect",
+    "GameGuard",
+    "Xigncode",
+    "PunkBuster",
+    "FairFight",
+    "Denuvo Anti-Cheat",
+    "Ricochet"
+  ],
+  "online_only_flags": [
+    "online-only",
+    "always-online",
+    "requires-online",
+    "server-authoritative",
+    "live-service-only"
+  ],
+  "storefront_drm_indicators": [
+    "Denuvo",
+    "SteamStub",
+    "Arxan",
+    "VMProtect-storefront",
+    "EpicOnlineServices-drm"
+  ],
+  "rules": [
+    {
+      "game_id": "vrclient-smoke-host",
+      "controlled_smoke_target": true,
+      "allow_offline": true,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "phase3-smoke-adapter",
+      "allowed_launch_modes": [
+        "offline",
+        "single_player"
+      ],
+      "acceptable_modding_postures": [
+        "official",
+        "community-supported",
+        "unsupported",
+        "unknown"
+      ]
+    },
+    {
+      "game_id": "repo",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "vrclient-repo-adapter",
+      "allowed_launch_modes": [
+        "private_modded",
+        "private_modded_coop",
+        "single_player"
+      ],
+      "acceptable_modding_postures": [
+        "official",
+        "community-supported"
+      ]
+    },
+    {
+      "game_id": "lethal-company",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "lcvr-orchestrated",
+      "allowed_launch_modes": [
+        "private_modded_coop",
+        "single_player"
+      ],
+      "acceptable_modding_postures": [
+        "community-supported"
+      ]
+    },
+    {
+      "game_id": "peak",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "peakvr-orchestrated",
+      "allowed_launch_modes": ["private_modded_coop", "single_player"],
+      "acceptable_modding_postures": ["community-supported"]
+    },
+    {
+      "game_id": "content-warning",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "cwvr-orchestrated",
+      "allowed_launch_modes": ["private_modded_coop", "single_player"],
+      "acceptable_modding_postures": ["community-supported"]
+    },
+    {
+      "game_id": "big-walk",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "big-walk-vr-orchestrated",
+      "allowed_launch_modes": ["private_modded_coop"],
+      "acceptable_modding_postures": ["community-supported"]
+    },
+    {
+      "game_id": "rv-there-yet",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "rv-there-yet-uevr",
+      "allowed_launch_modes": ["private_modded_coop", "single_player"],
+      "acceptable_modding_postures": ["community-supported"]
+    },
+    {
+      "game_id": "gta-san-andreas",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "vrclient-gta-sa-legacy-d3d9",
+      "allowed_launch_modes": [
+        "offline",
+        "single_player"
+      ],
+      "acceptable_modding_postures": [
+        "community-supported",
+        "unsupported"
+      ]
+    },
+    {
+      "game_id": "example-anti-cheat-protected",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "example-blocked-adapter",
+      "allowed_launch_modes": [
+        "offline"
+      ],
+      "acceptable_modding_postures": [
+        "unsupported",
+        "unknown"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "template",
+  "game_slug": "game-slug",
+  "title": "Game title VR controls",
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick", "action": "Movement action" },
+        { "slot": "right_stick", "control": "Right stick", "action": "View action" },
+        { "slot": "left_primary", "control": "X", "action": "Left primary action" },
+        { "slot": "left_secondary", "control": "Y", "action": "Left secondary action" },
+        { "slot": "right_primary", "control": "A", "action": "Right primary action" },
+        { "slot": "right_secondary", "control": "B", "action": "Right secondary action" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Left trigger action" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Right trigger action" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Left grip action" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Right grip action" },
+        { "slot": "menu", "control": "Menu", "action": "Menu action" },
+        { "slot": "both_sticks", "control": "Both stick clicks", "action": "Stick chord action" },
+        { "slot": "both_grips", "control": "Both grips", "action": "Grip chord action" }
+      ]
+    }
+  ]
+}

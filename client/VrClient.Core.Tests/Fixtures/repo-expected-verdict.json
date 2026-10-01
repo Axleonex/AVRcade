@@ -1,0 +1,6 @@
+{
+  "game_slug": "repo",
+  "verdict": "Warn",
+  "reason_code": "private_modded_coop_requires_acknowledgement",
+  "message_key": "safety.warn.private_modded_coop"
+}

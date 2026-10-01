@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/uevr-release.schema.json",
+  "title": "VRClient UEVR Release Pin",
+  "type": "object",
+  "required": [
+    "schema", "tool", "author", "pinned_tag", "download_url", "sha256",
+    "injector", "nightly_channel"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "uevr-release/1" },
+    "tool": { "const": "UEVR" },
+    "author": { "const": "praydog" },
+    "pinned_tag": { "type": "string", "minLength": 1 },
+    "download_url": { "type": "string", "pattern": "^https://github\\.com/praydog/UEVR/" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "injector": {
+      "type": "object",
+      "required": ["exe"],
+      "properties": { "exe": { "const": "UEVRInjector.exe" } }
+    },
+    "nightly_channel": {
+      "type": "object",
+      "required": ["pinned_tag", "download_url", "sha256"],
+      "properties": {
+        "pinned_tag": { "type": "string", "pattern": "^nightly-" },
+        "download_url": { "type": "string", "pattern": "^https://github\\.com/praydog/UEVR-nightly/" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

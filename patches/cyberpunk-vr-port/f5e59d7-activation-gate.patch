@@ -1,0 +1,394 @@
+diff --git a/mods/cet/CyberpunkVRPort_Stereo/modules/vrcam_select.lua b/mods/cet/CyberpunkVRPort_Stereo/modules/vrcam_select.lua
+index 20ea026..2ec7d4e 100644
+--- a/mods/cet/CyberpunkVRPort_Stereo/modules/vrcam_select.lua
++++ b/mods/cet/CyberpunkVRPort_Stereo/modules/vrcam_select.lua
+@@ -15,7 +15,8 @@
+ 
+ local VrcamSelect = {
+     selected     = nil,     -- component name from vrcam.json
+-    want         = true,    -- false once the overlay asks for VRCAM off
++    want         = false,   -- enabled only by VRClient's per-process activation state
++    vrActive     = false,
+     appliedName  = nil,     -- what we last actually applied (nil = nothing applied yet)
+     appliedWant  = nil,
+     lastError    = nil,
+@@ -72,6 +73,14 @@ local function readEnableRequest()
+     return nil
+ end
+ 
++local function readVrActivationState()
++    local f = io.open("bridge/vrclient_vr_active.txt", "r")
++    if not f then return false end
++    local body = f:read("*a") or ""
++    f:close()
++    return body:match("^%s*1%s*$") ~= nil
++end
++
+ function VrcamSelect.reload()
+     local name, err = readSelection()
+     VrcamSelect.selected    = name
+@@ -178,6 +187,12 @@ end
+ 
+ function VrcamSelect.init()
+     VrcamSelect.reload()
++    VrcamSelect.vrActive = readVrActivationState()
++    VrcamSelect.want = VrcamSelect.vrActive
++    if not VrcamSelect.vrActive then
++        local wf = io.open("bridge/vrcam_active.txt", "w")
++        if wf then wf:write(""); wf:close() end
++    end
+ end
+ 
+ function VrcamSelect.tick(dt)
+@@ -195,7 +210,7 @@ function VrcamSelect.tick(dt)
+     VrcamSelect.ticksToRetry = RETRY_TICKS
+ 
+     local req = readEnableRequest()
+-    if req ~= nil then VrcamSelect.want = req end
++    if req ~= nil then VrcamSelect.want = VrcamSelect.vrActive and req end
+ 
+     -- Re-apply only when the DESIRED state changed. The old guard compared tostring(player),
+     -- but CET hands out a fresh wrapper on every Game.GetPlayer() call, so that string differed
+diff --git a/mods/redscript/CyberpunkVRPort_NoAnims/vrport_no_anims.reds b/mods/redscript/CyberpunkVRPort_NoAnims/vrport_no_anims.reds
+index 6cbeba9..8d1bd1a 100644
+--- a/mods/redscript/CyberpunkVRPort_NoAnims/vrport_no_anims.reds
++++ b/mods/redscript/CyberpunkVRPort_NoAnims/vrport_no_anims.reds
+@@ -6,6 +6,8 @@
+ 
+ module CyberpunkVRPort.NoAnims
+ 
++native func IsVRClientVrActive() -> Bool;
++
+ // EXPERIMENT (post-sprint pistol twirl): the itemType = -1 sentinel below is NON-VANILLA.
+ // Vanilla always publishes a VALID weapon-type index (ItemType().AnimFeatureIndex()); -1 means
+ // "no weapon type" and was used to force a neutral/empty-hands upper-body pose so the weapon
+@@ -26,6 +28,9 @@ func VRPortPublishNeutralWeaponPose(scriptInterface: ref<StateGameScriptInterfac
+ protected const func GetWeaponEquipDuration(const scriptInterface: ref<StateGameScriptInterface>,
+                                             const stateContext: ref<StateContext>,
+                                             stateMachineInstanceData: StateMachineInstanceData) -> Float {
++  if !IsVRClientVrActive() {
++    return wrappedMethod(scriptInterface, stateContext, stateMachineInstanceData);
++  }
+   return 0.0;
+ }
+ 
+@@ -33,12 +38,18 @@ protected const func GetWeaponEquipDuration(const scriptInterface: ref<StateGame
+ protected const func GetWeaponUnEquipDuration(const scriptInterface: ref<StateGameScriptInterface>,
+                                               stateContext: ref<StateContext>,
+                                               stateMachineInstanceData: StateMachineInstanceData) -> Float {
++  if !IsVRClientVrActive() {
++    return wrappedMethod(scriptInterface, stateContext, stateMachineInstanceData);
++  }
+   return 0.0;
+ }
+ 
+ // No first-equip cinematic (long camera/hand animation the first time each weapon is drawn).
+ @wrapMethod(FirstEquipSystem)
+ public final func HasPlayedFirstEquip(itemID: TweakDBID) -> Bool {
++  if !IsVRClientVrActive() {
++    return wrappedMethod(itemID);
++  }
+   return true;
+ }
+ 
+@@ -114,11 +125,12 @@ public func InstantEquipHACK(stateContext: ref<StateContext>,
+ //    vanilla logic runs, then overwrite the feature with our value last so ours is the one
+ //    that lands for the frame.
+ //
+-//    These reds mods are VR-only installs, so no separate VR gate is needed (matches how the
+-//    rest of this module unconditionally neutralises poses).
++//    Every override below is gated by the native per-process launch contract so an installed
++//    VR package remains behaviorally vanilla when Cyberpunk starts outside VRClient.
+ // ============================================================================================
+ 
+ func VRPortPublishWeaponSprintBlock(scriptInterface: ref<StateGameScriptInterface>) -> Void {
++  if !IsVRClientVrActive() { return; }
+   if !IsDefined(scriptInterface) { return; }
+   let f = new AnimFeature_WeaponSprintBlock();
+   f.active = true;   // true => block the sprint weapon-lower anim => weapon stays UP for VRIK
+@@ -129,6 +141,7 @@ func VRPortPublishWeaponSprintBlock(scriptInterface: ref<StateGameScriptInterfac
+ public func OnEnter(stateContext: ref<StateContext>,
+                     scriptInterface: ref<StateGameScriptInterface>) -> Void {
+   wrappedMethod(stateContext, scriptInterface);
++  if !IsVRClientVrActive() { return; }
+   VRPortPublishWeaponSprintBlock(scriptInterface);
+ }
+ 
+@@ -137,6 +150,7 @@ protected func OnUpdate(timeDelta: Float,
+                         stateContext: ref<StateContext>,
+                         scriptInterface: ref<StateGameScriptInterface>) -> Void {
+   wrappedMethod(timeDelta, stateContext, scriptInterface);
++  if !IsVRClientVrActive() { return; }
+   // Re-publish AFTER vanilla OnUpdate so our active=true wins every frame.
+   VRPortPublishWeaponSprintBlock(scriptInterface);
+ }
+@@ -155,6 +169,7 @@ protected func OnUpdate(timeDelta: Float,
+ public func OnExit(stateContext: ref<StateContext>,
+                    scriptInterface: ref<StateGameScriptInterface>) -> Void {
+   wrappedMethod(stateContext, scriptInterface);
++  if !IsVRClientVrActive() { return; }
+   VRPortPublishWeaponSprintBlock(scriptInterface);
+ }
+ 
+@@ -162,6 +177,7 @@ public func OnExit(stateContext: ref<StateContext>,
+ public func OnForcedExit(stateContext: ref<StateContext>,
+                          scriptInterface: ref<StateGameScriptInterface>) -> Void {
+   wrappedMethod(stateContext, scriptInterface);
++  if !IsVRClientVrActive() { return; }
+   VRPortPublishWeaponSprintBlock(scriptInterface);
+ }
+ 
+@@ -186,17 +202,26 @@ public func OnForcedExit(stateContext: ref<StateContext>,
+ protected final func DisableCameraBobbing(stateContext: ref<StateContext>,
+                                           scriptInterface: ref<StateGameScriptInterface>,
+                                           b: Bool) -> Void {
++  if !IsVRClientVrActive() {
++    wrappedMethod(stateContext, scriptInterface, b);
++    return;
++  }
+   wrappedMethod(stateContext, scriptInterface, true);   // force bob OFF regardless of state
+ }
+ 
+ @wrapMethod(PlayerPuppet)
+ private final func DisableCameraBobbing(b: Bool) -> Void {
++  if !IsVRClientVrActive() {
++    wrappedMethod(b);
++    return;
++  }
+   wrappedMethod(true);
+ }
+ 
+ @wrapMethod(PlayerPuppet)
+ private final func UpdatePlayerSettings() -> Void {
+   wrappedMethod();
++  if !IsVRClientVrActive() { return; }
+   // Re-assert after the vanilla settings read so the menu's head-bob setting can't turn it back on.
+   AnimationControllerComponent.SetInputBool(this, n"disable_camera_bobbing", true);
+   // MELEE CAMERA SHAKE -> 0. The animgraph input 'melee_camera_shake_weight' (vanilla: TweakDB
+@@ -229,6 +254,7 @@ private final func UpdatePlayerSettings() -> Void {
+ @wrapMethod(ReadyEvents)
+ protected func OnTick(timeDelta: Float, stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
+   wrappedMethod(timeDelta, stateContext, scriptInterface);
++  if !IsVRClientVrActive() { return; }
+   let f = new AnimFeature_WeaponHandlingStats();
+   f.weaponRecoil = 0.0;
+   f.weaponSpread = GameInstance.GetStatsSystem(scriptInterface.GetGame())
+diff --git a/mods/cet/CyberpunkVRPort_Stereo/init.lua b/mods/cet/CyberpunkVRPort_Stereo/init.lua
+index 190317d..f4b3cc5 100644
+--- a/mods/cet/CyberpunkVRPort_Stereo/init.lua
++++ b/mods/cet/CyberpunkVRPort_Stereo/init.lua
+@@ -26,10 +26,12 @@ registerForEvent("onInit", function()
+ 
+     -- Bind in CET > Bindings if you edit vrcam.json by hand. The launcher's own writes are picked
+     -- up on the next load anyway; this is for changing the pick without leaving the game.
+-    registerHotkey("vrcam_reload_selection", "VRCAM: re-read vrcam.json", function()
+-        VrcamSel.reload()
+-        print("[Stereo.VRCAM] " .. VrcamSel.status())
+-    end)
++    if type(registerHotkey) == 'function' then
++        registerHotkey("vrcam_reload_selection", "VRCAM: re-read vrcam.json", function()
++            VrcamSel.reload()
++            print("[Stereo.VRCAM] " .. VrcamSel.status())
++        end)
++    end
+ end)
+ 
+ registerForEvent("onUpdate", function(dt)
+diff --git a/mods/cet/CyberpunkVRPort_VRIK/init.lua b/mods/cet/CyberpunkVRPort_VRIK/init.lua
+index 84e8105..4f98402 100644
+--- a/mods/cet/CyberpunkVRPort_VRIK/init.lua
++++ b/mods/cet/CyberpunkVRPort_VRIK/init.lua
+@@ -3,6 +3,17 @@
+ -- controller pose math without spawning props or touching weapons.
+ 
+ local isReady = false
++
++-- RED4ext writes this file for every process before CET initializes. Only a
++-- VRClient child with VRCLIENT_VR_ACTIVE=1 may run the camera/body transform
++-- pump; ordinary Steam/GOG launches retain completely vanilla flat behavior.
++local function readVrActivationState()
++    local f = io.open("vrclient_vr_active.txt", "r")
++    if not f then return false end
++    local body = f:read("*a") or ""
++    f:close()
++    return body:match("^%s*1%s*$") ~= nil
++end
+ local drawEnabled = true
+ local hideNativeArms = false -- kept for UI only; VRFPP hide path is disabled
+ local gizmoScale = 1.0
+@@ -325,7 +336,7 @@ local function drawHandGizmo(dvs, name, hand, bodyColor)
+ end
+ 
+ registerForEvent('onInit', function()
+-    isReady = true
++    isReady = readVrActivationState()
+ end)
+ 
+ local vrTrackingEnabled = false
+@@ -369,16 +380,18 @@ local function ensureObservers()
+     end)
+ end
+ 
+-registerHotkey('ToggleVRHands', 'Toggle VR Hands', function()
+-    vrTrackingEnabled = not vrTrackingEnabled
+-    if vrTrackingEnabled then
+-        pcall(function() Game.InstallVRAnimPoseHook() end)
+-        pcall(function() Game.ArmVRAnimPosePlayer() end)
+-        pcall(function() Game.SetVRBindMode(4) end)  -- 4 = full-arm model-space IK
+-    else
+-        pcall(function() Game.SetVRBindMode(0) end)
+-    end
+-end)
++if type(registerHotkey) == 'function' then
++    registerHotkey('ToggleVRHands', 'Toggle VR Hands', function()
++        vrTrackingEnabled = not vrTrackingEnabled
++        if vrTrackingEnabled then
++            pcall(function() Game.InstallVRAnimPoseHook() end)
++            pcall(function() Game.ArmVRAnimPosePlayer() end)
++            pcall(function() Game.SetVRBindMode(4) end)  -- 4 = full-arm model-space IK
++        else
++            pcall(function() Game.SetVRBindMode(0) end)
++        end
++    end)
++end
+ 
+ -- Mouse-Y disable is now owned by the F10 overlay (Tracking/Camera) via vrik_settings.ini;
+ -- the old CET hotkey was removed so the file poll doesn't fight a manual toggle.
+@@ -389,15 +402,17 @@ local lastCamQuat = nil
+ 
+ 
+ 
+-registerHotkey('LogVRDiag', 'Log VR Hand Diagnostic', function()
+-    if type(SetVRDiagCapture) == 'function' then pcall(function() SetVRDiagCapture(1) end) end
+-    if type(LogVRDiag) == 'function' and lastCamPos and lastCamQuat then
+-        pcall(function()
+-            LogVRDiag(lastCamPos.x, lastCamPos.y, lastCamPos.z,
+-                      lastCamQuat.i, lastCamQuat.j, lastCamQuat.k, lastCamQuat.r)
+-        end)
+-    end
+-end)
++if type(registerHotkey) == 'function' then
++    registerHotkey('LogVRDiag', 'Log VR Hand Diagnostic', function()
++        if type(SetVRDiagCapture) == 'function' then pcall(function() SetVRDiagCapture(1) end) end
++        if type(LogVRDiag) == 'function' and lastCamPos and lastCamQuat then
++            pcall(function()
++                LogVRDiag(lastCamPos.x, lastCamPos.y, lastCamPos.z,
++                          lastCamQuat.i, lastCamQuat.j, lastCamQuat.k, lastCamQuat.r)
++            end)
++        end
++    end)
++end
+ 
+ registerForEvent('onUpdate', function(dt)
+     if not isReady then return end
+diff --git a/src/red4ext_stereo/plugin_main.cpp b/src/red4ext_stereo/plugin_main.cpp
+index 4169f4d..4e2385c 100644
+--- a/src/red4ext_stereo/plugin_main.cpp
++++ b/src/red4ext_stereo/plugin_main.cpp
+@@ -29,6 +29,7 @@
+ #include <windows.h>
+ #include <d3d12.h>
+ #include <atomic>
++#include <cstring>
+ 
+ #include <RED4ext/RED4ext.hpp>
+ 
+@@ -54,6 +55,71 @@ extern "C" ID3D12CommandQueue* CyberpunkVR_GetGameQueue();
+ namespace {
+ 
+ std::atomic<bool> g_started{false};
++std::atomic<bool> g_vrActive{false};
++
++bool ReadVrActivationEnvironment() {
++    char value[8] = {};
++    const DWORD size = GetEnvironmentVariableA("VRCLIENT_VR_ACTIVE", value,
++                                               static_cast<DWORD>(sizeof(value)));
++    return size == 1 && strcmp(value, "1") == 0;
++}
++
++void WriteVrActivationBridgeState(bool active) {
++    char path[MAX_PATH] = {};
++    if (!GetModuleFileNameA(nullptr, path, MAX_PATH)) return;
++    char* slash = strrchr(path, '\\');
++    if (!slash) return;
++    *slash = '\0';
++
++    char bridgeDir[MAX_PATH] = {};
++    strcpy_s(bridgeDir, path);
++    strcat_s(bridgeDir,
++             "\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge");
++    CreateDirectoryA(bridgeDir, nullptr);
++
++    char statePath[MAX_PATH] = {};
++    strcpy_s(statePath, bridgeDir);
++    strcat_s(statePath, "\\vrclient_vr_active.txt");
++    if (FILE* file = fopen(statePath, "w")) {
++        fputs(active ? "1\n" : "0\n", file);
++        fclose(file);
++    }
++
++    // The VRIK CET pump supplies the camera/entity pair used to keep the avatar body
++    // below and behind the HMD. Give it the same per-process contract as VRCAM so a
++    // flat launch remains completely passive while a VRClient launch cannot start
++    // with the body transform feed missing.
++    char vrikDir[MAX_PATH] = {};
++    strcpy_s(vrikDir, path);
++    strcat_s(vrikDir,
++             "\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK");
++    CreateDirectoryA(vrikDir, nullptr);
++
++    char vrikStatePath[MAX_PATH] = {};
++    strcpy_s(vrikStatePath, vrikDir);
++    strcat_s(vrikStatePath, "\\vrclient_vr_active.txt");
++    if (FILE* file = fopen(vrikStatePath, "w")) {
++        fputs(active ? "1\n" : "0\n", file);
++        fclose(file);
++    }
++}
++
++void NativeIsVRClientVrActive(RED4ext::IScriptable*, RED4ext::CStackFrame* frame,
++                              bool* out, int64_t) {
++    frame->code++;
++    if (out) *out = g_vrActive.load();
++}
++
++void PostRegisterTypes() {
++    auto rtti = RED4ext::CRTTISystem::Get();
++    RED4ext::CBaseFunction::Flags flags = {.isNative = true, .isStatic = true};
++    auto function = RED4ext::CGlobalFunction::Create("CyberpunkVRPort.NoAnims.IsVRClientVrActive",
++                                                      "IsVRClientVrActive",
++                                                      &NativeIsVRClientVrActive);
++    function->flags = flags;
++    function->SetReturnType("Bool");
++    rtti->RegisterFunction(function);
++}
+ 
+ // The game hooks (camera, FOV, LoD, DLSS resolution, XInput) on their own thread, exactly as
+ // DllMain used to start them. WorkerThread does its own wait before pattern-scanning.
+@@ -68,6 +134,14 @@ RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::v1::PluginHandle, RED4ext::v1::
+     switch (reason) {
+     case RED4ext::v1::EMainReason::Load: {
+         if (g_started.exchange(true)) break;
++        auto rtti = RED4ext::CRTTISystem::Get();
++        rtti->AddPostRegisterCallback(PostRegisterTypes);
++        const bool vrActive = ReadVrActivationEnvironment();
++        g_vrActive.store(vrActive);
++        WriteVrActivationBridgeState(vrActive);
++        if (!vrActive) {
++            return true;
++        }
+         InitRuntimePaths();
+         Log("=== CyberpunkVRPort red4ext plugin loaded (no dxgi proxy) ===\n");
+         ApplyFirstLaunchGameSettings();
+@@ -94,7 +168,7 @@ RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::v1::PluginHandle, RED4ext::v1::
+ RED4EXT_C_EXPORT void RED4EXT_CALL Query(RED4ext::v1::PluginInfo* info) {
+     info->name = L"CyberpunkVRPort";
+     info->author = L"CyberpunkVRPort";
+-    info->version = RED4EXT_V1_SEMVER(0, 1, 0);
++    info->version = RED4EXT_V1_SEMVER(0, 1, 1);
+     // Matches the loader actually installed here (runtime 1.29.1), which predates API v1 and
+     // skips plugins that declare it outright -- the testbed plugin had to do the same.
+     info->runtime = RED4EXT_V1_RUNTIME_VERSION_INDEPENDENT;
+warning: in the working copy of 'mods/cet/CyberpunkVRPort_Stereo/modules/vrcam_select.lua', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mods/redscript/CyberpunkVRPort_NoAnims/vrport_no_anims.reds', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/red4ext_stereo/plugin_main.cpp', LF will be replaced by CRLF the next time Git touches it

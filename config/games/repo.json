@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "game_id": "repo",
+  "display_name": "R.E.P.O.",
+  "controlled_smoke_target": false,
+  "executable_names": [
+    "REPO.exe"
+  ],
+  "support_policy": {
+    "allowed_sources": [
+      "steam",
+      "manual"
+    ],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "runtime": {
+    "path": "build/phase5-validation/vr_runtime_frame.lib",
+    "sha256": "cc71f56583884755ce5f28c89b52ba71160db0c3ce71746bbd7e0d275cc11ce1",
+    "architecture": "x64"
+  },
+  "builds": [
+    {
+      "build_id": "steam-3241660-build-23363152",
+      "support": "supported",
+      "confidence_threshold": 80,
+      "file_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "412f7cf79cf16888999e22905ca3bb11a6074857efdf8c754073a47ef872317c"
+        }
+      ],
+      "product_versions": [
+        "2022.3.67.7073210",
+        "2022.3.67f2 (6bedba8691df)",
+        "steam-buildid-23363152"
+      ],
+      "signatures": [
+        {
+          "id": "repo-steam-appmanifest-buildid",
+          "pattern": "appid=3241660;buildid=23363152",
+          "confidence": 90
+        }
+      ],
+      "offsets": []
+    }
+  ]
+}

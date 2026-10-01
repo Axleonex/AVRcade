@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-rdr2-adapter",
+  "adapter_version": "0.1.0",
+  "display_name": "VRClient Red Dead Redemption 2 Adapter",
+  "host_api": { "min": "1.0.0", "max": "1.0.0" },
+  "supported_games": ["red-dead-redemption-2"],
+  "supported_builds": [
+    { "game_id": "red-dead-redemption-2", "build_id": "steam-1174180-build-13773296" }
+  ],
+  "activation": "blocked_until_rage_bridge_services",
+  "capabilities": ["rage_bridge", "frame_tick", "config_reload", "fast_restart"],
+  "required_services": ["rage_graphics", "rage_view", "rage_game_state", "rage_input"],
+  "required_exports": [
+    "vrclient_get_adapter_abi",
+    "vrclient_get_adapter_metadata",
+    "vrclient_create_adapter",
+    "vrclient_destroy_adapter"
+  ]
+}

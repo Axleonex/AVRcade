@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "list_id": "avrcade-test-revocations-runtime-2026-06",
+  "revoked_key_ids": [],
+  "revoked_artifacts": [
+    {
+      "artifact_id": "vrclient-runtime-fixture",
+      "sha256": "75566459392040f7b98e95b85741edaded68a2bdd17ed427b2e7251c5cf20020",
+      "reason": "fixture revocation used to prove SIGN-03"
+    }
+  ]
+}

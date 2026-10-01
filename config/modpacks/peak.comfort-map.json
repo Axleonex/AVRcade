@@ -1,0 +1,7 @@
+{
+  "schema": "comfort-map/1",
+  "game_slug": "peak",
+  "cfg_file": "BepInEx/config/com.andrey04o.PeakVR.cfg",
+  "verified_against_cfg": false,
+  "map": {}
+}

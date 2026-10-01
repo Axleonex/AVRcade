@@ -1,0 +1,9 @@
+{
+  "_comment": [
+    "VRClient's first engine-native second-view proof uses the smallest authored VRCAM target.",
+    "The component and virtualCamera names must match the MIT reference asset exactly.",
+    "This is a diagnostic selection, not a final headset-resolution policy."
+  ],
+  "component": "vrcam_1080x1200",
+  "virtualCamera": "vrcam_feed_1080x1200"
+}

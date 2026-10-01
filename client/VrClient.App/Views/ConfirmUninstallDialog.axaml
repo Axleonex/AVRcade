@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VrClient.App.Views.ConfirmUninstallDialog"
+        Width="460" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="Remove VR conversion">
+  <Border Margin="24" Padding="24" Background="{DynamicResource SurfaceBrush}"
+          CornerRadius="8">
+    <StackPanel Spacing="24">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Remove VR conversion?" FontSize="23" FontWeight="SemiBold" />
+        <TextBlock Name="GameNameText" FontSize="16" FontWeight="Medium" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap" MaxWidth="420"
+                   Text="AVRcade will remove the files it installed and restore the normal Steam launch path. Your game and save data stay in place." />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+        <Button Content="Keep VR conversion" Click="Cancel_Click" />
+        <Button Classes="danger" Content="Remove VR conversion" Click="Confirm_Click" />
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

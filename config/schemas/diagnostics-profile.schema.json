@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/diagnostics-profile.schema.json",
+  "title": "VRClient Diagnostics Profile",
+  "type": "object",
+  "required": ["version", "enabled", "logging", "crash_capture", "overlay", "export"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "logging": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "directory",
+        "max_buffer_records",
+        "max_retained_logs",
+        "max_file_bytes",
+        "flush_on_shutdown"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_buffer_records": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_retained_logs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_file_bytes": {
+          "type": "integer",
+          "minimum": 4096
+        },
+        "flush_on_shutdown": {
+          "type": "boolean"
+        }
+      }
+    },
+    "crash_capture": {
+      "type": "object",
+      "required": ["enabled", "directory", "max_recent_records"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_recent_records": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "export": {
+      "type": "object",
+      "required": ["directory", "include_environment", "automatic_upload"],
+      "additionalProperties": false,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "include_environment": {
+          "type": "boolean"
+        },
+        "automatic_upload": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "telemetry_aggregation": {
+      "type": "object",
+      "description": "B7/CRASH-02 local-only aggregate summary controls. Optional and off by default; never authorizes upload.",
+      "required": ["enabled", "local_only", "automatic_upload"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "local_only": {
+          "type": "boolean",
+          "const": true
+        },
+        "automatic_upload": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/orchestrated-game.schema.json",
+  "title": "VRClient Community-Mod Game Route",
+  "type": "object",
+  "required": ["version", "game_id", "display_name", "controlled_smoke_target", "executable_names", "support_policy", "vr_mod", "builds"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "game_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "display_name": { "type": "string", "minLength": 1 },
+    "controlled_smoke_target": { "const": false },
+    "executable_names": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "support_policy": {
+      "type": "object",
+      "required": ["allowed_sources", "target_architecture", "anti_cheat_risk", "online_risk"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_sources": { "type": "array", "minItems": 1, "items": { "enum": ["direct", "manual", "attach", "steam", "epic"] } },
+        "target_architecture": { "enum": ["x64", "x86", "arm64"] },
+        "anti_cheat_risk": { "enum": ["none", "known_safe", "known_risky", "unknown"] },
+        "online_risk": { "enum": ["none", "offline_only", "private_modded_coop", "known_online", "unknown"] }
+      }
+    },
+    "vr_mod": {
+      "type": "object",
+      "required": ["package", "headset_verified_by_vrclient"],
+      "additionalProperties": false,
+      "properties": {
+        "package": { "type": "string", "minLength": 1 },
+        "tested_game_version": { "type": "string", "minLength": 1 },
+        "package_deprecated": { "type": "boolean" },
+        "requires_steamvr": { "type": "boolean" },
+        "headset_verified_by_vrclient": { "type": "boolean" }
+      }
+    },
+    "builds": { "type": "array", "maxItems": 0 }
+  }
+}

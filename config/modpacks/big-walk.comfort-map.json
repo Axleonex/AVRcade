@@ -1,0 +1,7 @@
+{
+  "schema": "comfort-map/1",
+  "game_slug": "big-walk",
+  "cfg_file": "BepInEx/config/BigWalkVR.cfg",
+  "verified_against_cfg": false,
+  "map": {}
+}

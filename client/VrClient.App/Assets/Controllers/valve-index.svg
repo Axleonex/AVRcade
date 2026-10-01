@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="440" viewBox="0 0 320 220">
+  <rect width="320" height="220" fill="#0E1B24"/>
+  <defs>
+    <linearGradient id="indexBody" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3f505a"/><stop offset="1" stop-color="#111d24"/></linearGradient>
+  </defs>
+  <!-- Valve Index / Knuckles: dark elongated bodies, trackpads, and hand straps; no tracking rings. -->
+  <g stroke="#a9c5d1" stroke-width="2.5" stroke-linejoin="round">
+    <path fill="url(#indexBody)" d="M87 27 C50 32 45 76 56 127 L69 190 C73 210 94 210 104 187 L126 112 C139 72 124 24 87 27Z"/>
+    <path fill="url(#indexBody)" d="M233 27 C270 32 275 76 264 127 L251 190 C247 210 226 210 216 187 L194 112 C181 72 196 24 233 27Z"/>
+    <path fill="none" stroke="#65cde8" stroke-width="11" d="M53 116 C81 92 111 106 119 140 C123 158 113 180 98 190"/>
+    <path fill="none" stroke="#65cde8" stroke-width="11" d="M267 116 C239 92 209 106 201 140 C197 158 207 180 222 190"/>
+    <ellipse fill="#243b47" cx="78" cy="77" rx="16" ry="21"/>
+    <ellipse fill="#243b47" cx="242" cy="77" rx="16" ry="21"/>
+    <circle fill="#0a141a" cx="94" cy="53" r="12"/><circle fill="#0a141a" cx="226" cy="53" r="12"/>
+    <circle fill="#5f91a9" cx="106" cy="40" r="7"/><circle fill="#5f91a9" cx="113" cy="57" r="7"/>
+    <circle fill="#5f91a9" cx="214" cy="40" r="7"/><circle fill="#5f91a9" cx="207" cy="57" r="7"/>
+    <circle fill="#5f91a9" cx="95" cy="104" r="6"/><circle fill="#5f91a9" cx="225" cy="104" r="6"/>
+    <path fill="#718f9f" d="M54 33 L74 21 L89 31"/><path fill="#718f9f" d="M266 33 L246 21 L231 31"/>
+    <path fill="#5f91a9" d="M51 123 L45 139 L52 153 L61 142Z"/><path fill="#5f91a9" d="M269 123 L275 139 L268 153 L259 142Z"/>
+  </g>
+  <g fill="white" font-family="Arial, sans-serif" font-size="6" font-weight="700" text-anchor="middle">
+    <text x="106" y="42">A</text><text x="113" y="59">B</text>
+    <text x="214" y="42">A</text><text x="207" y="59">B</text>
+  </g>
+</svg>

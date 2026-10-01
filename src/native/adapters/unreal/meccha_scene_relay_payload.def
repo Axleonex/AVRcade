@@ -1,0 +1,3 @@
+LIBRARY "vrclient_meccha_scene_relay_payload"
+EXPORTS
+    DetourFinishHelperProcess @1

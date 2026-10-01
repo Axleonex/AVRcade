@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-repo-adapter",
+  "adapter_version": "0.1.0",
+  "display_name": "VRClient R.E.P.O. Adapter",
+  "host_api": {
+    "min": "1.0.0",
+    "max": "1.0.0"
+  },
+  "supported_games": [
+    "repo"
+  ],
+  "supported_builds": [
+    {
+      "game_id": "repo",
+      "build_id": "steam-3241660-build-23363152"
+    }
+  ],
+  "capabilities": [
+    "frame_tick",
+    "config_reload",
+    "fast_restart"
+  ],
+  "required_exports": [
+    "vrclient_get_adapter_abi",
+    "vrclient_get_adapter_metadata",
+    "vrclient_create_adapter",
+    "vrclient_destroy_adapter"
+  ]
+}

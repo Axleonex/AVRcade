@@ -1,0 +1,46 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "verified",
+  "game_slug": "cyberpunk-2077",
+  "title": "Cyberpunk 2077 VR controls",
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick", "action": "Move / run", "note": "Push fully forward to sprint" },
+        { "slot": "right_stick", "control": "Right stick", "action": "Turn / look" },
+        { "slot": "right_primary", "control": "A", "action": "Jump / confirm" },
+        { "slot": "right_secondary", "control": "B", "action": "Dodge / cancel" },
+        { "slot": "left_primary", "control": "X", "action": "Interact / reload" },
+        { "slot": "left_secondary", "control": "Y", "action": "Switch weapon" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Fire" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Aim" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Holster / draw weapon" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Crouch / shoulder action" },
+        { "slot": "menu", "control": "Left Menu", "action": "Pause menu" },
+        { "slot": "both_sticks", "control": "Both stick clicks", "action": "Hub / map" },
+        { "slot": "both_grips", "control": "Both grips", "action": "Recenter VR view" }
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index Controllers",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left thumbstick", "action": "Move / run", "note": "Push fully forward to sprint" },
+        { "slot": "right_stick", "control": "Right thumbstick", "action": "Turn / look" },
+        { "slot": "right_primary", "control": "Right A", "action": "Jump / confirm" },
+        { "slot": "right_secondary", "control": "Right B", "action": "Dodge / cancel" },
+        { "slot": "left_primary", "control": "Left A", "action": "Interact / reload" },
+        { "slot": "left_secondary", "control": "Left B", "action": "Switch weapon" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Fire" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Aim" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Holster / draw weapon" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Crouch / shoulder action" },
+        { "slot": "menu", "control": "Left system", "action": "Pause menu" },
+        { "slot": "both_sticks", "control": "Both stick clicks", "action": "Hub / map" },
+        { "slot": "both_grips", "control": "Both grips", "action": "Recenter VR view" }
+      ]
+    }
+  ]
+}

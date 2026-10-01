@@ -1,0 +1,174 @@
+{
+  "schema": "redengine-native/1",
+  "profile_id": "cyberpunk-2077-redengine4-native-steam-20383525",
+  "game": {
+    "slug": "cyberpunk-2077",
+    "display_name": "Cyberpunk 2077",
+    "steam_app_id": "1091500",
+    "steam_buildid_observed": "20383525",
+    "launcher_executable": "REDprelauncher.exe",
+    "shipping_binary": "bin\\x64\\Cyberpunk2077.exe",
+    "executable_sha256_observed": "a7de82945c03e041fc7339fcf9066224d98db2f5d80fea50f7947bb350a60991",
+    "adapter_build_id": "steam-1091500-build-20383525"
+  },
+  "engine": {
+    "family": "redengine",
+    "major": 4,
+    "integration": "red4ext"
+  },
+  "renderer": {
+    "expected_api": "d3d12",
+    "runtime_backend": "d3d12",
+    "observation_state": "game_verified"
+  },
+  "loading": {
+    "mode": "red4ext_plugin",
+    "proxy_dll_forbidden": true,
+    "activation_mode": "per_process_opt_in",
+    "activation_environment": "VRCLIENT_VR_ACTIVE=1",
+    "state": "game_verified"
+  },
+  "dependencies": [
+    {
+      "path": "red4ext\\red4ext.dll",
+      "reason": "RED4ext is the supported native plugin loading seam"
+    },
+    {
+      "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+      "reason": "VRClient's managed Cyberpunk backend uses the MIT engine-aware final-frame and OpenXR stereo plugin"
+    },
+    {
+      "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll",
+      "reason": "The MIT CyberpunkVR Port VRIK plugin owns the player arm-bone pose hook and consumes VRClient controller poses"
+    },
+    {
+      "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil",
+      "reason": "The engine-aware backend loads its pixel shader by this exact name"
+    },
+    {
+      "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil",
+      "reason": "The engine-aware backend loads its vertex shader by this exact name"
+    },
+    {
+      "path": "bin\\x64\\plugins\\cyber_engine_tweaks.asi",
+      "reason": "The isolated VRCAM proof uses CET only to enable one authored camera component"
+    },
+    {
+      "path": "red4ext\\plugins\\Codeware\\Codeware.dll",
+      "reason": "Codeware exposes live REDengine entity components to the CET VRCAM selector"
+    },
+    {
+      "path": "red4ext\\plugins\\ArchiveXL\\ArchiveXL.dll",
+      "reason": "CyberpunkVR Port declares ArchiveXL as a runtime framework dependency"
+    },
+    {
+      "path": "red4ext\\plugins\\TweakXL\\TweakXL.dll",
+      "reason": "CyberpunkVR Port declares TweakXL as a runtime framework dependency"
+    },
+    {
+      "path": "engine\\tools\\scc.exe",
+      "reason": "redscript is required to compile RED4ext and gameplay script extensions"
+    },
+    {
+      "path": "archive\\pc\\mod\\cyberpunkvrport.archive",
+      "reason": "MIT reference asset supplies disabled REDengine render-to-texture camera components"
+    },
+    {
+      "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds",
+      "reason": "MIT comfort slice disables locomotion head bob, melee camera shake, recoil kick, and sprint weapon-lower animation that conflict with HMD/controller tracking"
+    },
+    {
+      "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua",
+      "reason": "MIT selector enables the single low-resolution VRCAM chosen by VRClient"
+    },
+    {
+      "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua",
+      "reason": "VR-gated transform pump publishes the player camera/entity pair required to keep the avatar body aligned below and behind the HMD"
+    },
+    {
+      "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua",
+      "reason": "VR-gated HUD safe-area controller moves tutorial, alert, minimap, quest, and action widgets into a readable headset-centered region"
+    },
+    {
+      "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini",
+      "reason": "VRClient centered HUD preset is persisted independently from flat-screen game settings"
+    }
+  ],
+  "conflicts": [
+    {
+      "path": "bin\\x64\\dxgi.dll",
+      "reason": "DXGI proxy VR/render hooks can duplicate or recurse with the RED4ext bridge"
+    },
+    {
+      "path": "bin\\x64\\d3d12.dll",
+      "reason": "D3D12 proxy hooks can conflict with VRClient device and queue observation"
+    },
+    {
+      "path": "red4ext\\plugins\\VRClient.REDengine",
+      "reason": "The retired experimental target-histogram bridge must stay outside RED4ext's recursive DLL scan tree"
+    }
+  ],
+  "conversion": {
+    "stereo_method": "engine_second_view",
+    "ownership": {
+      "runtime": "vrclient",
+      "stereo": "vrclient",
+      "camera": "vrclient",
+      "input": "vrclient",
+      "submission": "vrclient"
+    },
+    "capabilities": {
+      "red4ext_bridge": "game_verified",
+      "graphics_bridge": "game_verified",
+      "stereo_views": "game_verified",
+      "head_tracking": "game_verified",
+      "hud": "game_observed",
+      "gamepad_fallback": "planned",
+      "motion_controls": "game_observed"
+    }
+  },
+  "distribution": {
+    "commercial_use": false,
+    "ship_game_assets": false,
+    "upstream_source_license": "MIT",
+    "attribution_required": true,
+    "human_legal_review_required": true
+  },
+  "verification": {
+    "status": "headset_verified",
+    "evidence": [
+      "Architecture researched against RED4ext and the MIT-licensed CyberpunkVR Port 0.1.x reference",
+      "2026-08-04 preflight on X:\\SteamLibrary: Steam build 20383525, Cyberpunk2077.exe SHA-256 a7de82945c03e041fc7339fcf9066224d98db2f5d80fea50f7947bb350a60991",
+      "2026-08-04 preflight found no listed proxy or competing VR-hook conflicts",
+      "RED4ext v1.30.0 archive SHA-256 3A72225C9D2C46C99F4A4159D952B9D24366357C2423EB7EA255C84E9E11C0B0 matched the official release checksum",
+      "VRClient.REDengine.dll SHA-256 505C5DCDF7D29001C5FB5429446D54BD36456806ABBD1009A644A7156C00414D, built against RED4ext.SDK 1.0.0 commit a4a781088a92a8efa890d94fde4efd8985d497c7, passed controlled API v1, Cyberpunk 2.31 (SemVer fields 2.3.1) build-gate, load, unload, and refusal tests",
+      "2026-08-03 23:27:36-23:35:36 local live run: RED4ext v1.30.0 loaded exactly one VRClient.REDengine 0.1.0 plugin, the bridge logged pinned build steam-1091500-build-20383525, and both plugin and loader unloaded cleanly",
+      "Preserved evidence: artifacts/cyberpunk-red4ext/20260803-noop-live/red4ext-2026-08-03-23-27-36.log SHA-256 C4B8B7ADE76B61AAAEEAE553AB09600225D71CE16D1BBE7700F06161D98136CD; vrclient.redengine-2026-08-03-23-27-37.log SHA-256 15C671BE5482D31F0AAFAC7902653BA351F0B59098E94D3C457564596421D6D6",
+      "VRClient.REDengine 0.2.0 controlled D3D12 test used a WARP device, direct queue, HWND swapchain, Present, ResizeBuffers, observation query, and clean detachment; all calls passed through unchanged and exact counters/dimensions were observed",
+      "Installed observer DLL SHA-256 8BE63DF26233DA9CA6E98BDB908EEC588F274B99B56C335C827F46FDA5188789; rollback DLL SHA-256 505C5DCDF7D29001C5FB5429446D54BD36456806ABBD1009A644A7156C00414D",
+      "2026-08-03 23:53:17-2026-08-04 00:41:16 local live graphics run: user confirmed normal behavior; observer captured ready=1, 1920x1080, DXGI format 28, 3 buffers, 320419 presents, and 2 resizes; RED4ext cleanly unloaded the only plugin",
+      "Preserved graphics evidence: artifacts/cyberpunk-red4ext/20260804-d3d12-live/red4ext-2026-08-03-23-53-17.log SHA-256 89DDDF7EBDD9D1C8FD304422280C974035DC1B9025BE74B2F59212C021E3B423; vrclient.redengine-2026-08-03-23-53-18.log SHA-256 65FD6DB3559017C1B25B6735C3329C21025213B81BCCC0B7B2B6C5B4C583A972",
+      "VRClient.REDengine 0.3.0 controlled proof: successful committed and placed 1080x1200 D3D12 render-target allocations were both counted, an unrelated 512x512 allocation was ignored, every call passed through, and all device/swapchain detours detached before unload",
+      "Installed manifest-backed VRCAM proof slice: official CET 1.37.1 archive SHA-256 1855017796A27F518199F5B7D7210EF1DB7A5C5F0AF468C68E04E6E666AD248C plus MIT CyberpunkVR Port asset/selector at commit f5e59d7e81a35ccf71da1e75b34483335e908174; no gameplay/HUD/weapon/OpenXR modules imported",
+      "Installed official Codeware 1.20.3 archive SHA-256 9A53E9B368F1603013985ECB6A8D8715501E46D4C2955832446A658A746E3A0E to expose live REDengine entity components required by the CET selector",
+      "2026-08-04 01:26:53-01:30:04 local VRCAM run: Codeware 1.20.3 and VRClient.REDengine 0.3.0 loaded; CET found 35 authored VRCAM components, enabled exactly vrcam_1080x1200 via Toggle, and published vrcam_feed_1080x1200; VRClient observed 108 successful 1080x1200 D3D12 render-target allocations and 24444 presents; both plugins unloaded cleanly",
+      "Preserved VRCAM evidence: artifacts/cyberpunk-red4ext/20260804-vrcam-engine-view-live/red4ext-2026-08-04-01-26-53.log SHA-256 9E4A885825C352C37845400802ED7D35C3DE077563D1A150E63C0DCAA5AFBB5B; vrclient.redengine-2026-08-04-01-26-56.log SHA-256 E9E07AD6FE1DB871A82804D16652155E2ED30B440C85782E4A75BF9922AADB2F; scripting.log SHA-256 1A0BDBDF30D70AE48A3BE9C9B81D7703906B58F3B63058DDE616F1CE3758E3E4; vrcam_active.txt SHA-256 B873D1AB18D13DFBA662C711337ACA147BE667CBFFBA84097C53A465D7B3E1AE",
+      "VRClient.REDengine 0.4.0 controlled WARP proof: the observer retained the first target-sized sRGB VRCAM color resource, ignored an unrelated RTV, correlated the retained resource's RTV creation exactly once, preserved all D3D12 pass-through calls, and detached every hook cleanly; installed DLL SHA-256 C7051B3B14CBE6D1FB2006C6DA4A385DF18BAB0E574E7A78F8ACF8200430E83C",
+      "2026-08-05 headset diagnosis rejected the experimental RGBA8 resource-histogram path: pre/post-Present captures were byte-identical, inline candidates were black, and headset output was green/black or corrupted pixels rather than the desktop scene",
+      "VRClient switched to the MIT CyberpunkVR Port engine-aware path at source commit f5e59d7e81a35ccf71da1e75b34483335e908174 with its exact RED4ext SDK d02a1f329744cd4e39c6f7f3fdf63053731e1aff and MinHook d94c64d32ea37bc4f5ee47d580709f70c6fb6080 pins",
+      "Pinned CyberpunkVR_Stereo source f5e59d7e81a35ccf71da1e75b34483335e908174 plus VRClient HMD-readiness patch; installed DLL SHA-256 9CB880F24282FB511E965B74E1B5BA8A6A1E20CD379DF9E2F4054A637E012650; this backend identifies the final RenderFinal2D R11G11B10_FLOAT output by REDengine view identity and submits through OpenXR instead of guessing RGBA8 targets",
+      "ArchiveXL 1.27.1, TweakXL 1.11.4, and redscript 0.5.31 were obtained from their maintainers' GitHub releases, scanned with Microsoft Defender, installed without overwriting existing files, and verified byte-for-byte after deployment",
+      "2026-08-05 headset run removed the prior color corruption and proved the engine view path, but VirtualDesktopXR returned XR_ERROR_FORM_FACTOR_UNAVAILABLE (-35) at the plugin's single xrGetSystem call; no OpenXR session was created, so the headset showed only Virtual Desktop and controller input was mistaken for head tracking",
+      "VRClient patch f5e59d7-openxr-hmd-readiness retries only XR_ERROR_FORM_FACTOR_UNAVAILABLE for up to 29.5 seconds, preserves immediate failure for all other errors, logs recovery/timeout evidence, builds cleanly, and passed Microsoft Defender scanning",
+      "2026-08-05 live Oculus Quest 2 run through VirtualDesktopXR: user confirmed immersive stereo and working left/right/up/down HMD tracking; OpenXR submitted two fresh views with 10198 successful submits and 2 misses, both eyes used 1344x1440 recommended images, mirrored runtime FOVs, and camera residual separation tracked the runtime IPD at approximately 0.068 m",
+      "VRClient controller patch f5e59d7-controller-navigation maps the OpenXR menu action to Cyberpunk's actual Pause binding (Xbox Back/Select) and adds a both-thumbstick-click Hub/Map fallback (Xbox Start) for controller profiles whose system action is runtime-reserved; installed DLL SHA-256 BFDE122D65D6878A611E4FB8EF823AD8ABE545325FBC22AA0747F1DB004EC51F",
+      "2026-08-05 installed the pinned upstream NoAnims comfort slice, SHA-256 0E6DCEFDE1C0DE30B2366AA8E6217C516E53BFC8D850C00502483290AB6C6268, after live testing exposed sprint arms/camera motion and punch camera retreat; redscript compiled it successfully at 12:28:16 with no errors, and the user confirmed movement was more comfortable in the subsequent headset run; the script forces camera bob off, zeros the melee camera-shake animgraph weight, blocks sprint weapon-lower animation, and removes presentation-only recoil kick",
+      "2026-08-05 Plan 1 activation contract: VRCLIENT_VR_ACTIVE=1 is the only value that enables stereo/hooks, CET VRCAM, and NoAnims; absent/0 launches stay flat and every process overwrites CET bridge state",
+      "2026-08-05 native validation correction: the RED4ext global is registered with full name CyberpunkVRPort.NoAnims.IsVRClientVrActive and short name IsVRClientVrActive, matching the redscript module-qualified symbol",
+      "2026-08-06 camera/body regression diagnosis: the native log reported that CyberpunkVRPort_VRIK/vrik_settings.ini could not be created because the VRIK CET transform pump was absent; VRClient now requires and per-process-gates that pump so flat launches stay passive while VR launches receive camera/entity alignment data",
+      "2026-08-23 built and installed the MIT CyberpunkVR_Hands VRIK arm-bone plugin at red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll; the exact installed SHA-256 is tracked in the install manifest, pending headset verification of live arm movement",
+      "2026-08-23 stereo/arm safety repair: generic node-dispatch view-data virtual access now fails closed during REDengine camera lifetime transitions; final IPD sign derives from MAIN/VRCAM dispatcher identity instead of camera-hook parity, including vehicle rear-look; VRIK uses true 1:1 controller scale and clamps unreachable wrist targets to calibrated anatomical reach instead of lengthening arm bones"
+      ,"2026-08-23 HUD usability update: the shipped safe area now uses a tighter compact preset, while VRClient writes an untracked per-user Comfortable, Compact, or Hidden mode override; hidden mode collapses gameplay HUD regions without touching flat launches or separate menu layers"
+    ]
+  }
+}

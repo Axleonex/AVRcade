@@ -1,0 +1,57 @@
+{
+  "schema": "uevr-game/1",
+  "game_slug": "rv-there-yet",
+  "game_id": "rv-there-yet",
+  "display_name": "RV There Yet?",
+  "steam_app_id": "3949040",
+  "engine": "unreal",
+  "uevr_channel": "nightly",
+  "executable_names": ["Ride.exe"],
+  "executable_roles": {
+    "launcher_stub": "Ride.exe",
+    "shipping_binary": "Ride/Binaries/Win64/Ride-Win64-Shipping.exe"
+  },
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "uevr_profile": {
+    "release": "config/unreal/uevr-release.json",
+    "required_uevr_channel": "nightly",
+    "rendering_method": "synchronized_sequential",
+    "supported_builds": [],
+    "source": {
+      "repository": "https://github.com/uevr-profiles/repo",
+      "revision": "975fde4c8e3d4ec12883d67a264742cecf4e9496",
+      "profile_id": "a5d68bf1-cb90-09ba-0ef0-659645fb5007",
+      "tree_url": "https://github.com/uevr-profiles/repo/tree/975fde4c8e3d4ec12883d67a264742cecf4e9496/a5d68bf1-cb90-09ba-0ef0-659645fb5007",
+      "license": "not_declared",
+      "redistribution": "user_import_only",
+      "files": [
+        { "path": "ProfileMeta.json", "sha256": "704bf28bfa1a425f4a54bc74e01b0bd26047d5e13e425934b8822dcfcc4590a3", "content_type": "metadata", "disposition": "import" },
+        { "path": "README.md", "sha256": "25f59b0fc7a8bdd26fccfe04ec0d70aea8aa913ea2cc0fd3d11c65b48fe08f9f", "content_type": "documentation", "disposition": "import" },
+        { "path": "cameras.txt", "sha256": "ea92615b01591b49b4ba23041ba34b9c886ff3e043c5ce6c856f31f0cfd62250", "content_type": "camera_config", "disposition": "import" },
+        { "path": "config.txt", "sha256": "0942c8f2361e76d7ca65f2551f3ce50940e1119d45ac8531edbd705bf42ebbfc", "content_type": "uevr_config", "disposition": "import" },
+        { "path": "imgui.ini", "sha256": "dd32c13ea4a0be4d71200f7a67333a3fb6beba4ee9e333f7b8500c9fa2eb0998", "content_type": "imgui_config", "disposition": "import" }
+      ]
+    },
+    "excluded_files": [
+      { "path": "_EXTRAS.zip", "sha256": "206aef1c3fbe18139b63ff174b5460ba6b4cb1f07ab11e92abb4adc5b001ea0d", "reason": "contains a diagnostic log only; not required at runtime" }
+    ],
+    "capabilities": {
+      "headset_stereo": "upstream_claimed_unverified",
+      "head_tracking": "upstream_claimed_unverified",
+      "gamepad": "untested",
+      "motion_controls": "not_present",
+      "private_coop": "untested"
+    },
+    "notes": "Community profile by d_rey86 requires a recent UEVR nightly and provides a quick head-aiming setup. No Lua, plugin DLL, or motion-controller mapping is present. VRClient does not redistribute these unlicensed files; the user must select a locally obtained archive."
+  },
+  "verification": {
+    "injection_stable": false,
+    "headset_t1": false,
+    "profile_status": "unverified",
+    "evidence": null
+  }
+}

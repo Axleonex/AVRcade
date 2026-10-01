@@ -1,0 +1,198 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VrClient.App.ViewModels"
+        x:Class="VrClient.App.Views.FalloutNewVegasSetupDialog"
+        x:DataType="vm:FalloutNewVegasSetupViewModel"
+        Width="980" Height="780" MinWidth="760" MinHeight="620"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="Fallout: New Vegas VR launch options">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="5">
+        <TextBlock Text="Fallout: New Vegas — launch options" FontSize="29" FontWeight="SemiBold" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap" MaxWidth="760"
+                   Text="Choose a VR route. For the ordinary flat game with Vortex mods, use Play in Vortex; AVRcade does not need a third launcher." />
+      </StackPanel>
+      <Button Grid.Column="1" Content="Close" Click="Close_Click" VerticalAlignment="Top" />
+    </Grid>
+
+    <ScrollViewer Grid.Row="1" Margin="0,20" HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="18" Margin="0,0,12,12">
+        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Native VR — no Vortex mods" FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap" Text="Experimental native stereo with no vorpX or mod-manager profile. AVRcade blocks this route if it detects a Vortex deployment or extra physical plugins. Purge New Vegas mods in Vortex first if needed. Manually installed loose files cannot yet be ruled out; headset behavior is unverified." />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="Start Native VR" Command="{Binding StartNativeTestCommand}" />
+              <Button Content="Stop native VR" Command="{Binding StopNativeTestCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="VR with Vortex mods" FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap" Text="Deploy enabled New Vegas mods in Vortex. Its deployed files remain in the game's Data folder; AVRcade syncs active plugins into a separate MO2 VR profile, then launches FNVR motion controls with the native OpenXR adapter. Complete the setup below before launching." />
+            <Button Classes="primary" Content="Launch VR with Vortex"
+                    Command="{Binding LaunchHeadsetTestCommand}" IsEnabled="{Binding CanLaunchWithVortex}" />
+          </StackPanel>
+        </Border>
+        <Expander Header="Set up VR with Vortex and check readiness" IsExpanded="False">
+        <StackPanel Spacing="18">
+        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Isolated profile" FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap" Text="No MO2 profile yet? AVRcade creates a fresh one automatically. Existing profiles and saves stay untouched. This step prepares profile files; missing VR components are listed separately." />
+            <Button Classes="primary" Content="Prepare profile" Command="{Binding ApplyPreparationCommand}"
+                    IsEnabled="{Binding CanPrepare}" />
+          </StackPanel>
+        </Border>
+        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Vortex mods in the VR profile" FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap" Text="Required for VR with Vortex. Deploy and enable New Vegas mods in Vortex first. AVRcade reads the effective plugin list, checks that each plugin is in the game's Data folder, and updates only the isolated MO2 VR profile. It does not change Vortex or copy mod files. Some mods may still be incompatible with VR." />
+            <TextBlock Text="{Binding VortexSyncStatus}" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Preview Vortex sync" Command="{Binding PreviewVortexSyncCommand}"
+                      IsEnabled="{Binding CanPreviewVortexSync}" />
+              <Button Classes="primary" Content="Apply reviewed sync" Command="{Binding ApplyVortexSyncCommand}"
+                      IsEnabled="{Binding CanApplyVortexSync}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Expander Header="Advanced: game and profile locations" IsExpanded="False" IsEnabled="{Binding CanPrepare}">
+        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="eyebrow" Text="GAME AND PROFILE" />
+            <Grid ColumnDefinitions="170,*,Auto" RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,10,Auto">
+              <TextBlock Text="Game folder" VerticalAlignment="Center" />
+              <TextBox Grid.Column="1" Text="{Binding GameDirectory, Mode=TwoWay}" Watermark="Folder containing FalloutNV.exe" />
+              <Button Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseGame_Click" />
+
+              <TextBlock Grid.Row="2" Text="Storefront" VerticalAlignment="Center" />
+              <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Storefronts}"
+                        SelectedItem="{Binding Storefront, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+
+              <TextBlock Grid.Row="4" Text="Mod Organizer" VerticalAlignment="Center" />
+              <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ModOrganizerExecutablePath, Mode=TwoWay}"
+                       Watermark="ModOrganizer.exe" />
+              <Button Grid.Row="4" Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseMo2_Click" />
+
+              <TextBlock Grid.Row="6" Text="Normal profile" VerticalAlignment="Center" />
+              <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding SourceProfileName, Mode=TwoWay}"
+                       Watermark="Optional: leave blank for a fresh profile" />
+              <Button Grid.Row="6" Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseSourceProfile_Click" />
+
+              <TextBlock Grid.Row="8" Text="New VR profile" VerticalAlignment="Center" />
+              <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding VrProfileName, Mode=TwoWay}" />
+            </Grid>
+          </StackPanel>
+        </Border>
+        </Expander>
+
+        <Expander Header="Component locations and official downloads" IsExpanded="False" IsEnabled="{Binding CanPrepare}">
+        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="eyebrow" Text="OPEN-SOURCE VR COMPONENTS" />
+            <Grid ColumnDefinitions="170,*,Auto" RowDefinitions="Auto,10,Auto,10,Auto">
+              <TextBlock Text="FNVR Tracker" VerticalAlignment="Center" />
+              <TextBox Grid.Column="1" Text="{Binding TrackerExecutablePath, Mode=TwoWay}" />
+              <Button Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseTracker_Click" />
+
+              <TextBlock Grid.Row="2" Text="Native adapter" VerticalAlignment="Center" />
+              <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding NativeAdapterExecutablePath, Mode=TwoWay}" />
+              <Button Grid.Row="2" Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseNativeAdapter_Click" />
+
+              <TextBlock Grid.Row="4" Text="SteamVR folder" VerticalAlignment="Center" />
+              <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SteamVrDirectory, Mode=TwoWay}" />
+              <Button Grid.Row="4" Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseSteamVr_Click" />
+            </Grid>
+
+            <CheckBox Content="Use Quest through Virtual Desktop to SteamVR"
+                      IsChecked="{Binding UseVirtualDesktop, Mode=TwoWay}" />
+            <Grid ColumnDefinitions="170,*,Auto" IsVisible="{Binding UseVirtualDesktop}">
+              <TextBlock Text="Virtual Desktop" VerticalAlignment="Center" />
+              <TextBox Grid.Column="1" Text="{Binding VirtualDesktopExecutablePath, Mode=TwoWay}"
+                       Watermark="VirtualDesktop.Streamer.exe" />
+              <Button Grid.Column="2" Margin="8,0,0,0" Content="Browse…" Click="BrowseVirtualDesktop_Click" />
+            </Grid>
+            <Expander Header="Official download pages (opens in your browser)" IsExpanded="False">
+              <WrapPanel Margin="0,10,0,0">
+                <Button Content="MO2" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://github.com/ModOrganizer2/modorganizer/releases/tag/v2.5.2" />
+                <Button Content="FNV 4GB Patcher" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://www.nexusmods.com/newvegas/mods/62552" />
+                <Button Content="xNVSE" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://github.com/xNVSE/NVSE/releases/tag/6.4.8" />
+                <Button Content="JIP LN" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://www.nexusmods.com/newvegas/mods/58277" />
+                <Button Content="ShowOff" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://www.nexusmods.com/newvegas/mods/72541" />
+                <Button Content="FNVR + Tracker" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://github.com/iloveusername/Fallout-New-Virtual-Reality/releases/tag/V2" />
+                <Button Content="SteamVR" Margin="0,0,8,8" Click="OpenUrl_Click"
+                        Tag="https://store.steampowered.com/app/250820/SteamVR/" />
+              </WrapPanel>
+            </Expander>
+          </StackPanel>
+        </Border>
+        </Expander>
+
+        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="3">
+                <TextBlock Classes="eyebrow" Text="READINESS CHECKLIST" />
+                <TextBlock Classes="secondary" Text="NEEDED items must be resolved before AVRcade will launch the test." />
+              </StackPanel>
+              <Button Grid.Column="1" Classes="primary" Content="Check readiness"
+                      Command="{Binding CheckReadinessCommand}" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding Checks}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:FalloutNewVegasCheckViewModel">
+                  <Grid ColumnDefinitions="72,180,*" Margin="0,5">
+                    <Border Background="{DynamicResource GroundBrush}" CornerRadius="4" Padding="6,3"
+                            HorizontalAlignment="Left">
+                      <TextBlock Text="{Binding StateText}" FontSize="11" FontWeight="SemiBold" />
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{Binding Component}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,12,0" />
+                    <TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="eyebrow" Text="HEADSET VERIFICATION" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="When every check passes, use Launch VR with Vortex above. In the headset, verify distinct-eye depth, 6DoF tracking, both controllers, weapon direction, HUD and menus, a disposable save/reload, and a clean exit. VATS remains unsupported." />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="End test session" Command="{Binding StopSessionCommand}"
+                      IsEnabled="{Binding CanStopSession}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        </StackPanel>
+        </Expander>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+            BorderThickness="1" CornerRadius="8" Padding="14,10">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" VerticalAlignment="Center" />
+        <ProgressBar Grid.Column="1" Width="120" Height="4" IsIndeterminate="True"
+                     IsVisible="{Binding Busy}" Margin="16,0,0,0" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

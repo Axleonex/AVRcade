@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VRClient release package manifest",
+  "type": "object",
+  "required": ["schemaVersion", "packages"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["packageId", "version", "channel", "sha256"],
+        "properties": {
+          "packageId": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+          "version": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+          "channel": { "enum": ["stable", "nightly", "rollback"] },
+          "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

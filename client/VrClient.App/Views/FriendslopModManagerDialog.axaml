@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:VrClient.App.Views"
+        x:Class="VrClient.App.Views.FriendslopModManagerDialog"
+        Width="1200" Height="850" MinWidth="800" MinHeight="600"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="Friendslop mods in AVRcade">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="16">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+      <StackPanel Spacing="5">
+        <TextBlock x:Name="Heading" FontSize="24" FontWeight="SemiBold" />
+        <TextBlock x:Name="Instructions" TextWrapping="Wrap" />
+        <Button x:Name="VrModPageButton" Content="Open VR mod page" Click="OpenVrModPage_Click"
+                HorizontalAlignment="Left" />
+      </StackPanel>
+      <Button Grid.Column="1" Margin="10,0,0,0" Content="Detect again" Click="Detect_Click" VerticalAlignment="Center" />
+      <Button Grid.Column="2" Margin="10,0,0,0" Content="Focus manager typing" Click="Focus_Click" VerticalAlignment="Center" />
+      <Button Grid.Column="3" Margin="10,0,0,0" Content="Close" Click="Close_Click" VerticalAlignment="Center" />
+    </Grid>
+    <TextBlock x:Name="Status" Grid.Row="1" Margin="0,12" TextWrapping="Wrap" />
+    <Border Grid.Row="2" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+            Background="{DynamicResource SurfaceBrush}">
+      <views:VortexWindowHost x:Name="ManagerHost" />
+    </Border>
+  </Grid>
+</Window>

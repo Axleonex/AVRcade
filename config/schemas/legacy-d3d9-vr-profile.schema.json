@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/legacy-d3d9-vr-profile.schema.json",
+  "title": "VRClient Legacy D3D9 VR Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "game", "bridge", "mod_surface", "safety", "conversion", "verification"],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schema": { "const": "legacy-d3d9-vr/1" },
+    "game": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "display_name", "executable_name", "required_architecture", "renderer", "executable_sha256_observed"],
+      "properties": {
+        "slug": { "const": "gta-san-andreas" },
+        "display_name": { "const": "Grand Theft Auto: San Andreas" },
+        "executable_name": { "const": "gta_sa.exe" },
+        "required_architecture": { "const": "x86" },
+        "renderer": { "const": "d3d9-renderware" },
+        "executable_sha256_observed": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+      }
+    },
+    "bridge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "path", "sha256", "architecture"],
+      "properties": {
+        "status": { "enum": ["required", "pinned"] },
+        "path": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+        "sha256": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }] },
+        "architecture": { "const": "x86" }
+      }
+    },
+    "mod_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_globs", "directories"],
+      "properties": {
+        "file_globs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "directories": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "anti_cheat_risk", "online_risk", "direct_online_launch", "game_files_owned_by_user"],
+      "properties": {
+        "source": { "const": "manual" },
+        "anti_cheat_risk": { "const": "none" },
+        "online_risk": { "const": "offline_only" },
+        "direct_online_launch": { "const": false },
+        "game_files_owned_by_user": { "const": true }
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mod_coexistence", "game_files_mutated_by_vrclient", "required_bridge_capabilities", "ownership"],
+      "properties": {
+        "status": { "const": "bridge_required" },
+        "mod_coexistence": { "const": "preserve_existing_asi_surface" },
+        "game_files_mutated_by_vrclient": { "const": false },
+        "required_bridge_capabilities": { "type": "array", "items": { "type": "string" } },
+        "ownership": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runtime", "stereo", "camera", "input", "submission"],
+          "properties": {
+            "runtime": { "const": "vrclient" },
+            "stereo": { "const": "vrclient" },
+            "camera": { "const": "vrclient" },
+            "input": { "const": "vrclient" },
+            "submission": { "const": "vrclient" }
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "headset_verified", "evidence"],
+      "properties": {
+        "status": {
+          "enum": [
+            "game_identity_observed_bridge_missing",
+            "game_identity_observed_bridge_pinned_headset_pending"
+          ]
+        },
+        "headset_verified": { "const": false },
+        "evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+diff --git a/src/red4ext_stereo/plugin_main.cpp b/src/red4ext_stereo/plugin_main.cpp
+--- a/src/red4ext_stereo/plugin_main.cpp
++++ b/src/red4ext_stereo/plugin_main.cpp
+@@ -30,10 +30,11 @@
+ #include <d3d12.h>
+ #include <atomic>
+ #include <cstring>
+ 
+ #include <RED4ext/RED4ext.hpp>
++#include "openxr_manager.h"
+ 
+ extern void Log(const char* fmt, ...);
+ 
+ // Runtime paths (log file, vrport.ini, CET mod folders). Was called from DllMain.
+ extern void InitRuntimePaths();
+@@ -157,10 +158,15 @@
+         CyberpunkVRPort_PluginBootstrap();
+         StartWorkerThread();
+         break;
+     }
+     case RED4ext::v1::EMainReason::Unload:
++        if (g_vrActive.exchange(false)) {
++            Log("CyberpunkVRPort: stopping OpenXR before plugin unload.\n");
++            OpenXRManager::Get().Shutdown();
++            WriteVrActivationBridgeState(false);
++        }
+         Log("=== CyberpunkVRPort red4ext plugin unloaded ===\n");
+         break;
+     }
+     return true;
+ }
+diff --git a/src/vr/openxr/openxr_manager.cpp b/src/vr/openxr/openxr_manager.cpp
+--- a/src/vr/openxr/openxr_manager.cpp
++++ b/src/vr/openxr/openxr_manager.cpp
+@@ -1504,14 +1504,20 @@
+ // [OnPresent() moved to openxr_present.cpp]
+ 
+ 
+ void OpenXRManager::Shutdown() {
+     std::lock_guard<std::mutex> initLock(m_initMutex);
++    Log("OpenXRManager: Shutdown starting.\n");
+     m_stopFrameThread.store(true, std::memory_order_relaxed);
+     NotifySubmitThread();   // wake the parked thread so it observes the stop flag
+     if (m_frameThread) {
+-        WaitForSingleObject(m_frameThread, 2000);
++        const DWORD waitResult = WaitForSingleObject(m_frameThread, 5000);
++        if (waitResult != WAIT_OBJECT_0) {
++            Log("OpenXRManager: submit thread did not stop (wait=%lu); retaining XR resources during process exit.\n",
++                waitResult);
++            return;
++        }
+         CloseHandle(m_frameThread);
+         m_frameThread = nullptr;
+     }
+ 
+     if (m_viewSpace != XR_NULL_HANDLE) {
+@@ -1522,15 +1528,10 @@
+         xrDestroySpace(m_localSpace);
+         m_localSpace = XR_NULL_HANDLE;
+     }
+ 
+     EndSession();
+-
+-    if (m_session != XR_NULL_HANDLE) {
+-        xrDestroySession(m_session);
+-        m_session = XR_NULL_HANDLE;
+-    }
+ 
+     for (auto& eye : m_eyeSwapchains) {
+         if (eye.handle != XR_NULL_HANDLE) {
+             xrDestroySwapchain(eye.handle);
+             eye.handle = XR_NULL_HANDLE;
+@@ -1539,10 +1540,14 @@
+             xrDestroySwapchain(eye.depthHandle);
+             eye.depthHandle = XR_NULL_HANDLE;
+         }
+     }
+     m_eyeSwapchains.clear();
++    if (m_session != XR_NULL_HANDLE) {
++        xrDestroySession(m_session);
++        m_session = XR_NULL_HANDLE;
++    }
+     m_views.clear();
+     m_viewConfigViews.clear();
+     m_runtimeIsSteamVR.store(false, std::memory_order_relaxed);
+ 
+     if (m_fenceEvent) {

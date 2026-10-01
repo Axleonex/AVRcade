@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "modpack-spec/1",
+  "type": "object",
+  "required": ["schema", "game_slug", "steam_app_id", "community", "mods"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "modpack-spec/1" },
+    "game_slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "steam_app_id": { "type": "string", "pattern": "^[0-9]+$" },
+    "community": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "mods": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["namespace", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "namespace": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

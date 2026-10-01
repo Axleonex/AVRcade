@@ -1,0 +1,7 @@
+[ { "name":"BepInExPack","full_name":"BepInEx-BepInExPack","owner":"BepInEx","is_deprecated":false,
+    "versions":[{"version_number":"5.4.2100","full_name":"BepInEx-BepInExPack-5.4.2100",
+    "download_url":"https://example.invalid/bepinex.zip","dependencies":[],"file_size":1000}] },
+  { "name":"DemoVR","full_name":"DemoAuthor-DemoVR","owner":"DemoAuthor","is_deprecated":false,
+    "versions":[{"version_number":"1.0.0","full_name":"DemoAuthor-DemoVR-1.0.0",
+    "download_url":"https://example.invalid/demovr.zip",
+    "dependencies":["BepInEx-BepInExPack-5.4.2100"],"file_size":2000}] } ]

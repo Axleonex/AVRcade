@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "enabled": true,
+  "logging": {
+    "enabled": true,
+    "directory": "logs/diagnostics",
+    "max_buffer_records": 4096,
+    "max_retained_logs": 8,
+    "max_file_bytes": 4194304,
+    "flush_on_shutdown": true
+  },
+  "crash_capture": {
+    "enabled": true,
+    "directory": "logs/crashes",
+    "max_recent_records": 32
+  },
+  "overlay": {
+    "enabled": false
+  },
+  "export": {
+    "directory": "diagnostic-exports",
+    "include_environment": true,
+    "automatic_upload": false
+  },
+  "telemetry_aggregation": {
+    "enabled": false,
+    "local_only": true,
+    "automatic_upload": false
+  }
+}

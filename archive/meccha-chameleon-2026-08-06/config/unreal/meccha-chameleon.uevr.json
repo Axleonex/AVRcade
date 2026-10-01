@@ -1,0 +1,46 @@
+{
+  "schema": "uevr-game/1",
+  "game_slug": "meccha-chameleon",
+  "game_id": "meccha-chameleon",
+  "display_name": "MECCHA CHAMELEON",
+  "steam_app_id": "4704690",
+  "engine": "unreal",
+  "uevr_channel": "nightly",
+  "engine_version": "UE 5.6 (++UE5+Release-5.6-CL-44394996, read from exe metadata 2026-07-11) - EXCEEDS stable UEVR 1.05's 5.4 ceiling: the NIGHTLY channel is REQUIRED (see uevr-release.json nightly_channel)",
+  "steam_buildid_observed": "24149874",
+  "install_observed": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MECCHA CHAMELEON (default C: library; SteamLibraryScanner resolves any library via libraryfolders.vdf)",
+  "executable_names": ["PenguinHotel.exe"],
+  "executable_roles": {
+    "launcher_stub": "PenguinHotel.exe",
+    "shipping_binary": "Chameleon\\Binaries\\Win64\\PenguinHotel-Win64-Shipping.exe",
+    "note": "Steam starts the launcher stub (UE project name is 'PenguinHotel'); the shipping binary is the real game process UEVR must ATTACH to"
+  },
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "anti_cheat_risk": "none",
+    "anti_cheat_evidence": "defensive research 2026-07-10: no dedicated anti-cheat, no VAC/EAC/BattlEye; EOS matchmaking; enforcement is report-based",
+    "online_risk": "private_modded_coop",
+    "online_note": "public lobbies exist and are cheater-report hostile - modded play is PRIVATE FRIEND ROOMS ONLY (user directive 2026-07-10: private co-op is the default posture)"
+  },
+  "uevr_profile": {
+    "release": "config/unreal/uevr-release.json",
+    "rendering_method": "TBD at headset QA (native_stereo preferred, synced_sequential fallback)",
+    "notes": "first milestone tier T1: stereo + head tracking in a private room; motion controls are per-profile follow-up work"
+  },
+  "verification": {
+    "injection_stable": false,
+    "headset_t1": false,
+    "profile_status": "unverified",
+    "head_bone": null,
+    "paint_mode_property": null,
+    "evidence": null
+  },
+  "gates_before_first_inject": [
+    "DONE 2026-07-11: game installed (C: default library, buildid 24149874)",
+    "DONE 2026-07-11: executable_names filled (PenguinHotel launcher stub + Win64-Shipping attach target)",
+    "DONE 2026-07-11: UE version read = 5.6 -> nightly channel selected and hash-pinned",
+    "build the orchestration increment (uevr-fetch + launch -> --attach flow)",
+    "confirm UEVRInjector --attach argument syntax against the running game",
+    "headset QA session in a PRIVATE room (T1 = stereo + head tracking)"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/safety-rules.schema.json",
+  "title": "VRClient Safety Rule Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "rule_set_version",
+    "anti_cheat_indicators",
+    "online_only_flags",
+    "storefront_drm_indicators",
+    "rules"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "rule_set_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Independently deliverable rule-set version (SAFE-03). Bump on any rule data change; this string is recorded in safety diagnostics for traceability."
+    },
+    "anti_cheat_indicators": {
+      "type": "array",
+      "description": "DEFENSIVE config-only list of known anti-cheat product/service/module name fragments used to RECOGNIZE risky targets and BLOCK. Never used to disable, hide from, patch, or bypass anti-cheat.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "online_only_flags": {
+      "type": "array",
+      "description": "Known online-only / always-online mode flag fragments observable without evasion.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "storefront_drm_indicators": {
+      "type": "array",
+      "description": "Known storefront DRM wrapper/module name fragments observable without evasion.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "game_id",
+          "controlled_smoke_target",
+          "allow_offline",
+          "allow_warn_on_uncertain",
+          "allowed_launch_modes",
+          "acceptable_modding_postures"
+        ],
+        "allOf": [
+          {
+            "description": "Autonomy floor: only the controlled smoke target may auto-approve. A non-smoke entry MUST NOT set allow_offline:true, mirroring the B2 hook-discovery safety gate, so this engine's auto-Allow path cannot disagree with the B2 gate's refusal.",
+            "if": {
+              "properties": {
+                "allow_offline": {
+                  "const": true
+                }
+              },
+              "required": ["allow_offline"]
+            },
+            "then": {
+              "properties": {
+                "controlled_smoke_target": {
+                  "const": true
+                }
+              },
+              "required": ["controlled_smoke_target"]
+            }
+          }
+        ],
+        "properties": {
+          "game_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "controlled_smoke_target": {
+            "type": "boolean"
+          },
+          "allow_offline": {
+            "type": "boolean"
+          },
+          "allow_warn_on_uncertain": {
+            "type": "boolean"
+          },
+          "adapter_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowed_launch_modes": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Launch modes this entry permits. An EMPTY list is rejected: the engine treats an empty allow-list as permitting NO launch mode (least-permissive / default-block), so a shipped rule must explicitly list every permitted mode.",
+            "items": {
+              "enum": [
+                "offline",
+                "private_modded",
+                "private_modded_coop",
+                "single_player"
+              ]
+            }
+          },
+          "acceptable_modding_postures": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Modding postures acceptable for this entry (a favorable signal only; never overrides identity/anti-cheat/online/launch-mode). An EMPTY list is rejected: the engine treats an empty list as 'no posture acceptable' (forces Warn), so the permissive vs restrictive choice must be made explicitly in data.",
+            "items": {
+              "enum": [
+                "official",
+                "community-supported",
+                "unsupported",
+                "unknown",
+                "conflicting-with-integrity-policy"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

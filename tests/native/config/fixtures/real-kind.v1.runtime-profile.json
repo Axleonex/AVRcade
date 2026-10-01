@@ -1,0 +1,4 @@
+{
+  "version": 1,
+  "note": "Minimal version-only stand-in for a real runtime-profile doc. B5 negotiation only inspects the integer 'version' field; this fixture asserts a real-kind v1 doc decides LOAD. It is NOT a full runtime-profile (that lives at config/defaults/runtime-profile.json and is validated by its own schema)."
+}

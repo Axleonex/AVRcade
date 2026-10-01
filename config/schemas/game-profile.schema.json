@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/game-profile.schema.json",
+  "title": "VRClient Game Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "profile_id", "input", "comfort", "hud"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["motion_aim_mode", "dominant_hand", "handedness_swap", "actions"],
+      "properties": {
+        "motion_aim_mode": {
+          "type": "string",
+          "enum": ["controller", "head", "hybrid"]
+        },
+        "dominant_hand": {
+          "type": "string",
+          "enum": ["left", "right"]
+        },
+        "handedness_swap": {
+          "type": "boolean"
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "binding", "gamepad_binding", "gamepad_fallback", "dead_zone"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "move_x",
+                  "move_y",
+                  "turn_x",
+                  "interact",
+                  "menu",
+                  "hub_menu",
+                  "recenter",
+                  "comfort_snap_turn",
+                  "comfort_vignette_toggle"
+                ]
+              },
+              "binding": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gamepad_binding": {
+                "type": "string",
+                "minLength": 1
+              },
+              "gamepad_fallback": {
+                "type": "boolean"
+              },
+              "dead_zone": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "comfort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preset",
+        "snap_turn",
+        "smooth_turn",
+        "vignette",
+        "seated_standing",
+        "world_scale",
+        "recenter"
+      ],
+      "properties": {
+        "preset": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snap_turn": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "degrees"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "degrees": { "type": "number", "minimum": 15.0, "maximum": 90.0 }
+          }
+        },
+        "smooth_turn": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "degrees_per_second"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "degrees_per_second": { "type": "number", "minimum": 30.0, "maximum": 360.0 }
+          }
+        },
+        "vignette": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "strength"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "strength": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          }
+        },
+        "seated_standing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "height_offset_m"],
+          "properties": {
+            "mode": { "type": "string", "enum": ["seated", "standing"] },
+            "height_offset_m": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+          }
+        },
+        "world_scale": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.0
+        },
+        "recenter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "hud": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coordinate_convention", "anchors"],
+      "properties": {
+        "coordinate_convention": {
+          "type": "string",
+          "const": "row_major_right_handed_meters_forward_negative_z"
+        },
+        "anchors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "element_id",
+              "template_data",
+              "anchor_mode",
+              "visibility_rule",
+              "depth_m",
+              "scale",
+              "offset",
+              "curvature"
+            ],
+            "properties": {
+              "element_id": { "type": "string", "minLength": 1 },
+              "template_data": { "type": "boolean" },
+              "anchor_mode": { "type": "string", "enum": ["head_locked", "world_locked"] },
+              "visibility_rule": {
+                "type": "string",
+                "enum": ["always", "when_gameplay", "when_menu"]
+              },
+              "depth_m": { "type": "number", "exclusiveMinimum": 0.0, "maximum": 10.0 },
+              "scale": { "type": "number", "exclusiveMinimum": 0.0, "maximum": 10.0 },
+              "offset": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["x_m", "y_m", "z_m"],
+                "properties": {
+                  "x_m": { "type": "number", "minimum": -10.0, "maximum": 10.0 },
+                  "y_m": { "type": "number", "minimum": -10.0, "maximum": 10.0 },
+                  "z_m": { "type": "number", "minimum": -10.0, "maximum": 10.0 }
+                }
+              },
+              "curvature": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

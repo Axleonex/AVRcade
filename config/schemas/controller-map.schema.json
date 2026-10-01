@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/controller-map.schema.json",
+  "title": "VRClient Per-Game Controller Reference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "verification_state", "game_slug", "title", "devices"],
+  "allOf": [{
+    "if": { "properties": { "verification_state": { "const": "source_verified" } } },
+    "then": { "required": ["conversion_credit", "note"] }
+  }],
+  "properties": {
+    "schema": { "const": "controller-map/1" },
+    "verification_state": { "type": "string", "enum": ["template", "verified", "source_verified"] },
+    "note": { "type": "string", "minLength": 1 },
+    "game_slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "conversion_credit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["creator", "project", "project_url", "controls_url"],
+      "properties": {
+        "creator": { "type": "string", "minLength": 1 },
+        "project": { "type": "string", "minLength": 1 },
+        "project_url": { "type": "string", "pattern": "^https://" },
+        "controls_url": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "display_name", "bindings"],
+        "properties": {
+          "id": { "type": "string", "enum": ["quest-touch", "valve-index"] },
+          "display_name": { "type": "string", "minLength": 1 },
+          "bindings": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["slot", "control", "action"],
+              "properties": {
+                "slot": {
+                  "type": "string",
+                  "enum": [
+                    "left_stick", "right_stick",
+                    "left_primary", "left_secondary",
+                    "right_primary", "right_secondary",
+                    "left_trigger", "right_trigger",
+                    "left_grip", "right_grip",
+                    "menu", "both_sticks", "both_grips"
+                  ]
+                },
+                "control": { "type": "string", "minLength": 1 },
+                "action": { "type": "string", "minLength": 1 },
+                "note": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

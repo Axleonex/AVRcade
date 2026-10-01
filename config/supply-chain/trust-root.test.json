@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "root_id": "avrcade-test-root-2026-06",
+  "root_version": "2026-06-16.1",
+  "trusted_keys": [
+    {
+      "key_id": "avrcade-test-signing-rsa-2026-06",
+      "algorithm": "rsa-pkcs1-sha256",
+      "issuer_root_id": "avrcade-test-root-2026-06",
+      "rsa_modulus_hex": "b215cd227c3c737de7066dbe9947ef2ceb40266a28f91da7515206d9f8c821ef5621ba8c8be6a44dd22ffa35130038f2704d4fe02056eb1885d3b9bc03220bd949e4fc2df2c3f077a154e553436cdacda5d21f67bf9d8ea6423eaeecf184ea8f76e610a95bb68804a4afb700a10f6514b6c85cf267cf8dad8c407927d0dbf32676ff47bf7d25bc6a9d2a5bea03e3f96556b75d278184ec0264c5f5dae0c0c0f0b932af28083e726e5c57111b472dac5c763779934c63f76133db28213658f616ea4a0ab26e2dfbeeca73db8de27a820323d91a997253f01cc0f22366dbbfb381066caa44879f20647c54585d915f1eb9c60833d7d8d2d13977003a6e22b06071",
+      "rsa_public_exponent_hex": "010001",
+      "usage": [
+        "artifact-signing"
+      ]
+    }
+  ]
+}

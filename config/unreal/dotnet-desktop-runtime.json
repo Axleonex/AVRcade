@@ -1,0 +1,13 @@
+{
+  "schema": "dotnet-desktop-tool/1",
+  "version": "8.0.29",
+  "release_date": "2026-07-14",
+  "support_phase": "maintenance",
+  "eol_date": "2026-11-10",
+  "runtime_download_url": "https://builds.dotnet.microsoft.com/dotnet/Runtime/8.0.29/dotnet-runtime-8.0.29-win-x64.zip",
+  "runtime_sha512": "e3f31d298a2b674b54c7fc89fb3f06d9645fc5879a54f2ebf2ea20e9ee7ae55f1bfe3284c1f90a591d6be2d6bcd251790ddc27771d65303e7a6a56d331df4632",
+  "desktop_download_url": "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.29/windowsdesktop-runtime-8.0.29-win-x64.zip",
+  "desktop_sha512": "7cf8d7ec8daeb2734dc44e0a06ca5001cdb459ba7534f4821b6a0e918cf4004e45531d5df794885b0a48ffb61658fc4a43ff23a3260fe9bbc1c32f807d422651",
+  "install_dir_convention": "%LOCALAPPDATA%/vrclient/tools/dotnet/8.0.29",
+  "purpose": "App-local supported Windows Desktop runtime for UEVRInjector via DOTNET_ROLL_FORWARD=Major; avoids installing end-of-life .NET 6 system-wide."
+}

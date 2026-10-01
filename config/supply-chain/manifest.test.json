@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "manifest_id": "vrclient-b6-fixture-manifest",
+  "bundle_version": "2026-06-16.1",
+  "artifacts": [
+    {
+      "artifact_id": "vrclient-runtime-fixture",
+      "artifact_type": "runtime-dll",
+      "artifact_version": "0.1.0",
+      "relative_path": "tests/native/supply_chain/fixtures/runtime.dll.fixture",
+      "sha256": "75566459392040f7b98e95b85741edaded68a2bdd17ed427b2e7251c5cf20020",
+      "signatures": [
+        {
+          "key_id": "avrcade-test-signing-rsa-2026-06",
+          "algorithm": "rsa-pkcs1-sha256",
+          "signature": "1293d31b12e6bb597668594e725118d93358d0a2005d05c90b222eb6bfee30823aabac726969218b54cbd98f35dee3b673397cb17364cad3e01d5dca9758d8da716c5d458774b4f9c02125a7a90b7e0c05789144e1192138a580de7f0ee50fe469ee14af1968e3c1af3ace6139436033c44876ef88869f9c372cb663685d1b0d865a80de19d0bc52ba92884f2d8d18e552b862eb1dd729abc7f824cff86beec3b22b371250dc458e0f983fd7e7cd62d045247715468c785fb93da82d8c17ce4e21a76aa0164e3a99e4c05dceffa419b201f111f784c66c43635165863fe9649cf08b5b96487bed9c3df3edb31fac77039c2996297fe3d8aa78a811d273f42af3"
+        }
+      ]
+    },
+    {
+      "artifact_id": "vrclient-adapter-fixture",
+      "artifact_type": "adapter-dll",
+      "artifact_version": "0.1.0",
+      "relative_path": "tests/native/supply_chain/fixtures/adapter.dll.fixture",
+      "sha256": "3496535a9b5b477c71fd0baacffe3307ef16bbf7b8123a6d35da98350de59191",
+      "signatures": [
+        {
+          "key_id": "avrcade-test-signing-rsa-2026-06",
+          "algorithm": "rsa-pkcs1-sha256",
+          "signature": "1d70cef977f980e25c766e84639e063d92eb171e2845bda23ef8dc6c6fdd96a86ed0e6917b361f3f01b66ad1a03cba2ed056dcf5a3f6b9f31560376dcea2458cd421e6300f8c3e276de0ca84035d5ed5d85573d57667200946513fd4e4210a5c01b85121505be615ee0200f0a01d23884e2fb9b3140094ff5cf40c952fc14eaeea35e5d5ee1a43b9a9bb2153d97a22695e2b92b7d592b5f19cbfd0e8efe6b56237227bc4c4c2834cf8934fec2e1844c7a1019f0f15732214dde62be3dcfef4a9d309669fb31d8e2484abc42991a74225345b23a80f1959f27a9572ac3c20489f8b7305818f2970e23e4800fc38324fc266b1ce7b15b68e00a8cd3dec9bb80a7b"
+        }
+      ]
+    },
+    {
+      "artifact_id": "vrclient-config-bundle-fixture",
+      "artifact_type": "config-bundle",
+      "artifact_version": "2026-06-16.1",
+      "relative_path": "tests/native/supply_chain/fixtures/config-bundle.json",
+      "sha256": "f53cea3fb3fa8b4b77c2019ee467f483dbb373a1d9464b613200e594fdce5c15",
+      "signatures": [
+        {
+          "key_id": "avrcade-test-signing-rsa-2026-06",
+          "algorithm": "rsa-pkcs1-sha256",
+          "signature": "1ee3b44a32668f00dec7dd7a7bd84b0388f7398941b3605cf5b6253b82cb642870755f47d9ebc3bea902d2d13824c876d0127021ce93b09cb06423f5a27a77ec0da16de69399a412f3b80532820540e9673b7f90c91087123e43b46d3c14a6e07e63901881f21d45b6b2292ffe9df79cf59ff8b19a1f96ef6b28da070d90796978962151c91f7b14cd21c0da3eb3d2eb1bb671d91eac49421600b9c750ac8402b7a00adabf16576ac5cafe6bc767580715c7c1f14e6e7b23b69d0544b3e7b451cb629aa57a9302036a5b1e52766915ac01539bb938c9ff4ddeb89589cecdbf5ce176442b1542345d0c9fe621d1cd69ed61de17cc018553600f2dee8eb942cd15"
+        }
+      ]
+    }
+  ]
+}

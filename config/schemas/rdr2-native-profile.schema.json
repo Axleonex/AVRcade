@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/rdr2-native-profile.schema.json",
+  "title": "VRClient RDR2 Foundation Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "game", "renderer", "loading", "safety", "mod_profiles", "verification"],
+  "properties": {
+    "schema": { "const": "rdr2-native/1" },
+    "game": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "display_name", "steam_app_id", "launcher_executable", "steam_buildid_observed", "executable_sha256_observed"],
+      "properties": {
+        "slug": { "const": "red-dead-redemption-2" },
+        "display_name": { "const": "Red Dead Redemption 2" },
+        "steam_app_id": { "const": "1174180" },
+        "launcher_executable": { "const": "RDR2.exe" },
+        "steam_buildid_observed": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9]+$" }] },
+        "executable_sha256_observed": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }] }
+      }
+    },
+    "renderer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observation_state"],
+      "properties": { "observation_state": { "enum": ["planned", "game_observed", "game_verified"] } }
+    },
+    "loading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "direct_executable_launch", "online_mode_blocked"],
+      "properties": {
+        "mode": { "const": "steam_owned_launch" },
+        "direct_executable_launch": { "const": false },
+        "online_mode_blocked": { "const": true }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supported_source", "ownership_chain", "allowed_mode", "review_status"],
+      "properties": {
+        "supported_source": { "const": "steam" },
+        "ownership_chain": { "const": ["steam", "rockstar_games_launcher"] },
+        "allowed_mode": { "const": "story" },
+        "review_status": { "enum": ["unknown", "reviewed_story_mode", "blocked"] }
+      }
+    },
+    "mod_profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["storage", "transactional_restore"],
+      "properties": {
+        "storage": { "const": "external_local_app_data" },
+        "transactional_restore": { "const": true }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": { "enum": ["blocked_unpinned", "preflight_ready", "game_observed", "game_verified"] },
+        "evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

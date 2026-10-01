@@ -1,0 +1,287 @@
+{
+  "schema": "vrclient-redengine-install/1",
+  "installed_at_utc": "2026-08-24T01:09:34Z",
+  "last_updated_at_utc": "2026-09-30T22:32:33Z",
+  "game_root": "W:\\SteamLibrary\\steamapps\\common\\Cyberpunk 2077",
+  "cyberpunk": {
+    "steam_buildid": "20383525",
+    "executable_sha256": "a7de82945c03e041fc7339fcf9066224d98db2f5d80fea50f7947bb350a60991"
+  },
+  "packages": [
+    {
+      "name": "RED4ext",
+      "version": "1.30.0",
+      "source": "https://github.com/wopss/RED4ext/releases/tag/v1.30.0",
+      "archive_sha256": "3A72225C9D2C46C99F4A4159D952B9D24366357C2423EB7EA255C84E9E11C0B0",
+      "files": [
+        { "path": "bin\\x64\\winmm.dll", "sha256": "22690F3AC5EFBFA825B758028F114D0E7D83833160716F199C56056DB01FC8BE" },
+        { "path": "red4ext\\LICENSE.txt", "sha256": "A0B08B28AE3931A5A41A1788AAC6C7A391513BFC3599272021EA5B2C1AF2F6F6" },
+        { "path": "red4ext\\RED4ext.dll", "sha256": "59309A78A9606481D13F87E8FBF9EA9C0B735115389DED0295537180C9E52511" },
+        { "path": "red4ext\\THIRD_PARTY_LICENSES.txt", "sha256": "B49E3D32F961C21E0B15F4C9B11DA9455D7C9905A457B1DFA88504F6592220FF" }
+      ]
+    },
+    {
+      "name": "CyberpunkVR Port Stereo (VRClient-managed backend)",
+      "version": "0.1.2+f5e59d7e81a3.vrclient.hmdready1.controls1.activation2.nativefix1.cambody1.usability1.stereosafety1.exitshutdown1",
+      "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+      "license": "MIT",
+      "build_dependencies": {
+        "red4ext_sdk_commit": "d02a1f329744cd4e39c6f7f3fdf63053731e1aff",
+        "minhook_commit": "d94c64d32ea37bc4f5ee47d580709f70c6fb6080"
+      },
+      "files": [
+        { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll", "sha256": "B379E84EDEF521F0195AF571110ED00E6D6443E2DE8F25264F72D43934A0B344" },
+        { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil", "sha256": "8AB2E80B42064C2A04695986374FA7F4611B8444AF84E840C98082DEB4239565" },
+        { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil", "sha256": "AEA0E213A75B6D921E4D86E267A102D859D0A2609A6F58F500E2F77A523EB12E" },
+        { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\LICENSE-CyberpunkVRPort-MIT.txt", "sha256": "A9C100B3B7CB0169E14B1AABE6963F724582A0D40C067ADE516BB12A4BB98E5E" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua", "sha256": "585F911FBC6591F7D61BE4C5CBA0D8E0C28038B913AFA77920BB09EE64546BA1" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua", "sha256": "58AC23EE406D0701CFCE139655E869D08468F0698AE6DB4A5FFE309E835D8888" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua", "sha256": "42834AEC59E73B451ECA49E2BC73BF37E3B4ACC2AE1F05AB6DF3F30B0592F27A" },
+        { "path": "archive\\pc\\mod\\cyberpunkvrport.archive", "sha256": "848AB2743AA0D7E5B243C5E1394990BBC544DAC985B8ADABA5517F046F1B4F37" }
+      ]
+    },
+    {
+      "name": "CyberpunkVR Port NoAnims (VR comfort slice)",
+      "version": "0.1.2+f5e59d7e81a3.activation1.stance1",
+      "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+      "license": "MIT",
+      "files": [
+        { "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds", "sha256": "8C7D407A7EA3D83EB2021908438E9CF1E0C5AAD9277B12DB03536724C8277C0E" }
+      ]
+    },
+    {
+      "name": "CyberpunkVR Port Hands (VRIK arm-bone hook)",
+      "version": "0.1.2+f5e59d7e81a3.vrclient.hands1.reach1",
+      "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+      "license": "MIT",
+      "build_dependencies": {
+        "red4ext_sdk_commit": "d02a1f329744cd4e39c6f7f3fdf63053731e1aff",
+        "minhook_commit": "d94c64d32ea37bc4f5ee47d580709f70c6fb6080"
+      },
+      "files": [
+        { "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll", "sha256": "7D5B502F50708404B059ADC7CE872FA107856590B9BFEDAD3A94384282D09144" }
+      ]
+    },
+    {
+      "name": "CyberpunkVR Port HUD Safe Area (VRClient centered preset)",
+      "version": "0.1.2+f5e59d7e81a3.activation1.compact2.usermodes2",
+      "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+      "license": "MIT",
+      "files": [
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua", "sha256": "5199046B8E5A79A613D1535BE8BD930A41FD239584415839CF7A3338D39871E5" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini", "sha256": "631C6E8E192C2FB60BE037137644A2290C62ED86DEB662A80C9A9D2692FDBB0C" }
+      ]
+    },
+    {
+      "name": "ArchiveXL",
+      "version": "1.27.1",
+      "source": "https://github.com/psiberx/cp2077-archive-xl/releases/tag/v1.27.1",
+      "archive_sha256": "608B7B2FED4C35751CD264A87DCFE9D9074FB6D48458D29BDE955F1C03DC0D5C",
+      "files": [
+        { "path": "red4ext\\plugins\\ArchiveXL\\ArchiveXL.dll", "sha256": "CEE7AACCFEAA19AE2F865BB80E08AFDD63FA1F14968C44C0A0538BF0B8D931B2" }
+      ]
+    },
+    {
+      "name": "TweakXL",
+      "version": "1.11.4",
+      "source": "https://github.com/psiberx/cp2077-tweak-xl/releases/tag/v1.11.4",
+      "archive_sha256": "13033A1F10CB1DBFA534964B22E3405AA33E8F29145F17164D318B021402883F",
+      "files": [
+        { "path": "red4ext\\plugins\\TweakXL\\TweakXL.dll", "sha256": "92AB8134835D83F76BCF38FCD72A76FCC65325D2443063EA87A68252730B3794" }
+      ]
+    },
+    {
+      "name": "redscript",
+      "version": "0.5.31",
+      "source": "https://github.com/jac3km4/redscript/releases/tag/v0.5.31",
+      "archive_sha256": "799BBD88863F6728616F8D723C941EA15DFF71ED5BBFD50C525F0D39EA0BF46B",
+      "files": [
+        { "path": "engine\\tools\\scc.exe", "sha256": "DA2C0DE580173010C907A05FDD2F3CD2430D6E62BF748339D65060118AE32EDD" },
+        { "path": "engine\\tools\\scc_lib.dll", "sha256": "49EB60A3613C990CD13B6136E827A74F9F64AD68E2F911D8C93E4E3D3F53C100" }
+      ]
+    }
+  ],
+  "rollback": {
+    "policy": "Remove only files whose current SHA-256 still matches this manifest; preserve user-modified or unknown files.",
+    "game_was_running_during_install": false,
+    "disabled_folders": [
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-engine-aware-switch\\VRClient.REDengine",
+        "reason": "Retired RGBA8 histogram bridge captured the wrong REDengine render target and produced green/black or corrupted headset output"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-engine-aware-switch\\CyberpunkVRPort_Stereo",
+        "reason": "Preserved the earlier diagnostic selector before installing the exact reference package"
+      }
+    ],
+    "overwritten_files": [
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "558B50ADF580B0A95873DEC0E56784B0D7416B340088EC21A8CC0D108FA0C624",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260930-exit-shutdown\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua",
+        "previous_sha256": "6C11FC6CD67DCDBBABACD88BD7C3F99D3E5936923A55BD401DF464F91E934DF4",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260823-hud-modes2\\init.lua"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua",
+        "previous_sha256": "B7AF35192E134B961FAC49702785513A237E317046DE230A15DAD8F61921818F",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260823-hud-modes1\\init.lua"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini",
+        "previous_sha256": "FB37C860A02B88264AC6BA79638933D750AF8A09D328BB5B96015182EBE44368",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260823-hud-modes1\\hud_layout.ini"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "FE44391E0F89CBDF42EDF6667040F737288F6B58E863000B98F802D8949862DD",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260823-stereo-arm-safety\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll",
+        "previous_sha256": "495E3FA138392CC59FC2F7DCC80625F7311AEDFCD94813422CD3C64A2FC9BE3E",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260823-stereo-arm-safety\\CyberpunkVR_Hands.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "22C1A30F640B65EEEF8E11E7DFC75B167CCBEEE250DAF1F76D136C505170D6F9",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260806-vr-usability\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds",
+        "previous_sha256": "20FA75E0B15834FD2A06730A99A883D9618F1EC883315E1B21C939DD73E7AC44",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260806-vr-usability\\vrport_no_anims.reds"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "FCEE3EA67A43A315D6BACE0D72581DB320A081BD801370B35967C06D28DDB3AA",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260806-vrik-camera-body-gate\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua",
+        "previous_sha256": "08368F2FDE09734C61E55F137BC3840AEF0F1265FF70C385B5CF60B230F13E43",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260806-vrik-camera-body-gate\\CyberpunkVRPort_Stereo.init.lua"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "00AC35A7E8CAC91C6902B3DCEFD98492AD707244F6FA98C18EFEEE0EA77BE722",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-activation-gate\\CyberpunkVR_Stereo.invalid-native.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "BFDE122D65D6878A611E4FB8EF823AD8ABE545325FBC22AA0747F1DB004EC51F",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-activation-gate\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua",
+        "previous_sha256": "7248207D83EEB17EC63559230309F8C32360788A9B3224EF2DFB64FF812F04DD",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-activation-gate\\vrcam_select.lua"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds",
+        "previous_sha256": "0E6DCEFDE1C0DE30B2366AA8E6217C516E53BFC8D850C00502483290AB6C6268",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-activation-gate\\vrport_no_anims.reds"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "9CB880F24282FB511E965B74E1B5BA8A6A1E20CD379DF9E2F4054A637E012650",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-controller-navigation\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "previous_sha256": "58BDF832159AB5E66BA9024C63062DF3275B30A5B8BF5382F7568EB590E13EEB",
+        "backup": "artifacts\\cyberpunk-dependencies\\game-backup-20260805-openxr-hmd-readiness\\CyberpunkVR_Stereo.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "505C5DCDF7D29001C5FB5429446D54BD36456806ABBD1009A644A7156C00414D",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.1.0-live-verified-20260803.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "8BE63DF26233DA9CA6E98BDB908EEC588F274B99B56C335C827F46FDA5188789",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.2.0-d3d12-game-verified-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "FE8DA05B5BB4DF404EF1B3846A9C459CF0DD49BEEE70407D40A6BBDF18D94BA2",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.3.0-vrcam-game-observed-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "C7051B3B14CBE6D1FB2006C6DA4A385DF18BAB0E574E7A78F8ACF8200430E83C",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.0-srgb-rejected-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "2B9BA71D00DC06714FFFD6F5DF2F311FF1B14E41E9659CF46B604114EF2504AA",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.1-unorm-histogram-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "614C166C75235389D0DCDC272795F7C9642822BB0B972748AC8D2336A53AEFD7",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.2-rtv-correlation-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "11EBCE6FC53B55AD89D26D1A800F2AEBE70F3E9A82A6B301F55EDD354D1B8362",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.3-om-bindings-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "94FE09776D9DEC0DB855F24C1DEA4A243C6D109A76951EBFE2379AB37BC1CD5A",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.4-resource-lifecycle-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "9BFA834461065F77D1A1A71033EC9D6D251385265BA9E996FE0CB22D8323DE50",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.5-name-copy-identity-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "6E335666E413E1C6937C3ACEE3013DDD4010230420024513B4EFB94CD04DFC5D",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.4.6-vrcam-selector-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "16EE6827305453ABB78DABB004E16BFD4D6E11DF6D177B9B664B74EB6B1C42D8",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.5.0-one-shot-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "25EB3B543C9A71EE7E9209839CF91E1E1E392AF38463106235570A77499FA880",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.0-green-black-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "C6BA00EB3CCBDDF1F54BFD4A30F283C9D2A9E8CFBF256FC211AD8C3D11684535",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.1-color-squares-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "1181731A2DD36D8C595C14EBAA017FC85567D650601D5AC7BE8607B058DE0B2E",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.2-gpu-readback-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "F5A0E45E7B3670D710E2A965A028434FD401A8AB25CA0D7CE2AA0A1DF48C6797",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.3-queue-attribution-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "94E50B041DD101459AAE7C5E5B55E5AD649AB9C1654A55DE8DD85660F952294F",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.4-present-timing-live-20260804.dll"
+      },
+      {
+        "path": "red4ext\\plugins\\VRClient.REDengine\\VRClient.REDengine.dll",
+        "previous_sha256": "671B7E231C49BB93B084D32DAFF1C1EB42A92F4D1E54E105153D2E1CDF99D733",
+        "backup": "artifacts\\cyberpunk-dependencies\\VRClient.REDengine-0.6.5-inline-transition-black-live-20260804.dll"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "game_id": "peak",
+  "display_name": "PEAK",
+  "controlled_smoke_target": false,
+  "executable_names": ["PEAK.exe"],
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "vr_mod": {
+    "package": "Andrey04o-PeakVR",
+    "tested_game_version": "2.4.b",
+    "headset_verified_by_vrclient": false
+  },
+  "builds": []
+}

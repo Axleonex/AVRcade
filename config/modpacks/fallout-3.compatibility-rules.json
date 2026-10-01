@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "game": "fallout-3",
+  "rules": [
+    {
+      "pattern": "enb|reshade|sweetfx|graphics injector",
+      "category": "post-processing",
+      "status": "ConflictsWithDepthVr",
+      "explanation": "A graphics proxy or post-processing injector can compete with the DirectX 9 ReShade depth hook.",
+      "suggested_action": "Preserve all files, use one reviewed proxy chain, and test depth visualization before stereo."
+    },
+    {
+      "pattern": "camera|first.?person|animation|weapon|skeleton|body",
+      "category": "camera-animation",
+      "status": "RequiresVrConfiguration",
+      "explanation": "Camera, skeleton, body and weapon placement can conflict with head-driven view or stereo convergence.",
+      "suggested_action": "Test locomotion, dialogue, VATS, Pip-Boy, terminals, lockpicking and weapon transitions."
+    },
+    {
+      "pattern": "hud|ui|menu|pip.?boy",
+      "category": "hud-menu",
+      "status": "RequiresVrConfiguration",
+      "explanation": "HUD and menu replacements may require scale, convergence or stereo-depth changes.",
+      "suggested_action": "Verify readability in both eyes and preserve a desktop fallback profile."
+    },
+    {
+      "pattern": "fose|script extender|command extender|dll",
+      "category": "fose-plugin",
+      "status": "RequiresVrConfiguration",
+      "explanation": "Native plugins commonly depend on an exact executable and may share hook sites.",
+      "suggested_action": "Require Fallout3.exe 1.7.0.3 and compare every plugin's supported runtime before launch."
+    },
+    {
+      "pattern": "weather|lighting|shadow|water",
+      "category": "rendering",
+      "status": "RequiresVrConfiguration",
+      "explanation": "Rendering changes can alter depth selection, stereo artifacts and performance.",
+      "suggested_action": "Verify depth, shadows, water, interiors and exterior weather transitions."
+    },
+    {
+      "pattern": "texture|lod|landscape",
+      "category": "performance",
+      "status": "LikelyCompatible",
+      "explanation": "Asset replacement is generally compatible but can exceed VR memory and frame-time budgets.",
+      "suggested_action": "Measure frame pacing and reduce texture or LOD load when needed."
+    },
+    {
+      "pattern": "controller|gamepad|input|hotkey",
+      "category": "input",
+      "status": "RequiresVrConfiguration",
+      "explanation": "Input mods can overlap head-to-mouse, gamepad and recenter bindings.",
+      "suggested_action": "Check movement, snap/smooth turning, menus, VATS and recenter bindings."
+    },
+    {
+      "pattern": "launcher|4gb|anniversary|patcher",
+      "category": "launcher-build",
+      "status": "RequiresVrConfiguration",
+      "explanation": "Alternate launchers and executable patchers affect build identity and FOSE startup.",
+      "suggested_action": "Re-run executable identification after every patch and never stack patchers blindly."
+    }
+  ]
+}

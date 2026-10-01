@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/test/demo-config.v1.schema.json",
+  "title": "VRClient Demo Config (SYNTHETIC test-only, v1)",
+  "description": "Test-only synthetic config kind used by Bolt-on Phase B5 to prove the v1->v2 migration chain. NOT a production schema. Never loaded by the runtime. Lives outside config/schemas/ deliberately so it cannot be mistaken for a real kind.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "profile_id",
+    "display_name"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

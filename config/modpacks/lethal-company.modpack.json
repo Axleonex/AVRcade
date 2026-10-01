@@ -1,0 +1,10 @@
+{
+  "schema": "modpack-spec/1",
+  "game_slug": "lethal-company",
+  "steam_app_id": "1966720",
+  "community": "lethal-company",
+  "mods": [
+    { "namespace": "BepInEx", "name": "BepInExPack" },
+    { "namespace": "DaXcess", "name": "LethalCompanyVR" }
+  ]
+}

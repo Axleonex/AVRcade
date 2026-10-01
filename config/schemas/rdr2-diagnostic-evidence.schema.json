@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/rdr2-diagnostic-evidence.schema.json",
+  "title": "VRClient RDR2 Diagnostic Evidence",
+  "type": "object",
+  "required": [
+    "Schema",
+    "Title",
+    "RunId",
+    "SteamBuildId",
+    "ExecutableSha256",
+    "Compatibility",
+    "RendererObservation",
+    "CameraObservation",
+    "RecordedAtUtc"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "Schema": {
+      "type": "string",
+      "const": "vrclient-rdr2-diagnostic/1"
+    },
+    "Title": {
+      "type": "string",
+      "const": "red-dead-redemption-2"
+    },
+    "RunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "SteamBuildId": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "ExecutableSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Compatibility": {
+      "type": "string",
+      "const": "candidate"
+    },
+    "RendererObservation": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "vulkan_candidate",
+        "d3d12_candidate",
+        "vulkan_and_d3d12_candidate",
+        "vulkan_live_candidate",
+        "d3d12_live_candidate",
+        "vulkan_and_d3d12_live_candidate"
+      ]
+    },
+    "CameraObservation": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "native_bridge_candidate",
+        "native_bridge_verified"
+      ]
+    },
+    "RecordedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

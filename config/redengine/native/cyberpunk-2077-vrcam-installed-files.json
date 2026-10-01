@@ -1,0 +1,72 @@
+{
+  "schema": "vrclient-redengine-vrcam-install/1",
+  "installed_at_utc": "2026-08-04T05:22:56Z",
+  "game_root": "X:\\SteamLibrary\\steamapps\\common\\Cyberpunk 2077",
+  "packages": [
+    {
+      "name": "Cyber Engine Tweaks",
+      "version": "1.37.1",
+      "source": "https://github.com/maximegmd/CyberEngineTweaks/releases/tag/v1.37.1",
+      "archive_sha256": "1855017796A27F518199F5B7D7210EF1DB7A5C5F0AF468C68E04E6E666AD248C",
+      "license": "MIT",
+      "files": [
+        { "path": "bin\\x64\\global.ini", "sha256": "C02B09B2CF2CFAB32527EE1A88EE311500C1C2F4C95D20FE0898C9E0407A4D86" },
+        { "path": "bin\\x64\\LICENSE", "sha256": "98C3B6D063066AD2DDDC1A716D6CE5DF8ED63497B0084B248D8D05516C57DBC7" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\materialdesignicons.ttf", "sha256": "BD725A7A38939E5B59904E1B7A7265919ECEC256166ECE69D515C21005165907" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSans-Regular.ttf", "sha256": "4C8D67001D3C2977E5D6BF0A4F8ADD80CD564BD1DF60B7569FD23751E7DDA02A" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansJP-Regular.otf", "sha256": "34B41DE3F65166440EA2CE40121EB1C9B9C2BB92D188BD32A8E6091CD92316DB" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansKR-Regular.otf", "sha256": "29445948E432137E0DE104DEC389E956D72633AA0E4CB04CA572BB8E378E3D35" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansMono-Regular.ttf", "sha256": "97B31969BFE7EBF894C12AFDF6A5DCB6E87E64114697782802FE933E693EACD8" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansSC-Regular.otf", "sha256": "A2B93E6C2DB05D6BBBF6F27D413EC73269735B7B679019C8A5AA9670FF0FFBF2" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansTC-Regular.otf", "sha256": "8D9CD5F210C0204D2A1DDAEAF82DB1071E242126F4E18B9C350D8B1680BAE400" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\fonts\\NotoSansThai-Regular.ttf", "sha256": "F73BE376B0E1704DA118312E202BE49E8AC04A6B2E19B588CDFC2707C7F3E25D" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\scripts\\IconGlyphs\\icons.lua", "sha256": "F52AA193FE7FC562C82FACB18261834BDB30E61CFCA0FEB2EFFBA758F8A2CF80" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\scripts\\json\\json.lua", "sha256": "23031288E528880354D3D4651A9DC299B4C85E28889D9F5AE1DCCA76B3CDC8B1" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\scripts\\json\\LICENSE", "sha256": "F2C7E5EA921F2D0514E229E88AC39E51B3DB50698B270B3A9290B610B7015FDC" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\scripts\\json\\README.md", "sha256": "E71E8C5FA757699655D0D48843EC98B8A777C78819C1EEC623F61027AC4BC5D0" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\ThirdParty_LICENSES", "sha256": "83B9AF1FFCC13F5822AE9BA561969BFFCB8967A05EDFF6F41BF497E6C232FFF0" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\tweakdb\\tweakdbstr.kark", "sha256": "1EFF27BACBAC8BB55A632C8E393BC046E2C991A6F987B9A78A8ED3FC41EB1DB9" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\tweakdb\\usedhashes.kark", "sha256": "5D27963EC0DBC606074586134C6BA44CADCF3754E95991240CB8E9E11268835F" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks.asi", "sha256": "43A7B94698979703F9DFA2B0950607C9A88F53B84BBF09A8E593C7E218D41059" },
+        { "path": "bin\\x64\\version.dll", "sha256": "67565DD7F899C0E4EE3903B1CC8078FF20CA80B8100497C6AC813392E431D443" }
+      ]
+    },
+    {
+      "name": "Codeware",
+      "version": "1.20.3",
+      "source": "https://github.com/psiberx/cp2077-codeware/releases/tag/v1.20.3",
+      "archive_sha256": "9A53E9B368F1603013985ECB6A8D8715501E46D4C2955832446A658A746E3A0E",
+      "license": "MIT",
+      "files": [
+        { "path": "red4ext\\plugins\\Codeware\\Codeware.dll", "sha256": "E5884D3A739B1F5A0C36059C15A53465C88507B2FB1A7B8F0AB9BD920FC7467C" },
+        { "path": "red4ext\\plugins\\Codeware\\Data\\KnownHashes.txt", "sha256": "392E48A8B26154F8D34AA3C1268506D84A2B0BCD3DB1B374DFB9C212383A1C20" },
+        { "path": "red4ext\\plugins\\Codeware\\LICENSE", "sha256": "DCD5CFC3E620A938B674B5B74A18BBA24AC1D8C1353271DAC8599B0620238629" },
+        { "path": "red4ext\\plugins\\Codeware\\Scripts\\Codeware.Global.reds", "sha256": "A773C5DD5D2BCC599BF2748F0BA59094A18286AB85B13F1F1DF9D7C640CE8340" },
+        { "path": "red4ext\\plugins\\Codeware\\Scripts\\Codeware.Localization.reds", "sha256": "3433210C3798A74E22497C53C6641B1E87464EBF8E49FE4A1B05ADF5B15DFBDE" },
+        { "path": "red4ext\\plugins\\Codeware\\Scripts\\Codeware.reds", "sha256": "6E7403E74914E1226D181A83C6BFA0C525E90C9DE115EC06B05CB33F7847BABD" },
+        { "path": "red4ext\\plugins\\Codeware\\Scripts\\Codeware.UI.reds", "sha256": "F95D440D0B477BFC54F3036BA9AEF1F5C14D0AA568D7D1DD32D8ACBE7F473112" },
+        { "path": "red4ext\\plugins\\Codeware\\Scripts\\Codeware.UI.TextInput.reds", "sha256": "B8D310DFB14786202E948C71F842E0C1132719CD6334B79C25D83A0635610BCC" },
+        { "path": "red4ext\\plugins\\Codeware\\THIRD_PARTY_LICENSES", "sha256": "56E48489D42CE6EBBC4EBA4228EBFB422D82D57C79D8FEC84763C3889026020E" }
+      ]
+    },
+    {
+      "name": "CyberpunkVR Port VRCAM proof slice",
+      "version": "git-f5e59d7e81a35ccf71da1e75b34483335e908174",
+      "source": "https://github.com/dariulone/cyberpunk-vr-port",
+      "license": "MIT",
+      "files": [
+        { "path": "archive\\pc\\mod\\cyberpunkvrport.archive", "sha256": "848AB2743AA0D7E5B243C5E1394990BBC544DAC985B8ADABA5517F046F1B4F37" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua", "sha256": "4D48CF25B10AF1E04418B79A552CCAB8DBBD9CC1C5FCF5848BF82C2ACE3FB50F" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua", "sha256": "FE9FE448B0AB0D577156654D0447F9ADA1949F73853C938884BC6BB3011D78DE" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge\\.gitkeep", "sha256": "5A0222EAEFEB791DC68C31D0BADBA2F6FFECADB71EE0C4270F7905E817DF9F9F" },
+        { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\vrcam.json", "sha256": "BC4B964933471D01A49BB2A2BC9564C1215D7D9E0BFEDE547555B8D9A03DFA1C" },
+        { "path": "red4ext\\plugins\\VRClient.REDengine\\THIRD_PARTY_NOTICES.txt", "sha256": "D814E489C22FAED4BEA7FA2B5509C72E1F5113B39504ABE17CB11089EDE4BD08" }
+      ]
+    }
+  ],
+  "rollback": {
+    "policy": "Remove only files whose current SHA-256 still matches this manifest. Preserve generated CET configuration, bindings, logs, user modifications, and unknown files.",
+    "game_was_running_during_install": false,
+    "overwritten_files": []
+  }
+}

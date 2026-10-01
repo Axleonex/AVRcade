@@ -1,0 +1,30 @@
+AVRcade - before you install
+
+AVRcade is a launcher for playing flat PC games in VR. For each supported game
+it offers four ways to play: VR only, VR + mods, Mods without VR, and Vanilla.
+
+Supported games in this release:
+* R.E.P.O., Lethal Company, PEAK, Content Warning and Big Walk, through
+  community Unity VR mods that AVRcade downloads and verifies for you.
+* RV There Yet?, through UEVR and a community profile (experimental).
+* Grand Theft Auto: San Andreas (classic), through AVRcade's own VR bridge
+  (experimental).
+* Cyberpunk 2077: monitor modes work out of the box. "Install VR backend"
+  adds the VR plugins and downloads the modding frameworks they need
+  (experimental; one specific game build).
+
+You provide:
+* The game, owned and installed through Steam.
+* A PC VR headset connection through SteamVR or Virtual Desktop.
+* Optionally a mod manager (r2modman, Thunderstore Mod Manager, Vortex, or the
+  one you already use) for the two modded modes.
+
+AVRcade bundles its own .NET runtime; nothing else needs installing. The
+installer is per-user and does not ask for administrator access.
+
+Safety: VR conversions are mods. Use modded modes only in private sessions
+with friends who agreed to it. AVRcade asks you to confirm before a modded
+launch and refuses games with anti-cheat.
+
+This build is not code-signed yet, so Windows SmartScreen may ask you to
+confirm that you want to run it.

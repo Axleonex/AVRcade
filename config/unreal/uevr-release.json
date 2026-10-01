@@ -1,0 +1,39 @@
+{
+  "schema": "uevr-release/1",
+  "tool": "UEVR",
+  "author": "praydog",
+  "license_constraint": "All rights reserved - user-machine download from the official release ONLY; never bundle, redistribute, or vendor. Honor any author objection immediately.",
+  "pinned_tag": "1.05",
+  "published": "2024-11-16",
+  "download_url": "https://github.com/praydog/UEVR/releases/download/1.05/UEVR.zip",
+  "sha256": "af4f2f91306802d7ee4e8497d483a547ac8e9a3067dbafb81324100524215d3c",
+  "sha256_sidecar_url": "https://github.com/praydog/UEVR/releases/download/1.05/UEVR.zip.sha256",
+  "sha256_sidecar_encoding_note": "sidecar is UTF-16LE with BOM, UPPERCASE hex - decode + lowercase before comparing",
+  "revision": "1a810f69fe4cab82b352c574763959d4390b84ce",
+  "engine_support": "UE 4.8 - 5.4 (newer engines need the UEVR-nightly channel)",
+  "contents_verified_2026_07_11": [
+    "UEVRInjector.exe",
+    "UEVRBackend.dll",
+    "UEVRPluginNullifier.dll",
+    "openvr_api.dll",
+    "openxr_loader.dll",
+    "DISCLAIMER.txt",
+    "LICENSE"
+  ],
+  "injector": {
+    "exe": "UEVRInjector.exe",
+    "cli_attach_flag": "--attach",
+    "cli_syntax_confirmed": "UEVRInjector.exe --attach <ShippingProcessName>.exe (live-verified 2026-07-11)",
+    "requires_dotnet_desktop_runtime": "6.0",
+    "dotnet_note": "framework-dependent .NET 6 Desktop app (live-verified 2026-07-11 on a machine with only 8.0/9.0). Microsoft runtime installers are REDISTRIBUTABLE (unlike UEVR) - deployment design: VRClient installs it ON DEMAND at first Unreal-game use (official Microsoft installer, silent, one UAC prompt), keeping Unity-only installs lean. Until built, it is a documented prerequisite surfaced by uevr-launch's error=uevr_injector_dotnet_missing."
+  },
+  "install_dir_convention": "%LOCALAPPDATA%/vrclient/tools/uevr/<pinned_tag>",
+  "nightly_channel": {
+    "why": "stable 1.05 ceiling is UE 5.4; games on newer engines (e.g. MECCHA CHAMELEON = UE 5.6) require a nightly",
+    "pinned_tag": "nightly-01135-1b1693e820413a8afb1fdfd8f9da43a19870042e",
+    "published": "2026-06-17",
+    "download_url": "https://github.com/praydog/UEVR-nightly/releases/download/nightly-01135-1b1693e820413a8afb1fdfd8f9da43a19870042e/uevr.zip",
+    "sha256": "09987afa1b43e83e09b3b43a39e7471278a9834ab0c39fdec79041bb0779a42d",
+    "support_note": "UE 5.6 support is PLAUSIBLE (June-2026 nightly vs June-2026 engine) but UNVERIFIED until the first inject test - do not claim it works before the headset QA"
+  }
+}

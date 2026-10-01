@@ -1,0 +1,27 @@
+CyberpunkVR Port VRCAM asset and CET selector
+Copyright (c) 2026 dariulone
+Licensed under the MIT License:
+https://github.com/dariulone/cyberpunk-vr-port/blob/main/LICENSE
+
+Cyber Engine Tweaks
+Copyright its contributors
+Licensed under the MIT License:
+https://github.com/maximegmd/CyberEngineTweaks/blob/master/LICENSE
+
+Codeware
+Copyright (c) 2022-2026 psiberx
+Licensed under the MIT License:
+https://github.com/psiberx/cp2077-codeware/blob/main/LICENSE
+
+Khronos OpenXR SDK Loader
+Copyright (c) 2017-2026 The Khronos Group Inc.
+Licensed under the Apache License 2.0:
+https://github.com/KhronosGroup/OpenXR-SDK-Source/blob/main/LICENSE
+
+Khronos Vulkan Loader
+Copyright (c) 2015-2026 The Khronos Group Inc.
+Licensed under the Apache License 2.0:
+https://github.com/KhronosGroup/Vulkan-Loader/blob/main/LICENSE.txt
+
+These components are used only for the noncommercial VRClient compatibility
+prototype. Cyberpunk 2077 and REDengine remain property of CD PROJEKT RED.

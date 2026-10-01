@@ -1,0 +1,36 @@
+[
+  {
+    "name": "BepInExPack",
+    "full_name": "BepInEx-BepInExPack",
+    "owner": "BepInEx",
+    "package_url": "https://thunderstore.io/c/repo/p/BepInEx/BepInExPack/",
+    "is_deprecated": false,
+    "versions": [
+      {
+        "name": "BepInExPack",
+        "full_name": "BepInEx-BepInExPack-5.4.2100",
+        "version_number": "5.4.2100",
+        "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack/5.4.2100/",
+        "dependencies": [],
+        "file_size": 2000000
+      }
+    ]
+  },
+  {
+    "name": "RepoXR",
+    "full_name": "DaXcess-RepoXR",
+    "owner": "DaXcess",
+    "package_url": "https://thunderstore.io/c/repo/p/DaXcess/RepoXR/",
+    "is_deprecated": false,
+    "versions": [
+      {
+        "name": "RepoXR",
+        "full_name": "DaXcess-RepoXR-1.2.2",
+        "version_number": "1.2.2",
+        "download_url": "https://thunderstore.io/package/download/DaXcess/RepoXR/1.2.2/",
+        "dependencies": ["BepInEx-BepInExPack-5.4.2100"],
+        "file_size": 3000000
+      }
+    ]
+  }
+]

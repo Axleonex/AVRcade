@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="references.local.props" Condition="Exists('references.local.props')" />
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>

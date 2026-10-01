@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="440" viewBox="0 0 320 220">
+  <rect width="320" height="220" fill="#0E1B24"/>
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7fafc"/><stop offset="1" stop-color="#b9c8d2"/></linearGradient>
+  </defs>
+  <!-- Oculus / Meta Quest Touch family: light bodies and prominent tracking rings. -->
+  <g stroke="#1d3442" stroke-width="3" stroke-linejoin="round">
+    <path fill="none" stroke="#dceaf1" stroke-width="18" d="M82 92 C32 65 39 16 84 16 C129 16 139 58 108 81"/>
+    <path fill="none" stroke="#dceaf1" stroke-width="18" d="M238 92 C288 65 281 16 236 16 C191 16 181 58 212 81"/>
+    <path fill="url(#body)" d="M83 69 C52 79 47 115 61 170 C66 191 84 202 101 178 L123 128 C137 96 117 63 83 69Z"/>
+    <path fill="url(#body)" d="M237 69 C268 79 273 115 259 170 C254 191 236 202 219 178 L197 128 C183 96 203 63 237 69Z"/>
+    <ellipse fill="#314f60" cx="79" cy="94" rx="16" ry="16"/>
+    <ellipse fill="#314f60" cx="241" cy="94" rx="16" ry="16"/>
+    <circle fill="#29789b" cx="104" cy="80" r="9"/><circle fill="#29789b" cx="91" cy="62" r="9"/>
+    <circle fill="#29789b" cx="216" cy="80" r="9"/><circle fill="#29789b" cx="229" cy="62" r="9"/>
+    <rect fill="#5f91a9" x="102" y="102" width="15" height="8" rx="3"/>
+    <circle fill="#5f91a9" cx="218" cy="104" r="6"/>
+    <path fill="#7aa7ba" d="M54 118 L46 127 L52 149 L61 144Z"/>
+    <path fill="#7aa7ba" d="M266 118 L274 127 L268 149 L259 144Z"/>
+    <path fill="#718f9f" d="M65 54 L78 45 L91 54"/><path fill="#718f9f" d="M255 54 L242 45 L229 54"/>
+  </g>
+  <g fill="white" font-family="Arial, sans-serif" font-size="7" font-weight="700" text-anchor="middle">
+    <text x="91" y="65">Y</text><text x="104" y="83">X</text>
+    <text x="229" y="65">B</text><text x="216" y="83">A</text>
+  </g>
+</svg>

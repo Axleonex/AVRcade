@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "profile_id": "cyberpunk-2077-redengine4-steam-20383525",
+  "input": {
+    "motion_aim_mode": "controller",
+    "dominant_hand": "right",
+    "handedness_swap": false,
+    "actions": [
+      {
+        "id": "move_x",
+        "binding": "left_thumbstick_x",
+        "gamepad_binding": "left_stick_x",
+        "gamepad_fallback": true,
+        "dead_zone": 0.15
+      },
+      {
+        "id": "move_y",
+        "binding": "left_thumbstick_y",
+        "gamepad_binding": "left_stick_y",
+        "gamepad_fallback": true,
+        "dead_zone": 0.15
+      },
+      {
+        "id": "turn_x",
+        "binding": "right_thumbstick_x",
+        "gamepad_binding": "right_stick_x",
+        "gamepad_fallback": true,
+        "dead_zone": 0.2
+      },
+      {
+        "id": "interact",
+        "binding": "left_primary_button",
+        "gamepad_binding": "gamepad_x",
+        "gamepad_fallback": true,
+        "dead_zone": 0.05
+      },
+      {
+        "id": "menu",
+        "binding": "left_menu",
+        "gamepad_binding": "gamepad_back",
+        "gamepad_fallback": true,
+        "dead_zone": 0.0
+      },
+      {
+        "id": "hub_menu",
+        "binding": "left_thumbstick_click+right_thumbstick_click",
+        "gamepad_binding": "gamepad_start",
+        "gamepad_fallback": true,
+        "dead_zone": 0.0
+      },
+      {
+        "id": "recenter",
+        "binding": "right_grip+left_grip",
+        "gamepad_binding": "gamepad_back",
+        "gamepad_fallback": true,
+        "dead_zone": 0.0
+      },
+      {
+        "id": "comfort_snap_turn",
+        "binding": "right_thumbstick_x",
+        "gamepad_binding": "right_stick_x",
+        "gamepad_fallback": true,
+        "dead_zone": 0.2
+      },
+      {
+        "id": "comfort_vignette_toggle",
+        "binding": "left_grip",
+        "gamepad_binding": "gamepad_y",
+        "gamepad_fallback": true,
+        "dead_zone": 0.0
+      }
+    ]
+  },
+  "comfort": {
+    "preset": "cyberpunk_safe_default",
+    "snap_turn": {
+      "enabled": true,
+      "degrees": 30.0
+    },
+    "smooth_turn": {
+      "enabled": false,
+      "degrees_per_second": 90.0
+    },
+    "vignette": {
+      "enabled": true,
+      "strength": 0.6
+    },
+    "seated_standing": {
+      "mode": "seated",
+      "height_offset_m": 0.0
+    },
+    "world_scale": 1.0,
+    "recenter": {
+      "enabled": true
+    }
+  },
+  "hud": {
+    "coordinate_convention": "row_major_right_handed_meters_forward_negative_z",
+    "anchors": [
+      {
+        "element_id": "CyberpunkHudRoot",
+        "template_data": true,
+        "anchor_mode": "head_locked",
+        "visibility_rule": "always",
+        "depth_m": 1.5,
+        "scale": 1.0,
+        "offset": { "x_m": 0.0, "y_m": -0.08, "z_m": 0.0 },
+        "curvature": 0.08
+      },
+      {
+        "element_id": "CyberpunkSubtitles",
+        "template_data": true,
+        "anchor_mode": "head_locked",
+        "visibility_rule": "always",
+        "depth_m": 1.6,
+        "scale": 0.9,
+        "offset": { "x_m": 0.0, "y_m": -0.25, "z_m": 0.0 },
+        "curvature": 0.02
+      },
+      {
+        "element_id": "CyberpunkInteractionPrompt",
+        "template_data": true,
+        "anchor_mode": "head_locked",
+        "visibility_rule": "when_gameplay",
+        "depth_m": 1.35,
+        "scale": 0.9,
+        "offset": { "x_m": 0.0, "y_m": -0.12, "z_m": 0.0 },
+        "curvature": 0.02
+      },
+      {
+        "element_id": "CyberpunkMenu",
+        "template_data": true,
+        "anchor_mode": "head_locked",
+        "visibility_rule": "when_menu",
+        "depth_m": 1.75,
+        "scale": 0.85,
+        "offset": { "x_m": 0.0, "y_m": 0.0, "z_m": 0.0 },
+        "curvature": 0.05
+      }
+    ]
+  }
+}

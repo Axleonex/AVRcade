@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "packageId": "vrclient-shared-controls",
+      "version": "0.1.0-dev",
+      "channel": "stable",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

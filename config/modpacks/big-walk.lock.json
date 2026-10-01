@@ -1,0 +1,24 @@
+{
+  "schema": "modpack-lock/1",
+  "game_slug": "big-walk",
+  "community": "big-walk",
+  "resolved_at_utc": "2026-09-23T16:51:03Z",
+  "packages": [
+    {
+      "namespace": "BepInEx",
+      "name": "BepInExPack_IL2CPP",
+      "version": "6.0.755",
+      "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack_IL2CPP/6.0.755/",
+      "sha256": "a3ec977c7760c6045b742a9bf3e59c7b11baa80b023f402ebdbff07bad6b0d96",
+      "size_bytes": 34367097
+    },
+    {
+      "namespace": "CircuitLord",
+      "name": "Big_Walk_VR",
+      "version": "1.0.18",
+      "download_url": "https://thunderstore.io/package/download/CircuitLord/Big_Walk_VR/1.0.18/",
+      "sha256": "ca4c63d986c9477bf67a1bc78eec6baec0c3b60677bc66fab97294c5567221b0",
+      "size_bytes": 20216503
+    }
+  ]
+}

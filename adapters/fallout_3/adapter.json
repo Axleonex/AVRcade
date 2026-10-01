@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-fallout-3",
+  "game": "Fallout 3",
+  "steam_app_id": "22370",
+  "steam_app_ids": ["22370", "22300"],
+  "executable": "Fallout3.exe",
+  "architecture": "x86",
+  "renderer": "Direct3D 9",
+  "backends": [
+    {
+      "id": "depth-vr",
+      "label": "Depth VR - Free",
+      "status": "initial-functional-subject-to-headset-verification",
+      "stereo_kind": "depth-derived",
+      "openxr_viewer": "Osiris VR Viewer"
+    },
+    {
+      "id": "native-vr",
+      "label": "Native VR - Experimental",
+      "status": "exact-build-profiled-camera-render-hook-awaiting-headset-proof",
+      "stereo_kind": "independent-per-eye-required",
+      "fallback": "depth-vr"
+    },
+    {
+      "id": "desktop",
+      "label": "Desktop",
+      "status": "standard-non-vr-profile"
+    }
+  ],
+  "native": {
+    "shared_renderer": "src/native/gamebryo_dx9_openxr",
+    "game_hooks": "adapters/fallout_3",
+    "verified_build_profiles": [],
+    "reviewed_experimental_hook_profiles": [
+      {
+        "id": "steam-goty-1.7.0.3-anniversary-patched",
+        "executable_sha256": "03CF5ADA02FCF789FCF4639E05127D545FF3F69363B926709B8F0C3F8AD29107",
+        "profile": "adapters/fallout_3/fallout3-native-profile-steam-1.7.0.3.ini"
+      }
+    ],
+    "activation_policy": "refuse-without-exact-sha256-reviewed-hook-rvas-and-matching-render-entry-bytes",
+    "verified_label_requires": [
+      "exact_build_match",
+      "executable_sha256",
+      "independent_per_eye",
+      "headset_verified"
+    ]
+  },
+  "restrictions": {
+    "free_vr_only": true,
+    "bundles_game_assets": false,
+    "bundles_third_party_binaries": false,
+    "bypasses_drm": false,
+    "modifies_source_mo2_profile": false
+  }
+}

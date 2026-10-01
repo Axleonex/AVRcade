@@ -1,0 +1,64 @@
+{
+  "schema": "modpack-lock/1",
+  "game_slug": "peak",
+  "community": "peak",
+  "resolved_at_utc": "2026-09-23T16:55:59Z",
+  "packages": [
+    {
+      "namespace": "BepInEx",
+      "name": "BepInExPack_PEAK",
+      "version": "5.4.75301",
+      "download_url": "https://thunderstore.io/package/download/BepInEx/BepInExPack_PEAK/5.4.75301/",
+      "sha256": "a71432613ab0b2f560046bc341d949c9d853b4f5d5223ab5e7f2ef1f113522e7",
+      "size_bytes": 670172
+    },
+    {
+      "namespace": "MonoDetour",
+      "name": "MonoDetour",
+      "version": "0.6.7",
+      "download_url": "https://thunderstore.io/package/download/MonoDetour/MonoDetour/0.6.7/",
+      "sha256": "fd7580fc24cae4fc33f03caa3d7bcfbf636053d3ae518a688705c5edcd9b310b",
+      "size_bytes": 116462
+    },
+    {
+      "namespace": "MonoDetour",
+      "name": "MonoDetour_BepInEx_5",
+      "version": "0.6.7",
+      "download_url": "https://thunderstore.io/package/download/MonoDetour/MonoDetour_BepInEx_5/0.6.7/",
+      "sha256": "43d6e123dad81f74c603799ec2090bf24abc4c8a8a5cb2c6200ceaa842a7d169",
+      "size_bytes": 19819
+    },
+    {
+      "namespace": "PEAKModding",
+      "name": "SoftDependencyFix",
+      "version": "1.0.0",
+      "download_url": "https://thunderstore.io/package/download/PEAKModding/SoftDependencyFix/1.0.0/",
+      "sha256": "24700c6c986846899731f4b68f9bcff06dba09bca3203fe5e47231f37d041abe",
+      "size_bytes": 42955
+    },
+    {
+      "namespace": "PEAKModding",
+      "name": "PEAKLib_Core",
+      "version": "1.7.2",
+      "download_url": "https://thunderstore.io/package/download/PEAKModding/PEAKLib_Core/1.7.2/",
+      "sha256": "6c653bd788c18c6265bfcd32b9aab1e048e2edd865098ff4646e2d34160f6d59",
+      "size_bytes": 118064
+    },
+    {
+      "namespace": "PEAKModding",
+      "name": "PEAKLib_UI",
+      "version": "1.7.0",
+      "download_url": "https://thunderstore.io/package/download/PEAKModding/PEAKLib_UI/1.7.0/",
+      "sha256": "54bd7d352d22b4a9b0eb940100a97220c2a816b0a31d5b80a20f6aa5bed276e9",
+      "size_bytes": 121708
+    },
+    {
+      "namespace": "Andrey04o",
+      "name": "PeakVR",
+      "version": "1.5.0",
+      "download_url": "https://thunderstore.io/package/download/Andrey04o/PeakVR/1.5.0/",
+      "sha256": "20534b87fceafb115086ec1a9f3750599b2505d2b84faaa3d0689de1677f84e2",
+      "size_bytes": 4461563
+    }
+  ]
+}

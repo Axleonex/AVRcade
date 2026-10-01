@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/redengine-native-profile.schema.json",
+  "title": "VRClient Native REDengine Conversion Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "profile_id",
+    "game",
+    "engine",
+    "renderer",
+    "loading",
+    "dependencies",
+    "conflicts",
+    "conversion",
+    "distribution",
+    "verification"
+  ],
+  "properties": {
+    "schema": { "const": "redengine-native/1" },
+    "profile_id": { "type": "string", "minLength": 1 },
+    "game": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "display_name",
+        "steam_app_id",
+        "steam_buildid_observed",
+        "launcher_executable",
+        "shipping_binary",
+        "executable_sha256_observed",
+        "adapter_build_id"
+      ],
+      "properties": {
+        "slug": { "const": "cyberpunk-2077" },
+        "display_name": { "const": "Cyberpunk 2077" },
+        "steam_app_id": { "const": "1091500" },
+        "steam_buildid_observed": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9]+$" }
+          ]
+        },
+        "launcher_executable": { "const": "REDprelauncher.exe" },
+        "shipping_binary": { "const": "bin\\x64\\Cyberpunk2077.exe" },
+        "executable_sha256_observed": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+          ]
+        },
+        "adapter_build_id": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "major", "integration"],
+      "properties": {
+        "family": { "const": "redengine" },
+        "major": { "const": 4 },
+        "integration": { "const": "red4ext" }
+      }
+    },
+    "renderer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_api", "runtime_backend", "observation_state"],
+      "properties": {
+        "expected_api": { "const": "d3d12" },
+        "runtime_backend": { "const": "d3d12" },
+        "observation_state": {
+          "enum": ["planned", "game_observed", "game_verified"]
+        }
+      }
+    },
+    "loading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "proxy_dll_forbidden", "state"],
+      "properties": {
+        "mode": { "const": "red4ext_plugin" },
+        "proxy_dll_forbidden": { "const": true },
+        "activation_mode": { "enum": ["always_on", "per_process_opt_in"] },
+        "activation_environment": { "type": "string", "minLength": 1 },
+        "state": {
+          "enum": ["planned", "controlled_verified", "game_verified"]
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/pathRule" }
+    },
+    "conflicts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/pathRule" }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stereo_method", "ownership", "capabilities"],
+      "properties": {
+        "stereo_method": { "const": "engine_second_view" },
+        "ownership": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runtime", "stereo", "camera", "input", "submission"],
+          "properties": {
+            "runtime": { "const": "vrclient" },
+            "stereo": { "const": "vrclient" },
+            "camera": { "const": "vrclient" },
+            "input": { "const": "vrclient" },
+            "submission": { "const": "vrclient" }
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "red4ext_bridge",
+            "graphics_bridge",
+            "stereo_views",
+            "head_tracking",
+            "hud",
+            "gamepad_fallback",
+            "motion_controls"
+          ],
+          "properties": {
+            "red4ext_bridge": { "$ref": "#/$defs/capabilityState" },
+            "graphics_bridge": { "$ref": "#/$defs/capabilityState" },
+            "stereo_views": { "$ref": "#/$defs/capabilityState" },
+            "head_tracking": { "$ref": "#/$defs/capabilityState" },
+            "hud": { "$ref": "#/$defs/capabilityState" },
+            "gamepad_fallback": { "$ref": "#/$defs/capabilityState" },
+            "motion_controls": { "$ref": "#/$defs/capabilityState" }
+          }
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commercial_use",
+        "ship_game_assets",
+        "upstream_source_license",
+        "attribution_required",
+        "human_legal_review_required"
+      ],
+      "properties": {
+        "commercial_use": { "const": false },
+        "ship_game_assets": { "const": false },
+        "upstream_source_license": { "const": "MIT" },
+        "attribution_required": { "const": true },
+        "human_legal_review_required": { "const": true }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {
+          "enum": [
+            "blocked_unpinned",
+            "blocked_dependency",
+            "preflight_ready",
+            "controlled_verified",
+            "headset_verified"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "pathRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "reason"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "capabilityState": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "controlled_verified",
+        "game_observed",
+        "game_verified"
+      ]
+    }
+  }
+}

@@ -1,0 +1,3 @@
+LIBRARY "vrclient_proof_payload"
+EXPORTS
+    DetourFinishHelperProcess @1

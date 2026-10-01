@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:VrClient.App.Views"
+        x:Class="VrClient.App.Views.Fallout3VortexDialog"
+        Width="1200" Height="850" MinWidth="800" MinHeight="600"
+        Background="{DynamicResource GroundBrush}"
+        Foreground="{DynamicResource InkBrush}"
+        Title="Fallout 3 mods — Vortex in AVRcade">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="16">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="ManagerTitle" Text="Fallout 3 mods in Vortex" FontSize="24" FontWeight="SemiBold" />
+        <TextBlock x:Name="ManagerIntro" Text="Manage and deploy your Vortex mods here, then use AVRcade's Fallout 3 VR test launch. Vortex still owns its profiles and deployment." TextWrapping="Wrap" />
+      </StackPanel>
+      <Button Grid.Column="1" Margin="10,0,0,0" Content="Detect again" Click="Detect_Click" VerticalAlignment="Center" />
+      <Button Grid.Column="2" Margin="10,0,0,0" Content="Find Vortex.exe" Click="Browse_Click" VerticalAlignment="Center" />
+      <Button Grid.Column="3" Margin="10,0,0,0" Content="Focus manager typing" Click="Focus_Click" VerticalAlignment="Center" />
+      <Button Grid.Column="4" Margin="10,0,0,0" Content="Close" Click="Close_Click" VerticalAlignment="Center" />
+    </Grid>
+    <Border Grid.Row="1" Margin="0,12,0,0" Padding="12"
+            Background="{DynamicResource SurfaceBrush}" CornerRadius="8">
+      <StackPanel Spacing="4">
+        <TextBlock FontWeight="SemiBold" Text="Using Vortex here" />
+        <TextBlock x:Name="ManagerInstructions" TextWrapping="Wrap" Text="Choose Fallout 3 and your desired profile in Vortex, then deploy the mods. Close this panel and choose VR with Vortex mods in AVRcade. Vortex's own Play action stays non-VR by default." />
+        <TextBlock x:Name="ManagerStaging" TextWrapping="Wrap" Text="Resolve any Vortex deployment warning first. With hardlinks, the mod staging folder and Fallout 3 must share a drive; use Vortex's own move-staging flow." />
+        <TextBlock TextWrapping="Wrap" Text="If Vortex is not found, reconnect its install drive and select Detect again, or use Find Vortex.exe. A selected portable path is remembered." />
+      </StackPanel>
+    </Border>
+    <TextBlock x:Name="Status" Grid.Row="2" Margin="0,12" TextWrapping="Wrap"
+               Text="Detecting Vortex…" />
+    <Border Grid.Row="3" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+            Background="{DynamicResource SurfaceBrush}">
+      <views:VortexWindowHost x:Name="VortexHost" />
+    </Border>
+  </Grid>
+</Window>

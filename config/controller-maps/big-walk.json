@@ -1,0 +1,35 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "source_verified",
+  "game_slug": "big-walk",
+  "title": "Big Walk — Quest and Index controls",
+  "note": "Documented by the mod author; not yet tested on both controller families in VRClient. Only confirmed actions are shown. SteamVR remapping can change these bindings. Other VR options are in the game's pause menu under Big Walk VR.",
+  "conversion_credit": {
+    "creator": "CircuitLord",
+    "project": "Big Walk VR",
+    "project_url": "https://github.com/CircuitLord/BigWalkVRInstaller",
+    "controls_url": "https://old.thunderstore.io/c/big-walk/p/CircuitLord/Big_Walk_VR/"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Distance grab / interact" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Distance grab / interact" },
+        { "slot": "right_stick", "control": "Click right stick", "action": "Recenter view" },
+        { "slot": "left_secondary", "control": "Y (left upper button)", "action": "Pause menu", "note": "The author's Left B label corresponds to Y on Quest Touch." }
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index",
+      "bindings": [
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Distance grab / interact" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Distance grab / interact" },
+        { "slot": "right_stick", "control": "Click right thumbstick", "action": "Recenter view" },
+        { "slot": "left_secondary", "control": "Left B", "action": "Pause menu" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+VRClient supply-chain fixture
+artifact=runtime-dll
+version=0.1.0
+tampered=true

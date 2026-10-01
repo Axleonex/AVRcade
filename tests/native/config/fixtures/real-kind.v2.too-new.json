@@ -1,0 +1,4 @@
+{
+  "version": 2,
+  "note": "A real production config kind labeled version 2. Every real kind is currently registered at current=1, so this must REFUSE with reason refuse_too_new. Proves a client never silently accepts a config from a newer client."
+}

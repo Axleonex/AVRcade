@@ -1,0 +1,6 @@
+{ "version": 1, "rule_set_version": "demo", "anti_cheat_indicators": ["EasyAntiCheat"],
+  "online_only_flags": [], "storefront_drm_indicators": [],
+  "rules": [ { "game_id": "demo-coop", "controlled_smoke_target": false, "allow_offline": false,
+    "allow_warn_on_uncertain": false, "adapter_id": "demo",
+    "allowed_launch_modes": ["private_modded_coop","single_player"],
+    "acceptable_modding_postures": ["community-supported"] } ] }

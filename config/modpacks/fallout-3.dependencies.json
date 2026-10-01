@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "game": "fallout-3",
+  "retrieved_at": "2026-09-21",
+  "policy": {
+    "free_vr_only": true,
+    "automatic_downloads": false,
+    "redistribute_third_party_binaries": false,
+    "required_user_purchases": [
+      "A legitimate Fallout 3 or Fallout 3 GOTY license",
+      "Existing compatible VR hardware",
+      "The storefront/platform normally required by the owned edition"
+    ]
+  },
+  "dependencies": [
+    {
+      "id": "reshade",
+      "name": "ReShade",
+      "author_project": "crosire / ReShade",
+      "version": "6.8.0",
+      "license": "BSD-3-Clause",
+      "source_url": "https://github.com/crosire/reshade",
+      "download_url": "https://reshade.me/",
+      "sha256": null,
+      "redistribution": "not-bundled",
+      "acquisition": "user-download-from-official-source",
+      "notes": "Official project documents D3D9 and color/depth access. Fallout 3 depth-buffer usability remains a live calibration gate."
+    },
+    {
+      "id": "superdepth3d",
+      "name": "SuperDepth3D",
+      "author_project": "BlueSkyDefender / Depth3D",
+      "version": "5.4.0",
+      "license": "Proprietary; free for personal use only",
+      "source_url": "https://github.com/BlueSkyDefender/Depth3D",
+      "download_url": "https://github.com/BlueSkyDefender/Depth3D",
+      "sha256": null,
+      "redistribution": "prohibited-without-author-permission",
+      "acquisition": "user-download-and-supply",
+      "notes": "Generates depth-derived stereo including side-by-side output. VRClient does not copy, mirror, package, or download the shader."
+    },
+    {
+      "id": "osiris-vr-viewer",
+      "name": "Osiris VR Viewer",
+      "author_project": "BerZerker96 / Osiris VR Viewer",
+      "version": "1.57",
+      "license": "MIT",
+      "source_url": "https://github.com/BerZerker96/Osiris-Vr-Viewer",
+      "download_url": "https://github.com/BerZerker96/Osiris-Vr-Viewer/releases/tag/v1.57",
+      "sha256": null,
+      "redistribution": "license-permits-with-notice-but-not-bundled-by-vrclient",
+      "acquisition": "user-download-from-official-release",
+      "notes": "OpenXR viewer for full/half SBS and TAB sources with head-output options. SteamVR and wireless Virtual Desktop operation still require headset verification."
+    },
+    {
+      "id": "openxr-sdk",
+      "name": "OpenXR SDK and loader",
+      "author_project": "Khronos Group",
+      "version": "1.1.43 (x86 loader used for local validation)",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/KhronosGroup/OpenXR-SDK",
+      "download_url": "https://github.com/KhronosGroup/OpenXR-SDK/releases/tag/release-1.1.63",
+      "sha256": null,
+      "redistribution": "permitted-with-license-notice",
+      "acquisition": "built-from-source-by-existing-vrclient-tooling",
+      "notes": "The native x86 bridge uses the standard loader and runtime selection only."
+    },
+    {
+      "id": "minhook",
+      "name": "MinHook",
+      "author_project": "Tsuda Kageyu / MinHook contributors",
+      "version": "1.3.3 (repository-pinned source)",
+      "license": "BSD-2-Clause",
+      "source_url": "https://github.com/TsudaKageyu/minhook",
+      "download_url": "https://github.com/TsudaKageyu/minhook/releases/tag/v1.3.3",
+      "sha256": null,
+      "redistribution": "source-and-binary-redistribution-permitted-with-license-notice",
+      "acquisition": "built-from-repository-pinned-source",
+      "notes": "Provides the x86 trampoline used only after the Fallout3.exe SHA-256, RVAs and render-entry bytes match a reviewed profile."
+    },
+    {
+      "id": "virtualdesktopxr",
+      "name": "VirtualDesktopXR",
+      "author_project": "mbucchia and Virtual Desktop contributors",
+      "version": "provided by current Virtual Desktop Streamer",
+      "license": "MIT",
+      "source_url": "https://github.com/mbucchia/VirtualDesktop-OpenXR",
+      "download_url": "https://www.vrdesktop.net/",
+      "sha256": null,
+      "redistribution": "not-bundled",
+      "acquisition": "installed-with-user-owned-virtual-desktop-streamer",
+      "notes": "Standard OpenXR runtime path; VRClient adds no proprietary integration. SteamVR transport is also supported by selecting SteamVR OpenXR."
+    },
+    {
+      "id": "steamvr",
+      "name": "SteamVR OpenXR runtime",
+      "author_project": "Valve",
+      "version": "user-installed-current",
+      "license": "Valve platform terms",
+      "source_url": "https://store.steampowered.com/app/250820/SteamVR/",
+      "download_url": "https://store.steampowered.com/app/250820/SteamVR/",
+      "sha256": null,
+      "redistribution": "not-bundled",
+      "acquisition": "user-install-through-steam",
+      "notes": "Free runtime. VRClient detects the standard OpenXR manifest and does not handle Steam credentials."
+    },
+    {
+      "id": "fose",
+      "name": "Fallout Script Extender",
+      "author_project": "Ian Patterson, Stephen Abel, Paul Connelly and contributors",
+      "version": "1.2 beta 2 stable",
+      "license": "Project-specific distribution terms",
+      "source_url": "https://fose.silverlock.org/",
+      "download_url": "https://fose.silverlock.org/download/fose_v1_2_beta2.7z",
+      "sha256": null,
+      "redistribution": "not-bundled",
+      "acquisition": "user-download-from-official-source",
+      "notes": "Supports retail/Steam 1.7.0.3 and GOG; Steam 1.7.0.4 requires a compatible downgrade before FOSE use."
+    },
+    {
+      "id": "fallout-anniversary-patcher",
+      "name": "Fallout Anniversary Patcher",
+      "author_project": "c6 and contributors",
+      "version": "1.1",
+      "license": "Restricted asset permissions; included xdelta3 Apache-2.0 and SHA1 MIT components do not license the whole package",
+      "source_url": "https://www.nexusmods.com/fallout3/mods/24913",
+      "download_url": "https://www.nexusmods.com/fallout3/mods/24913",
+      "sha256": null,
+      "redistribution": "prohibited-without-author-permission",
+      "acquisition": "informed-user-download-and-execution",
+      "notes": "Only guided when Steam 1.7.0.4 needs FOSE-compatible 1.7.0.3. VRClient never runs it silently."
+    },
+    {
+      "id": "mod-organizer-2",
+      "name": "Mod Organizer 2",
+      "author_project": "ModOrganizer2 contributors",
+      "version": "2.5.2",
+      "license": "GPL-3.0",
+      "source_url": "https://github.com/ModOrganizer2/modorganizer",
+      "download_url": "https://github.com/ModOrganizer2/modorganizer/releases/tag/v2.5.2",
+      "sha256": null,
+      "redistribution": "not-bundled",
+      "acquisition": "user-select-existing-or-download-official-release",
+      "notes": "Preferred isolated-profile layer. Existing profiles and load order are preserved."
+    }
+  ]
+}

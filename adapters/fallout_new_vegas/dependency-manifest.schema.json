@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/fallout-new-vegas-dependencies.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "game", "retrieved_at", "dependencies"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": 1 },
+    "game": { "const": "fallout-new-vegas" },
+    "retrieved_at": { "type": "string", "format": "date" },
+    "dependencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "authors", "version", "source_url", "license", "redistribution", "acquisition", "sha256"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "authors": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "version": { "type": "string", "minLength": 1 },
+          "minimum_version": { "type": ["string", "null"] },
+          "source_url": { "type": "string", "format": "uri" },
+          "license": { "type": "string", "minLength": 1 },
+          "redistribution": { "type": "string", "minLength": 1 },
+          "acquisition": { "const": "user-supplied-from-official-source" },
+          "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "hash_note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

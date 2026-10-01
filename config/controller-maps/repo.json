@@ -1,0 +1,46 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "verified",
+  "game_slug": "repo",
+  "title": "R.E.P.O. VR controls",
+  "conversion_credit": {
+    "creator": "DaXcess",
+    "project": "RepoXR",
+    "project_url": "https://thunderstore.io/c/repo/p/DaXcess/RepoXR/",
+    "controls_url": "https://thunderstore.io/c/repo/p/DaXcess/RepoXR/#controls"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Oculus / Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick / click", "action": "Move; open chat or expressions", "note": "Click for chat; hold to open the expression wheel" },
+        { "slot": "right_stick", "control": "Right stick / click", "action": "Turn; adjust or rotate held items; crouch", "note": "Up/down changes held distance; click crouches" },
+        { "slot": "left_primary", "control": "X", "action": "Menu" },
+        { "slot": "left_secondary", "control": "Y", "action": "Reset height" },
+        { "slot": "right_primary", "control": "A", "action": "Jump" },
+        { "slot": "right_secondary", "control": "B", "action": "Tumble" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Sprint; expression input; previous spectator" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Grab; select expression; next spectator" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Rotate held item; grab map; attach or detach headlamp" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Interact; grab map; attach or detach headlamp" }
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index Controllers",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left thumbstick / click", "action": "Move; open chat or expressions", "note": "Click for chat; hold to open the expression wheel" },
+        { "slot": "right_stick", "control": "Right thumbstick / click", "action": "Turn; adjust or rotate held items; crouch", "note": "Up/down changes held distance; click crouches" },
+        { "slot": "left_primary", "control": "Left A", "action": "Menu" },
+        { "slot": "left_secondary", "control": "Left B", "action": "Reset height" },
+        { "slot": "right_primary", "control": "Right A", "action": "Jump" },
+        { "slot": "right_secondary", "control": "Right B", "action": "Tumble" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Sprint; expression input; previous spectator" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Grab; select expression; next spectator" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Rotate held item; grab map; attach or detach headlamp" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Interact; grab map; attach or detach headlamp" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "verified",
+  "game_slug": "lethal-company",
+  "title": "Lethal Company VR controls",
+  "conversion_credit": {
+    "creator": "DaXcess",
+    "project": "LethalCompanyVR (LCVR)",
+    "project_url": "https://thunderstore.io/c/lethal-company/p/DaXcess/LethalCompanyVR/",
+    "controls_url": "https://old.thunderstore.io/c/lethal-company/p/DaXcess/LethalCompanyVR/wiki/1198-controls-default/"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left stick / click", "action": "Move / sprint", "note": "Click to sprint" },
+        { "slot": "right_stick", "control": "Right stick / click", "action": "Turn or pivot / crouch", "note": "Vertical axis switches items; click crouches" },
+        { "slot": "right_primary", "control": "A", "action": "Jump" },
+        { "slot": "right_secondary", "control": "B", "action": "Drop item / delete build item" },
+        { "slot": "left_primary", "control": "X", "action": "Open menu" },
+        { "slot": "left_secondary", "control": "Y", "action": "Reset player height" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Use item / activate item" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Scan" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Grab / interact; tertiary item use" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Left-hand grab; secondary item use" },
+        { "slot": "both_grips", "control": "Both grips", "action": "Enter build mode" }
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index Controllers",
+      "bindings": [
+        { "slot": "left_stick", "control": "Left thumbstick / click", "action": "Move / sprint", "note": "Click to sprint" },
+        { "slot": "right_stick", "control": "Right thumbstick / click", "action": "Turn or pivot / crouch", "note": "Vertical axis switches items; click crouches" },
+        { "slot": "right_primary", "control": "Right A", "action": "Jump" },
+        { "slot": "right_secondary", "control": "Right B", "action": "Drop item / delete build item" },
+        { "slot": "left_primary", "control": "Left A", "action": "Open menu" },
+        { "slot": "left_secondary", "control": "Left B", "action": "Reset player height" },
+        { "slot": "right_trigger", "control": "Right trigger", "action": "Use item / activate item" },
+        { "slot": "left_trigger", "control": "Left trigger", "action": "Scan" },
+        { "slot": "right_grip", "control": "Right grip", "action": "Grab / interact; tertiary item use" },
+        { "slot": "left_grip", "control": "Left grip", "action": "Left-hand grab; secondary item use" },
+        { "slot": "both_grips", "control": "Both grips", "action": "Enter build mode" }
+      ]
+    }
+  ]
+}

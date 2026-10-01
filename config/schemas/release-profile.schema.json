@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VRClient release profile",
+  "type": "object",
+  "required": ["schemaVersion", "preferences"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "preferences": {
+      "type": "object",
+      "required": ["controller", "hudVisible", "hudScale", "turn", "comfortVignette"],
+      "properties": {
+        "controller": { "enum": ["default", "questXboxStyle", "questPlayStationStyle", "indexXboxStyle", "indexPlayStationStyle", "custom"] },
+        "hudVisible": { "type": "boolean" },
+        "hudScale": { "type": "number", "minimum": 0.5, "maximum": 2.0 },
+        "turn": { "enum": ["gameDefault", "snap", "smooth"] },
+        "comfortVignette": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

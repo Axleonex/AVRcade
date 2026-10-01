@@ -1,0 +1,7 @@
+{
+  "schema": "comfort-map/1",
+  "game_slug": "content-warning",
+  "cfg_file": "BepInEx/config/CWVR.cfg",
+  "verified_against_cfg": false,
+  "map": {}
+}

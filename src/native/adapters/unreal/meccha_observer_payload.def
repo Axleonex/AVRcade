@@ -1,0 +1,3 @@
+LIBRARY "vrclient_meccha_observer_payload"
+EXPORTS
+    DetourFinishHelperProcess @1

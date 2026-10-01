@@ -1,0 +1,3 @@
+LIBRARY "vrclient_meccha_stereo_payload"
+EXPORTS
+    DllMain

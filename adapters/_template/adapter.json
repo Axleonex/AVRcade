@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-template-adapter",
+  "adapter_version": "0.1.0",
+  "display_name": "VRClient Template Adapter",
+  "host_api": {
+    "min": "1.0.0",
+    "max": "1.0.0"
+  },
+  "supported_games": [
+    "vrclient-smoke-host"
+  ],
+  "supported_builds": [
+    {
+      "game_id": "vrclient-smoke-host",
+      "build_id": "smoke-2026-06-11"
+    }
+  ],
+  "capabilities": [
+    "frame_tick",
+    "config_reload",
+    "fast_restart"
+  ],
+  "required_exports": [
+    "vrclient_get_adapter_abi",
+    "vrclient_get_adapter_metadata",
+    "vrclient_create_adapter",
+    "vrclient_destroy_adapter"
+  ]
+}

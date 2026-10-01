@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/game-fingerprint.schema.json",
+  "title": "VRClient Game Fingerprint",
+  "type": "object",
+  "required": [
+    "version",
+    "game_id",
+    "display_name",
+    "controlled_smoke_target",
+    "executable_names",
+    "support_policy",
+    "runtime",
+    "builds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "game_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "controlled_smoke_target": {
+      "type": "boolean"
+    },
+    "executable_names": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "support_policy": {
+      "type": "object",
+      "required": [
+        "allowed_sources",
+        "target_architecture",
+        "anti_cheat_risk",
+        "online_risk"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "direct",
+              "manual",
+              "attach",
+              "steam",
+              "epic"
+            ]
+          }
+        },
+        "target_architecture": {
+          "enum": [
+            "x64",
+            "x86",
+            "arm64"
+          ]
+        },
+        "anti_cheat_risk": {
+          "enum": [
+            "none",
+            "known_safe",
+            "known_risky",
+            "unknown"
+          ]
+        },
+        "online_risk": {
+          "enum": [
+            "none",
+            "offline_only",
+            "private_modded_coop",
+            "known_online",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "architecture"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "architecture": {
+          "enum": [
+            "x64",
+            "x86",
+            "arm64"
+          ]
+        }
+      }
+    },
+    "builds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "build_id",
+          "support",
+          "confidence_threshold",
+          "file_hashes",
+          "product_versions",
+          "signatures",
+          "offsets"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "build_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "support": {
+            "enum": [
+              "supported",
+              "unsupported"
+            ]
+          },
+          "refusal_reason": {
+            "type": "string"
+          },
+          "confidence_threshold": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "file_hashes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "algorithm",
+                "value"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "algorithm": {
+                  "const": "sha256"
+                },
+                "value": {
+                  "type": "string",
+                  "pattern": "^[a-fA-F0-9]{64}$"
+                }
+              }
+            }
+          },
+          "product_versions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "pattern",
+                "confidence"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pattern": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "confidence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 99
+                }
+              }
+            }
+          },
+          "offsets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "rva",
+                "phase3_identity_only"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rva": {
+                  "type": "string",
+                  "pattern": "^0x[0-9A-Fa-f]+$"
+                },
+                "phase3_identity_only": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

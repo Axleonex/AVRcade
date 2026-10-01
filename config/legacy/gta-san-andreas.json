@@ -1,0 +1,61 @@
+{
+  "$schema": "../schemas/legacy-d3d9-vr-profile.schema.json",
+  "schema": "legacy-d3d9-vr/1",
+  "game": {
+    "slug": "gta-san-andreas",
+    "display_name": "Grand Theft Auto: San Andreas",
+    "executable_name": "gta_sa.exe",
+    "required_architecture": "x86",
+    "renderer": "d3d9-renderware",
+    "executable_sha256_observed": "a559aa772fd136379155efa71f00c47aad34bbfeae6196b0fe1047d0645cbd26"
+  },
+  "bridge": {
+    "status": "pinned",
+    "path": "vrclient_gtasa_theater.asi",
+    "sha256": "bd8418f309b3879eef9db1a49d7bd26e4a7e99c2832f2472bb8ccb470170842d",
+    "architecture": "x86"
+  },
+  "mod_surface": {
+    "file_globs": ["*.asi", "*.ini"],
+    "directories": ["cleo", "modloader", "scripts", "advanced_plugin_management_example"]
+  },
+  "safety": {
+    "source": "manual",
+    "anti_cheat_risk": "none",
+    "online_risk": "offline_only",
+    "direct_online_launch": false,
+    "game_files_owned_by_user": true
+  },
+  "conversion": {
+    "status": "bridge_required",
+    "mod_coexistence": "preserve_existing_asi_surface",
+    "game_files_mutated_by_vrclient": false,
+    "required_bridge_capabilities": [
+      "x86-asi-entrypoint",
+      "d3d9-frame-intercept",
+      "per-eye-stereo-render",
+      "hmd-camera-pose",
+      "openxr-submission",
+      "controller-input-translation",
+      "controller-driven-arm-ik",
+      "hud-and-cutscene-comfort"
+    ],
+    "ownership": {
+      "runtime": "vrclient",
+      "stereo": "vrclient",
+      "camera": "vrclient",
+      "input": "vrclient",
+      "submission": "vrclient"
+    }
+  },
+  "verification": {
+    "status": "game_identity_observed_bridge_pinned_headset_pending",
+    "headset_verified": false,
+    "evidence": [
+      "W drive inspection 2026-08-29",
+      "classic Windows PE32 x86 executable",
+      "user install SHA-256 pinned above",
+      "existing ASI and loader surface is observed but not managed"
+    ]
+  }
+}

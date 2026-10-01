@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/runtime-profile.schema.json",
+  "title": "VR Runtime Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "target_refresh_mode",
+    "dynamic_resolution",
+    "foveation",
+    "frame_pacing",
+    "debug_validation",
+    "lifecycle"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "target_refresh_mode": {
+      "type": "string",
+      "enum": ["system_default", "72hz", "80hz", "90hz", "120hz", "144hz"]
+    },
+    "dynamic_resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "min_scale", "max_scale", "initial_scale", "step_scale", "frame_time_budget_ms"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "min_scale": { "type": "number", "minimum": 0.5, "maximum": 1.0 },
+        "max_scale": { "type": "number", "minimum": 0.5, "maximum": 1.5 },
+        "initial_scale": { "type": "number", "minimum": 0.5, "maximum": 1.5 },
+        "step_scale": { "type": "number", "exclusiveMinimum": 0.0, "maximum": 0.25 },
+        "frame_time_budget_ms": { "type": "number", "exclusiveMinimum": 0.0, "maximum": 30.0 }
+      }
+    },
+    "foveation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "preset", "inner_radius", "outer_radius"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "preset": { "type": "string", "enum": ["off", "low", "medium", "high"] },
+        "inner_radius": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "outer_radius": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    },
+    "frame_pacing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_missed_frames", "cpu_guard_ms", "gpu_guard_ms", "recovery_frames"],
+      "properties": {
+        "max_missed_frames": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "cpu_guard_ms": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "gpu_guard_ms": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "recovery_frames": { "type": "integer", "minimum": 1, "maximum": 240 }
+      }
+    },
+    "debug_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["openxr", "renderdoc_markers", "assert_on_contract_violation"],
+      "properties": {
+        "openxr": { "type": "boolean" },
+        "renderdoc_markers": { "type": "boolean" },
+        "assert_on_contract_violation": { "type": "boolean" }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startup_timeout_ms", "loss_recovery_timeout_ms"],
+      "properties": {
+        "startup_timeout_ms": { "type": "integer", "minimum": 1000, "maximum": 60000 },
+        "loss_recovery_timeout_ms": { "type": "integer", "minimum": 1000, "maximum": 120000 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dynamic_resolution": {
+            "properties": {
+              "enabled": { "const": true }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "dynamic_resolution": {
+            "properties": {
+              "min_scale": { "type": "number" },
+              "max_scale": { "type": "number" },
+              "initial_scale": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

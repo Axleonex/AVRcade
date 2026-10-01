@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/vrclient/test/demo-config.v2.schema.json",
+  "title": "VRClient Demo Config (SYNTHETIC test-only, v2)",
+  "description": "Test-only synthetic config kind, v2. The v1->v2 migration renames display_name -> title and adds a defaulted comfort_mode. NOT a production schema. Never loaded by the runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "profile_id",
+    "title",
+    "comfort_mode"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 2
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "comfort_mode": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "comfort",
+        "intense"
+      ]
+    }
+  }
+}

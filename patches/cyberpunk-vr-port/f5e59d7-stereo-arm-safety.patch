@@ -1,0 +1,127 @@
+diff --git a/src/red4ext_plugin/vrik/vrik_hook.h b/src/red4ext_plugin/vrik/vrik_hook.h
+index d23414b..62cb9fb 100644
+--- a/src/red4ext_plugin/vrik/vrik_hook.h
++++ b/src/red4ext_plugin/vrik/vrik_hook.h
+@@ -985,6 +985,29 @@ static inline void VRIK_SolveArm(uint8_t* boneBuf, int upperIdx, int foreIdx, in
+         }
+     }
+ 
++    // ANATOMICAL REACH CLAMP. Keep ordinary motion exactly on the controller, but when the
++    // physical controller is beyond this avatar's calibrated shoulder-to-wrist length, stop
++    // the virtual wrist at full extension. The old path lengthened both bones and then pinned
++    // the wrist to the raw controller, which made the arms visibly rubbery. A small controller
++    // lead at an unreachable extreme is less distracting than changing the player's anatomy.
++    float reachableTarget[3] = { targetModel[0], targetModel[1], targetModel[2] };
++    {
++        float toRaw[3] = {
++            reachableTarget[0] - shP[0],
++            reachableTarget[1] - shP[1],
++            reachableTarget[2] - shP[2]
++        };
++        const float rawDist = std::sqrt(toRaw[0]*toRaw[0] + toRaw[1]*toRaw[1] + toRaw[2]*toRaw[2]);
++        const float maxReach = (upLen + foreLen) * 0.9995f;
++        if (rawDist > maxReach && rawDist > 1e-4f && maxReach > 1e-4f) {
++            const float s = maxReach / rawDist;
++            reachableTarget[0] = shP[0] + toRaw[0] * s;
++            reachableTarget[1] = shP[1] + toRaw[1] * s;
++            reachableTarget[2] = shP[2] + toRaw[2] * s;
++        }
++    }
++    targetModel = reachableTarget;
++
+     // Hand -> shoulder (F4VR convention; xDir is along this).
+     float handToShoulder[3] = { shP[0]-targetModel[0], shP[1]-targetModel[1], shP[2]-targetModel[2] };
+     float hsLen = std::sqrt(handToShoulder[0]*handToShoulder[0]
+@@ -993,17 +1016,9 @@ static inline void VRIK_SolveArm(uint8_t* boneBuf, int upperIdx, int foreIdx, in
+     if (hsLen < 1e-4f) return;
+     float xDir[3] = { handToShoulder[0]/hsLen, handToShoulder[1]/hsLen, handToShoulder[2]/hsLen };
+ 
+-    // STRETCH instead of clamp (per F4VR). If the user reaches farther than the rest-pose arm
+-    // length, we keep the arm STRAIGHT by lengthening upLen+foreLen proportionally to cover hsLen.
+-    // The cosine law then computes a wrist angle of 0 (cos=1, sin=0) -> elbow lies on the
+-    // hand-shoulder line -> arm is perfectly straight.
++    // Segment lengths remain anatomical. reachableTarget above already guarantees a valid
++    // two-bone triangle and allows an effectively straight arm without lengthening either bone.
+     float upL = upLen, foreL = foreLen;
+-    if (hsLen > upL + foreL) {
+-        float diff = hsLen - upL - foreL;
+-        float ratio = foreL / (foreL + upL);
+-        foreL += ratio * diff;
+-        upL   += (1.0f - ratio) * diff;
+-    }
+     // Hand far closer than |up-fore|: math has no solution; equalise to keep solver stable.
+     if (hsLen < std::fabs(upL - foreL) + 1e-3f) {
+         float avg = (upL + foreL) * 0.5f;
+diff --git a/src/vr/core/vr_core.cpp b/src/vr/core/vr_core.cpp
+--- a/src/vr/core/vr_core.cpp
++++ b/src/vr/core/vr_core.cpp
+@@ -3359,7 +3359,10 @@ extern "C" void __fastcall OnLocateCameraCallback(float* rbxPtr, float xmm0_val)
+     // head now stays at the stable center.
+     int32_t ipdShiftFP[3] = {0, 0, 0};
+     if (hasXR) {
+-        const int renderEye = (g_locateCameraHits % 2);
++        // LocateCamera can fire for auxiliary/rejected views (vehicle rear-look is one).
++        // Hook-call parity therefore is not eye identity and can swap/duplicate the IPD sign.
++        // renderEye was captured with the pair-locked pose above; the final per-view callback
++        // below derives MAIN/VRCAM directly from the render dispatcher.
+ 
+         float right[3] = {};
+         //float hmdQuat[4] = { xrPose.oriX, -xrPose.oriZ, xrPose.oriY, xrPose.oriW };
+@@ -4368,9 +4372,25 @@ extern "C" void __fastcall OnFinalCameraCallback(float* rsiPtr) {
+     // block killed AER stereo.
+     if (locateSeq != 0) {
+         int32_t* finalPosFP = reinterpret_cast<int32_t*>(rsiPtr);
+-        finalPosFP[0] = g_lastLocatePosFP[0] + g_lastIpdShiftFP[0];
+-        finalPosFP[1] = g_lastLocatePosFP[1] + g_lastIpdShiftFP[1];
+-        finalPosFP[2] = g_lastLocatePosFP[2] + g_lastIpdShiftFP[2];
++        int32_t viewShiftFP[3] = {
++            g_lastIpdShiftFP[0], g_lastIpdShiftFP[1], g_lastIpdShiftFP[2]
++        };
++        const bool finalIsVrcam = CyberpunkVR_IsVrcamViewActive() != 0;
++        const bool finalIsMain = !finalIsVrcam && CyberpunkVR_IsMainViewActive() != 0;
++        if (finalIsMain || finalIsVrcam) {
++            const float viewEyeSign = finalIsVrcam ? +1.0f : -1.0f;
++            float right[3] = {};
++            ComputeRightVectorFromQuaternion(locateQuat, right);
++            if (IsPlausibleUnitVector3(right)) {
++                const float shift = GetDesiredHalfIpd() * viewEyeSign * 131072.0f;
++                viewShiftFP[0] = static_cast<int32_t>(right[0] * shift);
++                viewShiftFP[1] = static_cast<int32_t>(right[1] * shift);
++                viewShiftFP[2] = static_cast<int32_t>(right[2] * shift);
++            }
++        }
++        finalPosFP[0] = g_lastLocatePosFP[0] + viewShiftFP[0];
++        finalPosFP[1] = g_lastLocatePosFP[1] + viewShiftFP[1];
++        finalPosFP[2] = g_lastLocatePosFP[2] + viewShiftFP[2];
+ 
+         // Orientation (display-cant / view-row rebuild). Must run AFTER the position
+         // write above because it reads finalPosFP into the view packet.
+diff --git a/src/vr/stereo/sync_stereo.cpp b/src/vr/stereo/sync_stereo.cpp
+index 187df6c..74daaf2 100644
+--- a/src/vr/stereo/sync_stereo.cpp
++++ b/src/vr/stereo/sync_stereo.cpp
+@@ -2234,5 +2234,6 @@ static uint8_t __fastcall Detour_ViewFeatureCheck(uintptr_t work_context, uintpt
+ // cloud hook was too late: the wetness bytes landed but ScreenSpaceRain had already read zero.
+ static void viewdata_fill_from_wc(void* wc);
++extern "C" __declspec(dllexport) int CyberpunkVR_ViewDataDispatchFill;
+ extern "C" __declspec(dllexport) uint32_t CyberpunkVR_ViewDataFixMask;
+ extern "C" __declspec(dllexport) uint32_t CyberpunkVR_FogMirrorMask;
+ extern "C" __declspec(dllexport) uint32_t CyberpunkVR_EnvMirrorMask;
+@@ -2588,5 +2589,6 @@ static uint8_t __fastcall Detour_NodeDispatch(
+         ? static_cast<uint32_t>(prof_work - reinterpret_cast<uintptr_t>(g_exe_base)) : 0;
+     // Close VRCAM's viewData holes as early as the view is seen at all.
+-    if ((CyberpunkVR_ViewDataFixMask || CyberpunkVR_FogMirrorMask ||
++    if (CyberpunkVR_ViewDataDispatchFill &&
++        (CyberpunkVR_ViewDataFixMask || CyberpunkVR_FogMirrorMask ||
+          CyberpunkVR_EnvMirrorMask) && vrcam_node && work_context)
+         viewdata_fill_from_wc(work_context);
+@@ -5270,3 +5272,9 @@ static void viewdata_diff_vrcam(__int64 vd) {
+ // reads +0x4A0. Nothing consumes the field, so filling it is a no-op.
++// FAIL CLOSED: the generic node-dispatch work object is not lifetime-stable while REDengine
++// destroys/recreates the player camera. Calling its virtual view-data accessor during that
++// transition caused Cyberpunk2077.exe+0x37E622 to read through null while spawning the player.
++// Keep the experimental early-fill path opt-in; typed consumer hooks continue to mirror their
++// own data without invoking an arbitrary work-object vtable.
++extern "C" __declspec(dllexport) int CyberpunkVR_ViewDataDispatchFill = 0;
+ extern "C" __declspec(dllexport) uint32_t CyberpunkVR_ViewDataFixMask = (1u << 0) | (1u << 5) | (1u << 7);
+ extern "C" __declspec(dllexport) uint64_t CyberpunkVR_DebugViewDataFixes = 0;

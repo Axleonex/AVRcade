@@ -1,0 +1,4 @@
+LIBRARY "vrclient_runtime_smoke_payload"
+EXPORTS
+    DetourFinishHelperProcess @1
+    vrclient_runtime_smoke_probe

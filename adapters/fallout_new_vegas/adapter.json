@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "adapter_id": "vrclient-fallout-new-vegas-community-vr",
+  "adapter_version": "0.2.0",
+  "display_name": "Fallout: New Vegas Community VR",
+  "integration_type": "native-openxr-with-community-gameplay-stack",
+  "native_renderer": true,
+  "supported_games": ["fallout-new-vegas"],
+  "storefronts": {
+    "supported": ["steam", "gog"],
+    "manual_override": true,
+    "unsupported": ["epic", "microsoft-store", "game-pass", "bethesda-net"]
+  },
+  "steam_app_id": "22380",
+  "game_executables": ["FalloutNV.exe", "FalloutNVLauncher.exe"],
+  "launch": {
+    "profile_manager": "mod-organizer-2",
+    "entrypoint": "nvse_loader.exe",
+    "component_order": ["virtual-desktop-if-selected", "steamvr", "fnvr-tracker", "mod-organizer-2:nvse_loader.exe", "vrclient-native-openxr-adapter"]
+  },
+  "capabilities": [
+    "storefront_discovery",
+    "prerequisite_validation",
+    "reversible_profile_conversion",
+    "compatibility_reporting",
+    "comfort_guidance",
+    "component_launch_orchestration",
+    "diagnostics"
+  ],
+  "restrictions": {
+    "bundles_game_assets": false,
+    "bundles_vorpx": false,
+    "bundles_third_party_mods": false,
+    "bypasses_activation": false,
+    "claims_hardware_verification": false
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "game_id": "vrclient-smoke-host",
+  "display_name": "VRClient Controlled Smoke Host",
+  "controlled_smoke_target": true,
+  "executable_names": [
+    "vrclient_smoke_host.exe"
+  ],
+  "support_policy": {
+    "allowed_sources": [
+      "direct",
+      "manual",
+      "attach"
+    ],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "none",
+    "online_risk": "offline_only"
+  },
+  "runtime": {
+    "path": "build/bin/vr_runtime.dll",
+    "sha256": "7e7bcebd643436b999580b67ec001527524d7f7a8d1d33ce46d8d15d934d7dc9",
+    "architecture": "x64"
+  },
+  "builds": [
+    {
+      "build_id": "smoke-2026-06-11",
+      "support": "supported",
+      "confidence_threshold": 80,
+      "file_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "a4a4893f8f2befed4daa6785f736cf32aa588af41553b3730b683b13fdc4efd7"
+        }
+      ],
+      "product_versions": [
+        "0.1.0-smoke"
+      ],
+      "signatures": [
+        {
+          "id": "smoke-main-banner",
+          "pattern": "VRCLIENT_SMOKE_HOST",
+          "confidence": 85
+        }
+      ],
+      "offsets": [
+        {
+          "name": "identity_banner",
+          "rva": "0x1000",
+          "phase3_identity_only": true
+        }
+      ]
+    },
+    {
+      "build_id": "smoke-deprecated",
+      "support": "unsupported",
+      "refusal_reason": "unsupported_sample_build",
+      "confidence_threshold": 80,
+      "file_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "c4455457d2081f1df5f3b6850f849664125cc89a0e58fcfd6ff86ef6d1ad1315"
+        }
+      ],
+      "product_versions": [
+        "0.0.9-smoke"
+      ],
+      "signatures": [
+        {
+          "id": "smoke-deprecated-banner",
+          "pattern": "VRCLIENT_SMOKE_HOST_DEPRECATED",
+          "confidence": 85
+        }
+      ],
+      "offsets": [
+        {
+          "name": "identity_banner",
+          "rva": "0x1000",
+          "phase3_identity_only": true
+        }
+      ]
+    }
+  ]
+}

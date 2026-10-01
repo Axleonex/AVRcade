@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avrcade.local/schemas/unreal-native-profile.schema.json",
+  "title": "VRClient Native Unreal Conversion Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "profile_id",
+    "game",
+    "engine",
+    "renderer",
+    "conversion",
+    "verification"
+  ],
+  "properties": {
+    "schema": {
+      "const": "unreal-native/1"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "game": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "display_name",
+        "steam_app_id",
+        "steam_buildid_observed",
+        "launcher_executable",
+        "shipping_binary",
+        "executable_sha256_observed"
+      ],
+      "properties": {
+        "slug": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "steam_app_id": { "type": "string", "pattern": "^[0-9]+$" },
+        "steam_buildid_observed": { "type": "string", "pattern": "^[0-9]+$" },
+        "launcher_executable": { "type": "string", "minLength": 1 },
+        "shipping_binary": { "type": "string", "minLength": 1 },
+        "executable_sha256_observed": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+          ]
+        }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "version_observed", "version_source"],
+      "properties": {
+        "family": { "const": "unreal" },
+        "version_observed": { "type": "string", "minLength": 1 },
+        "version_source": { "type": "string", "minLength": 1 }
+      }
+    },
+    "renderer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_api", "observed_api", "observation_state"],
+      "properties": {
+        "expected_api": { "const": "d3d12" },
+        "observed_api": {
+          "type": "string",
+          "enum": ["unverified", "d3d12", "d3d11", "vulkan"]
+        },
+        "observation_state": {
+          "type": "string",
+          "enum": ["planned", "controlled_verified", "game_observed"]
+        }
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_backend", "loading", "ownership", "capabilities"],
+      "properties": {
+        "runtime_backend": { "const": "d3d12" },
+        "loading": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "state"],
+          "properties": {
+            "mode": { "const": "in_process_adapter" },
+            "state": {
+              "type": "string",
+              "enum": [
+                "planned",
+                "controlled_verified",
+                "game_observed",
+                "game_verified"
+              ]
+            }
+          }
+        },
+        "ownership": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stereo", "camera", "input", "submission"],
+          "properties": {
+            "stereo": { "const": "vrclient" },
+            "camera": { "const": "vrclient" },
+            "input": { "const": "vrclient" },
+            "submission": { "const": "vrclient" }
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "graphics_bridge",
+            "stereo_views",
+            "head_tracking",
+            "gamepad_fallback",
+            "motion_controls"
+          ],
+          "properties": {
+            "graphics_bridge": { "$ref": "#/$defs/capabilityState" },
+            "stereo_views": { "$ref": "#/$defs/capabilityState" },
+            "head_tracking": { "$ref": "#/$defs/capabilityState" },
+            "gamepad_fallback": { "$ref": "#/$defs/capabilityState" },
+            "motion_controls": { "$ref": "#/$defs/capabilityState" }
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "external_converter_absent_required",
+        "private_room_only",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unverified", "controlled_verified", "headset_t1", "headset_t2"]
+        },
+        "external_converter_absent_required": { "type": "boolean" },
+        "private_room_only": { "type": "boolean" },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "capabilityState": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "controlled_verified",
+        "game_observed",
+        "game_verified"
+      ]
+    }
+  }
+}

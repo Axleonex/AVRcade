@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "game_id": "big-walk",
+  "display_name": "Big Walk",
+  "controlled_smoke_target": false,
+  "executable_names": ["Big Walk.exe"],
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "target_architecture": "x64",
+    "anti_cheat_risk": "known_safe",
+    "online_risk": "private_modded_coop"
+  },
+  "vr_mod": {
+    "package": "CircuitLord-Big_Walk_VR",
+    "requires_steamvr": true,
+    "headset_verified_by_vrclient": false
+  },
+  "builds": []
+}

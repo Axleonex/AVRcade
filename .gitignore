@@ -1,0 +1,48 @@
+build/
+Detours-*/
+Detours-*.zip
+# OpenXR SDK source + build + install prefix bootstrapped by tools/build-openxr.ps1.
+# Built from source (Khronos OpenXR-SDK, Apache-2.0, pinned tag) into a project-local,
+# non-standard prefix; only the bootstrap SCRIPT is committed, never these artifacts.
+external/
+# Runtime diagnostics/crash residue written by vrclient_* executables when run
+# from the repo root (e.g. logs/diagnostics/*.jsonl, logs/crashes/*).
+logs/
+
+# Local release products. The build scripts and installer source are tracked;
+# generated setup binaries and payloads are reproducible outputs.
+artifacts/dist/
+
+# Local evidence, captures and third-party drops gathered while developing the
+# adapters. None of it is needed to build, and much of it is other projects'
+# files or game-derived data that must not be redistributed.
+artifacts/
+
+# Python bytecode cache from the tests/native/**/*.py validators.
+__pycache__/
+*.pyc
+.pytest_cache/
+external/repoxr-src/
+
+# Assistant and planning scratch.
+
+# Build outputs and editor state.
+bin/
+obj/
+*.obj
+*.pdb
+*.ilk
+.vs/
+.vscode/
+*.user
+
+# Credentials never belong in the repository.
+.env
+.env.*
+*.pem
+*.pfx
+*.snk
+nexus-api-key.txt
+
+# Private word list for scripts/export-public.ps1
+.export-private-*.txt

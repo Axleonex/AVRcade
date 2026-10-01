@@ -1,0 +1,3 @@
+{ "schema": "modpack-spec/1", "game_slug": "demo-coop", "steam_app_id": "999999",
+  "community": "demo-coop", "mods": [ { "namespace": "BepInEx", "name": "BepInExPack" },
+  { "namespace": "DemoAuthor", "name": "DemoVR" } ] }

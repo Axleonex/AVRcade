@@ -1,0 +1,9 @@
+{
+  "schema": "comfort-map/1",
+  "game_slug": "lethal-company",
+  "cfg_file": "BepInEx/config/io.daxcess.lcvr.cfg",
+  "verified_against_cfg": true,
+  "map": {
+    "snap_turn.degrees": "Input/SnapTurnSize"
+  }
+}
