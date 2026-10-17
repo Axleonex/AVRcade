@@ -1,0 +1,9 @@
+{
+  "schema": "flat-catalogue-game/1",
+  "game_id": "yapyap",
+  "display_name": "YAPYAP",
+  "steam_app_id": "3834090",
+  "engine": "unity",
+  "executable_names": ["yapyap.exe"],
+  "vr_unavailable_reason": "YAPYAP uses a local UUVR and AVRcade bridge; launch SteamVR and select the matching profile for manager play."
+}

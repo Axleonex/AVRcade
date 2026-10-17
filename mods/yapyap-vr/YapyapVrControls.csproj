@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>10</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <OutputPath>$(MSBuildProjectDirectory)\artifacts\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetGameDir Condition="'$(TargetGameDir)' == ''">W:\SteamLibrary\steamapps\common\YAPYAP</TargetGameDir>
+    <BepInExRoot Condition="'$(BepInExRoot)' == ''">$(TargetGameDir)</BepInExRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="core/**/*.cs" />
+    <Compile Remove="tests/**/*.cs" />
+    <ProjectReference Include="core\YapyapVrControls.Core.csproj" />
+    <Compile Include="..\..\client\VrClient.Core\Streaming\SpectatorProtocol.cs" Link="Streaming\SpectatorProtocol.cs" />
+    <Reference Include="BepInEx"><HintPath>$(BepInExRoot)\BepInEx\core\BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(BepInExRoot)\BepInEx\core\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp-firstpass"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mirror"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Mirror.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MagicaClothV2"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\MagicaClothV2.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Unity.RenderPipelines.Universal.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Cinemachine"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\Unity.Cinemachine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.XRModule"><HintPath>$(TargetGameDir)\yapyap_Data\Managed\UnityEngine.XRModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Uuvr.XR.OpenVR"><HintPath>$(BepInExRoot)\BepInEx\plugins\AVRcade-UUVR\Uuvr.XR.OpenVR.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Uuvr"><HintPath>$(BepInExRoot)\BepInEx\plugins\AVRcade-UUVR\Uuvr.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

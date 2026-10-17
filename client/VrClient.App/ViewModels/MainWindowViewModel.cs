@@ -154,6 +154,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private string? GameModManagerExecutable(GameItemViewModel? game) =>
         game is not { UsesFolderMods: true } ? null
         : _gameModManagers.Load(game.Slug) ??
+          (game.IsYapyap ? _installedManagers.FirstOrDefault(manager =>
+              manager.Kind is ModManagerKind.R2Modman or ModManagerKind.Thunderstore)?.LaunchPath : null) ??
           _installedManagers.FirstOrDefault(manager => manager.Kind == ModManagerKind.Vortex)?.LaunchPath;
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
@@ -389,6 +391,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var view = item.View;
         var installed = view.InstallDir is not null;
         var allowed = view.Readiness is not GameReadiness.Blocked;
+        if (item.IsYapyap)
+            return PlayModePlanner.Yapyap(installed, YapyapVrInstall.Inspect(view.InstallDir),
+                GameModManagerExecutable(item) is not null,
+                VrClient.Core.Launch.SteamVrStartup.IsServerRunning());
         switch (view.Engine)
         {
             case GameEngine.Unity:
@@ -568,6 +574,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             var outcome = game.View.Engine switch
             {
+                _ when game.IsYapyap && mode is (PlayMode.VrOnly or PlayMode.VrWithMods) =>
+                    await _controller.LaunchYapyapVrAsync(mode,
+                        managerExecutable: mode == PlayMode.VrWithMods ? GameModManagerExecutable(game) : null),
+                _ when game.IsYapyap => _controller.LaunchYapyapDesktop(mode,
+                    managerExecutable: mode == PlayMode.ModsNoVr ? GameModManagerExecutable(game) : null),
                 GameEngine.Unity => LaunchUnity(game, dir, mode, acknowledge),
                 GameEngine.Unreal => mode is PlayMode.VrOnly or PlayMode.VrWithMods
                     ? await _controller.LaunchUnrealAsync(game.Slug, acknowledge)

@@ -1,0 +1,161 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "source_verified",
+  "game_slug": "yapyap",
+  "title": "YAPYAP controller map",
+  "note": "Quest X (left lower) and Index left A duck. Right B grabs on both devices; in menus it goes back. Right A jumps/confirms. Left trigger toggles inventory; right stick press pauses. Index uses the same hand/button positions and actions as Quest. Custom SteamVR bindings can change this map. Index bindings are source verified; a physical Index headset/controller test is pending.",
+  "conversion_credit": {
+    "creator": "AVRcade (local controller bridge); Raicuparta (UUVR rendering)",
+    "project": "AVRcade YAPYAP bridge with UUVR",
+    "project_url": "https://github.com/Raicuparta/uuvr",
+    "controls_url": "https://github.com/Raicuparta/uuvr#readme"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        {
+          "slot": "left_stick",
+          "control": "Left thumbstick: tilt / press",
+          "action": "Move / Ragdoll (press)",
+          "note": "In inventory, tilt left/right to retrieve and down to switch hands. Return the stick to center between selections."
+        },
+        {
+          "slot": "right_stick",
+          "control": "Right thumbstick: tilt / press",
+          "action": "Turn / Pause (press)",
+          "note": "Press once to open or close settings/pause."
+        },
+        {
+          "slot": "left_trigger",
+          "control": "Left trigger (index finger)",
+          "action": "Toggle inventory",
+          "note": "Squeeze and release to open or close inventory."
+        },
+        {
+          "slot": "right_trigger",
+          "control": "Right trigger (index finger)",
+          "action": "Fire",
+          "note": "Voice spells use the headset microphone."
+        },
+        {
+          "slot": "left_grip",
+          "control": "Left grip (middle finger)",
+          "action": "Use held item",
+          "note": "Disabled while inventory selection is open. Optional task list: left grip + left upper button; this also sends normal Use/Drop."
+        },
+        {
+          "slot": "right_grip",
+          "control": "Right grip (middle finger)",
+          "action": "Grab / Hold / Store item",
+          "note": "Alternative to right B. Look at the item first; keep holding for hold interactions. In inventory, a fresh squeeze stores the item."
+        },
+        {
+          "slot": "left_primary",
+          "control": "X (left lower button)",
+          "action": "Duck / Close inventory",
+          "note": "Quest X matches Index left A. In gameplay: duck; in inventory: close; not a menu-confirm button."
+        },
+        {
+          "slot": "left_secondary",
+          "control": "Y (left upper button)",
+          "action": "Drop item",
+          "note": "Quest Y matches Index left B. Optional left grip + this button opens tasks, also sending Use/Drop."
+        },
+        {
+          "slot": "right_primary",
+          "control": "A (right lower button)",
+          "action": "Jump / Confirm / Store",
+          "note": "Right A. In menus: confirm; in inventory: store the right-hand item."
+        },
+        {
+          "slot": "right_secondary",
+          "control": "B (right upper button)",
+          "action": "Grab / Store / Back",
+          "note": "Right B. In gameplay: grab/hold/interact. In inventory: store; in menus: go back."
+        },
+        {
+          "slot": "menu",
+          "control": "Right thumbstick press",
+          "action": "Pause shortcut",
+          "note": "Use right stick press. Grip + right B no longer pauses, so grabbing cannot open pause accidentally."
+        }
+      ],
+      "context": "Left X ducks; right B grabs. Inventory: left trigger toggles; tilt left/right to retrieve, down to swap hands. Right A/B or right grip stores. Left lower button or left trigger closes inventory. Right stick press pauses. In menus: right A confirms, right B goes back. Optional tasks: left grip + left upper button (also sends Use/Drop)."
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index",
+      "bindings": [
+        {
+          "slot": "left_stick",
+          "control": "Left thumbstick: tilt / press",
+          "action": "Move / Ragdoll (press)",
+          "note": "In inventory, tilt left/right to retrieve and down to switch hands. Return the stick to center between selections."
+        },
+        {
+          "slot": "right_stick",
+          "control": "Right thumbstick: tilt / press",
+          "action": "Turn / Pause (press)",
+          "note": "Press once to open or close settings/pause."
+        },
+        {
+          "slot": "left_trigger",
+          "control": "Left trigger (index finger)",
+          "action": "Toggle inventory",
+          "note": "Squeeze and release to open or close inventory."
+        },
+        {
+          "slot": "right_trigger",
+          "control": "Right trigger (index finger)",
+          "action": "Fire",
+          "note": "Voice spells use the headset microphone."
+        },
+        {
+          "slot": "left_grip",
+          "control": "Left grip (squeeze)",
+          "action": "Use held item",
+          "note": "Disabled while inventory selection is open. Optional task list: left grip + left upper button; this also sends normal Use/Drop."
+        },
+        {
+          "slot": "right_grip",
+          "control": "Right grip (squeeze)",
+          "action": "Grab / Hold / Store item",
+          "note": "Alternative to right B. Look at the item first; keep holding for hold interactions. In inventory, a fresh squeeze stores the item."
+        },
+        {
+          "slot": "left_primary",
+          "control": "A (left controller)",
+          "action": "Duck / Close inventory",
+          "note": "Quest X matches Index left A. In gameplay: duck; in inventory: close; not a menu-confirm button."
+        },
+        {
+          "slot": "left_secondary",
+          "control": "B (left controller)",
+          "action": "Drop item",
+          "note": "Quest Y matches Index left B. Optional left grip + this button opens tasks, also sending Use/Drop."
+        },
+        {
+          "slot": "right_primary",
+          "control": "A (right controller)",
+          "action": "Jump / Confirm / Store",
+          "note": "Right A. In menus: confirm; in inventory: store the right-hand item."
+        },
+        {
+          "slot": "right_secondary",
+          "control": "B (right controller)",
+          "action": "Grab / Store / Back",
+          "note": "Right B. In gameplay: grab/hold/interact. In inventory: store; in menus: go back."
+        },
+        {
+          "slot": "menu",
+          "control": "Right thumbstick press",
+          "action": "Pause shortcut",
+          "note": "Use right stick press. Grip + right B no longer pauses, so grabbing cannot open pause accidentally."
+        }
+      ],
+      "context": "Left Index A matches Quest X: duck. Right B grabs. Inventory: left trigger toggles; tilt left/right to retrieve, down to swap hands. Right A/B or right grip stores. Left lower button or left trigger closes inventory. Right stick press pauses. In menus: right A confirms, right B goes back. Optional tasks: left grip + left upper button (also sends Use/Drop)."
+    }
+  ]
+}

@@ -51,6 +51,44 @@ public static class PlayModePlanner
     private const string Blocked = "Blocked by AVRcade's safety policy";
     private const string NoRuntime = "No SteamVR or Virtual Desktop detected. Start your headset software first";
 
+    public const string YapyapNeedsSteamVr =
+        "AVRcade will start SteamVR before launching. Connect your headset; YAPYAP uses SteamVR even with Virtual Desktop";
+
+    /// steamVrRunning: YAPYAP's UUVR build uses OpenVR, so only SteamVR can show it in the headset.
+    public static IReadOnlyList<PlayModeState> Yapyap(bool installed, YapyapVrInstall vr,
+        bool managerAvailable = false, bool steamVrRunning = true)
+    {
+        if (!installed)
+            return All(NeedsGame);
+        var steamVrNote = steamVrRunning ? null : YapyapNeedsSteamVr;
+        if (!vr.Installed)
+            return [
+                Setup(PlayMode.VrOnly, vr.Detail, "See VR setup", PlayModeSetup.OpenVrSetup),
+                Setup(PlayMode.VrWithMods, vr.Detail, "See VR setup", PlayModeSetup.OpenVrSetup),
+                managerAvailable
+                    ? Ready(PlayMode.ModsNoVr, "Start Modded from a desktop profile without VR plugins", "Open manager for mods")
+                    : ModsSetup(PlayMode.ModsNoVr, "Choose a mod manager for desktop mods"),
+                Ready(PlayMode.Vanilla, "Normal Steam launch", "Play on monitor")
+            ];
+        return [
+            vr.OtherPluginFiles == 0
+                ? Ready(PlayMode.VrOnly, steamVrRunning ? "VR package installed; SteamVR is running" : "VR package installed; SteamVR starts automatically", "Play in VR", steamVrNote)
+                : Unavailable(PlayMode.VrOnly, "Other plugins are installed. Use VR + mods"),
+            managerAvailable
+                ? Ready(PlayMode.VrWithMods, "Choose a VR profile in the manager, then Start Modded",
+                    "Open manager for VR", "Manager opens first on desktop. SteamVR is required for the VR game")
+                : vr.OtherPluginFiles > 0
+                ? Ready(PlayMode.VrWithMods,
+                    $"VR plus {vr.OtherPluginFiles} extra plugin DLLs in the game folder",
+                    "Play VR + mods", steamVrNote)
+                : ModsSetup(PlayMode.VrWithMods, "Choose a mod manager; no extra mod is required"),
+            managerAvailable
+                ? Ready(PlayMode.ModsNoVr, "Start Modded from a desktop profile without VR plugins", "Open manager for mods")
+                : ModsSetup(PlayMode.ModsNoVr, "Choose a mod manager with a desktop profile"),
+            Ready(PlayMode.Vanilla, "Steam launch with the mod loader disabled", "Play vanilla")
+        ];
+    }
+
     public static IReadOnlyList<PlayModeState> Unity(UnityPlayFacts f)
     {
         if (Gate(f.GameInstalled, f.LaunchAllowed) is { } gate)

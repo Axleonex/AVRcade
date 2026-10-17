@@ -46,7 +46,7 @@ public sealed record ActionOutcome(bool Ok, string Message);
 public delegate string? SteamInstallLocator(string appId, string exeName);
 
 /// Headless facade the GUI binds to. No Avalonia dependency — fully unit-testable.
-public sealed class AppController
+public sealed partial class AppController
 {
     // Keep future Red Dead work in the repository without advertising it in AVRcade yet.
     private const bool RedDeadCatalogEnabled = false;
@@ -335,6 +335,7 @@ public sealed class AppController
     public IReadOnlyList<GameView> ListGames(bool? headsetConnected = null)
     {
         var views = new List<GameView>();
+        AddYapyapCatalogueEntry(views);
         var headset = headsetConnected ?? _headsetConnected();
         foreach (var g in new GameCatalog().Discover(ModpacksDir, GamesDir, ProfilesDir))
         {

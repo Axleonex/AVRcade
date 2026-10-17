@@ -82,6 +82,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     public IReadOnlyList<PlayModeViewModel> PlayModes => _playModes;
     public bool HasPlayModes => _playModes.Count > 0;
     public PlayModeViewModel? PlayModeFor(PlayMode mode) => _playModes.FirstOrDefault(m => m.Mode == mode);
+    public bool IsYapyap => Slug == "yapyap";
     public bool IsInstalled => View.InstallDir is not null;
     public bool NotInstalled => !IsInstalled;
     public bool IsVrReady => _playModes.Any(mode => mode.IsVr && mode.IsLaunch);
@@ -124,8 +125,13 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
         ? "AVRcade plays the classic Windows version you already own. Point it at the folder that contains gta_sa.exe."
         : "AVRcade plays the copy you own on Steam; it never downloads games. Install it in Steam, then press Refresh.";
 
-    public IReadOnlyList<SetupStepViewModel> SetupSteps =>
-    [
+    public IReadOnlyList<SetupStepViewModel> SetupSteps => IsYapyap
+        ? [
+            new(1, "Install YAPYAP in Steam", "AVRcade uses your owned Steam copy.", IsInstalled),
+            new(2, "Prepare the YAPYAP VR package", View.ReadinessDetail, View.ModInstalled),
+            new(3, "Connect through SteamVR", "SteamVR is required, including when using Virtual Desktop. VR Only starts it automatically.", _runtimeDetected)
+        ]
+        : [
         new(1, IsInstalled ? "Game installed" : "Install the game",
             IsInstalled ? "Found in your Steam library."
                 : "AVRcade does not download games. Install it in Steam, then refresh.", IsInstalled),
@@ -177,7 +183,9 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
         ? $"{credit.Project} by {credit.Creator}"
         : string.Empty;
     public string? ConversionProjectUrl => ControllerReference?.ConversionCredit?.ProjectUrl;
-    public string? ControllerGuideUrl => ControllerReference?.ConversionCredit?.ControlsUrl;
+    public string? ControllerGuideUrl => IsYapyap
+        ? "https://github.com/Axleonex/AVRcade/tree/main/mods/yapyap-vr"
+        : ControllerReference?.ConversionCredit?.ControlsUrl;
     public string ConversionCreditDescription => HasModded
         ? "AVRcade installs this upstream conversion for VR only; in a mod manager profile you install and update it there. Credit stays with its creator."
         : "AVRcade installs and launches this upstream conversion; credit remains with its creator.";
@@ -202,7 +210,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     public bool IsGtaSanAndreas => View.Engine is GameEngine.LegacyD3D9;
     public bool IsRvThereYet => Slug == "rv-there-yet";
     /// Games whose mods are deployed into the game folder by any manager the player likes.
-    public bool UsesFolderMods => IsCyberpunk || IsUnreal;
+    public bool UsesFolderMods => IsCyberpunk || IsUnreal || IsYapyap;
     public GtaTurnPreference GtaTurnPreference => _gtaTurnPreference;
     public bool IsGtaSmoothTurn => _gtaTurnPreference.Mode is GtaTurnMode.Smooth;
     public bool IsGtaSnapTurn => !IsGtaSmoothTurn;
@@ -318,6 +326,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     {
         "private_modded_coop_requires_acknowledgement" =>
             "Modded play is for private sessions with friends who agreed to it. AVRcade asks you to confirm before a modded launch.",
+        "yapyap_experimental_vr" => "Experimental UUVR conversion. Use private sessions and compatible VR profiles.",
         "approved" => "Approved for this launch.",
         "anti_cheat_detected" => "Blocked: anti-cheat detected.",
         "unknown_game" => "Blocked: this game is not in the supported catalogue.",
@@ -343,7 +352,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     /// UEVR, its runtime and (where one is required) the game's VR profile are all in place.
     private bool UnrealVrSetupReady =>
         View.ModInstalled && (!View.ProfileImportRequired || View.ProfileImported);
-    public bool CanPrepare => IsInstalled && (HasModded
+    public bool CanPrepare => !IsYapyap && IsInstalled && (HasModded
         ? Modded!.CanPrepareManaged
         : (IsRvThereYet && View.Readiness is not GameReadiness.Blocked && !UnrealVrSetupReady) ||
           View.Readiness is GameReadiness.NeedsVrMod or GameReadiness.NeedsUevr ||
@@ -359,7 +368,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     /// acknowledgement; vanilla play has nothing modded to acknowledge.
     public bool RequiresLaunchAcknowledgement =>
         View.SafetyVerdict.Equals("Warn", StringComparison.OrdinalIgnoreCase);
-    public bool CanUninstall => View.Engine is GameEngine.Unity or GameEngine.Redengine && View.ModInstalled;
+    public bool CanUninstall => !IsYapyap && View.Engine is GameEngine.Unity or GameEngine.Redengine && View.ModInstalled;
 
     public void Dispose() => Modded?.Dispose();
 }

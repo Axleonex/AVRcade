@@ -28,6 +28,7 @@ A mode that is not ready says why and offers its one next step, such as *Install
 | PEAK | [PeakVR](https://thunderstore.io/c/peak/p/Andrey04o/PeakVR/) by Andrey04o | Confirmed in a headset |
 | Content Warning | [CWVR](https://thunderstore.io/c/content-warning/p/DaXcess/CWVR/) by DaXcess | Confirmed in a headset |
 | Big Walk | [Big Walk VR](https://old.thunderstore.io/c/big-walk/p/CircuitLord/Big_Walk_VR/) by CircuitLord | Confirmed in a headset |
+| YAPYAP | [UUVR](https://github.com/Raicuparta/uuvr) with [AVRcade bridge 0.3.39](mods/yapyap-vr/) | Quest 2 stereo, controls, menus and hat clearance tested; Valve Index bindings source verified |
 | RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
 | Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
 | Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; **Install VR backend** adds the VR plugins and downloads the modding frameworks they need. Supports one specific game build, which AVRcade checks first. Monitor modes work without it |
@@ -56,6 +57,14 @@ A portable `AVRcade-<version>-win-x64.zip` is published beside the installer: un
 1. Install the game in Steam.
 2. Start SteamVR or Virtual Desktop and connect your headset. If both are running, AVRcade sends the game to SteamVR.
 3. Open the game in AVRcade and press the button on **VR only**. The first press installs the VR mod; the next one plays.
+
+YAPYAP currently requires the source-built [VR package](mods/yapyap-vr/) before
+its VR buttons become available; it is not downloaded by the generic Unity installer.
+It uses SteamVR even through Virtual Desktop. **VR only** launches through Steam
+without a mod manager. **VR + mods** opens your chosen manager so you can select
+a profile containing UUVR and the AVRcade bridge. An extra game mod is optional.
+For **Mods, no VR**, select a profile without those VR plugins. **Vanilla** disables
+the game-folder mod loader for that launch. Existing release installers predate this source update.
 
 ## Playing VR with mods
 
