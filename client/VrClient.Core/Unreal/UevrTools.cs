@@ -28,13 +28,19 @@ public sealed record UevrGame(
     bool InjectionStable, bool HeadsetT1Verified, bool ProfileVerified,
     UevrProfileSource? ProfileSource = null,
     UevrCapabilities? Capabilities = null,
-    IReadOnlyList<string>? SupportedBuilds = null);
+    IReadOnlyList<string>? SupportedBuilds = null,
+    IReadOnlyList<string>? SteamLaunchArguments = null,
+    IReadOnlyDictionary<string, string>? ConfigOverrides = null);
 
 public sealed record UevrProfileImportResult(
     string Destination, string ManifestPath, string? BackupDirectory, int FileCount);
 
+/// InstalledSha256 is what AVRcade wrote (after any config overrides); SourceSha256
+/// is the reviewed upstream file it came from. Older manifests have no SourceSha256
+/// because they wrote the upstream bytes unchanged.
 public sealed record UevrProfileManifestEntry(
-    string RelativePath, string InstalledSha256, string? BackupRelativePath);
+    string RelativePath, string InstalledSha256, string? BackupRelativePath,
+    string? SourceSha256 = null);
 
 public sealed record UevrProfileManifest(
     string GameSlug, string SourceRevision, string ImportedAtUtc,
@@ -107,7 +113,56 @@ public static class UevrTools
             root.TryGetProperty("verification", out var verification) &&
                 verification.TryGetProperty("profile_status", out var status) &&
                 status.GetString() == "verified",
-            source, capabilities, supportedBuilds);
+            source, capabilities, supportedBuilds,
+            root.TryGetProperty("steam_launch_arguments", out var launchArguments) &&
+                launchArguments.ValueKind is JsonValueKind.Array
+                ? launchArguments.EnumerateArray().Select(item => item.GetString()!).ToArray()
+                : [],
+            profile.ValueKind is JsonValueKind.Object &&
+                profile.TryGetProperty("config_overrides", out var overrides)
+                ? ReadConfigOverrides(overrides)
+                : new Dictionary<string, string>());
+    }
+
+    /// Headset-tested config.txt values applied on top of the reviewed upstream
+    /// profile at import. Only plain KEY=VALUE settings are accepted.
+    private static IReadOnlyDictionary<string, string> ReadConfigOverrides(JsonElement overrides)
+    {
+        if (overrides.ValueKind is not JsonValueKind.Object)
+            throw new InvalidDataException("config_overrides must be an object");
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var property in overrides.EnumerateObject())
+        {
+            var value = property.Value.ValueKind is JsonValueKind.String ? property.Value.GetString()! : null;
+            if (property.Name.Length == 0 || !property.Name.All(ch => char.IsAsciiLetterOrDigit(ch) || ch == '_') ||
+                value is null || value.Any(ch => ch is '\r' or '\n' or '='))
+                throw new InvalidDataException($"config_override_invalid:{property.Name}");
+            result[property.Name] = value;
+        }
+        return result;
+    }
+
+    /// Replace each overridden KEY=VALUE line in a UEVR config.txt, appending keys
+    /// the file does not have yet. The file's own line ending is kept.
+    public static string ApplyConfigOverrides(string configText, IReadOnlyDictionary<string, string> overrides)
+    {
+        if (overrides.Count == 0) return configText;
+        var newline = configText.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
+        var lines = configText.Split('\n').Select(line => line.TrimEnd('\r')).ToList();
+        var trailingNewline = lines.Count > 0 && lines[^1].Length == 0;
+        if (trailingNewline) lines.RemoveAt(lines.Count - 1);
+        var pending = new Dictionary<string, string>(overrides, StringComparer.Ordinal);
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var separator = lines[i].IndexOf('=');
+            if (separator <= 0) continue;
+            var key = lines[i][..separator];
+            if (pending.Remove(key, out var value))
+                lines[i] = $"{key}={value}";
+        }
+        lines.AddRange(pending.OrderBy(pair => pair.Key, StringComparer.Ordinal)
+            .Select(pair => $"{pair.Key}={pair.Value}"));
+        return string.Join(newline, lines) + (trailingNewline ? newline : string.Empty);
     }
 
     private static UevrProfileSource ReadProfileSource(JsonElement source)
@@ -226,6 +281,8 @@ public static class UevrTools
                     using var memory = new MemoryStream();
                     stream.CopyTo(memory);
                     var bytes = memory.ToArray();
+                    if (!IsValidProfilePayload(pinned.ContentType, relative, bytes))
+                        throw new InvalidDataException($"profile_invalid_content:{relative}");
                     var actual = Hashing.Sha256OfBytes(bytes);
                     if (!actual.Equals(pinned.Sha256, StringComparison.OrdinalIgnoreCase))
                         throw new HashMismatchException(
@@ -238,6 +295,14 @@ public static class UevrTools
                     StringComparer.OrdinalIgnoreCase).ToArray();
                 if (missing.Length > 0)
                     throw new InvalidDataException($"profile_missing_files:{string.Join(',', missing)}");
+            }
+
+            if (game.ConfigOverrides is { Count: > 0 } overrides)
+            {
+                var stagedConfig = SafeCombine(stage, "config.txt");
+                if (!expected.ContainsKey("config.txt") || !File.Exists(stagedConfig))
+                    throw new InvalidDataException("config_overrides_need_config_txt");
+                File.WriteAllText(stagedConfig, ApplyConfigOverrides(File.ReadAllText(stagedConfig), overrides));
             }
 
             Directory.CreateDirectory(destination);
@@ -253,7 +318,8 @@ public static class UevrTools
                     Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
                     File.Copy(target, backupPath, overwrite: false);
                 }
-                applied.Add(new UevrProfileManifestEntry(relative, pinned.Sha256, backupRelative));
+                applied.Add(new UevrProfileManifestEntry(relative,
+                    Hashing.Sha256OfFile(SafeCombine(stage, relative)), backupRelative, pinned.Sha256));
             }
 
             var manifest = new UevrProfileManifest(
@@ -320,6 +386,8 @@ public static class UevrTools
             totalBytes += bytes.Length;
             if (bytes.Length > 2 * 1024 * 1024 || totalBytes > 8 * 1024 * 1024)
                 throw new InvalidDataException("profile_download_too_large");
+            if (!IsValidProfilePayload(file.ContentType, relative, bytes))
+                throw new InvalidDataException($"profile_invalid_content:{relative}");
             if (!Hashing.Sha256OfBytes(bytes).Equals(file.Sha256, StringComparison.OrdinalIgnoreCase))
                 throw new HashMismatchException($"Profile sha256 mismatch for {relative}");
             downloaded.Add((relative, bytes));
@@ -375,11 +443,16 @@ public static class UevrTools
             {
                 var relative = NormalizeRelativePath(entry.RelativePath);
                 if (!expected.TryGetValue(relative, out var pinned) ||
-                    !entry.InstalledSha256.Equals(pinned.Sha256, StringComparison.OrdinalIgnoreCase))
+                    !(entry.SourceSha256 ?? entry.InstalledSha256).Equals(pinned.Sha256, StringComparison.OrdinalIgnoreCase))
                     return false;
                 var installed = SafeCombine(destination, relative);
-                if (!File.Exists(installed) ||
-                    !Hashing.Sha256OfFile(installed).Equals(pinned.Sha256, StringComparison.OrdinalIgnoreCase))
+                if (!File.Exists(installed))
+                    return false;
+                // Backrooms retains its tested in-headset calibration when UEVR
+                // saves UI/camera settings. Other games retain their original
+                // readiness checks; immutable Backrooms files still match exactly.
+                if ((game.Slug != BackroomsTrackedHands.GameSlug || !IsUserTunable(pinned.ContentType)) &&
+                    !Hashing.Sha256OfFile(installed).Equals(entry.InstalledSha256, StringComparison.OrdinalIgnoreCase))
                     return false;
             }
             return true;
@@ -448,13 +521,35 @@ public static class UevrTools
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 
+    private static bool IsUserTunable(string contentType)
+        => contentType is "uevr_config" or "camera_config" or "imgui_config" or "uevr_object_hook";
+
     private static bool IsReviewedProfileContent(string contentType, string relativePath)
     {
         var extension = Path.GetExtension(relativePath);
         if (extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) ||
             extension.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
             extension.Equals(".lua", StringComparison.OrdinalIgnoreCase)) return false;
+        if (contentType == "uevr_object_hook")
+            return extension.Equals(".json", StringComparison.OrdinalIgnoreCase) &&
+                   relativePath.StartsWith("uobjecthook/", StringComparison.OrdinalIgnoreCase) &&
+                   relativePath.Count(character => character == '/') == 1;
         return contentType is "uevr_config" or "camera_config" or "imgui_config" or "documentation" or "metadata";
+    }
+
+    private static bool IsValidProfilePayload(string contentType, string relativePath, byte[] bytes)
+    {
+        if (!IsReviewedProfileContent(contentType, relativePath)) return false;
+        if (contentType is not ("uevr_object_hook" or "metadata")) return true;
+        try
+        {
+            using var document = JsonDocument.Parse(bytes);
+            return document.RootElement.ValueKind is JsonValueKind.Object or JsonValueKind.Array;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     private static string NormalizeRelativePath(string path)

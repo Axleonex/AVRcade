@@ -29,6 +29,7 @@ A mode that is not ready says why and offers its one next step, such as *Install
 | Content Warning | [CWVR](https://thunderstore.io/c/content-warning/p/DaXcess/CWVR/) by DaXcess | Confirmed in a headset |
 | Big Walk | [Big Walk VR](https://old.thunderstore.io/c/big-walk/p/CircuitLord/Big_Walk_VR/) by CircuitLord | Confirmed in a headset |
 | YAPYAP | [UUVR](https://github.com/Raicuparta/uuvr) with [AVRcade bridge 0.3.39](mods/yapyap-vr/) | Quest 2 stereo, controls, menus and hat clearance tested; Valve Index bindings source verified |
+| Escape the Backrooms | [UEVR](https://github.com/praydog/UEVR), community profile and AVRcade keyboard, HUD, menus and controller arms | [Quest-tested source checkpoint; helper setup required](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
 | RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
 | Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
 | Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; **Install VR backend** adds the VR plugins and downloads the modding frameworks they need. Supports one specific game build, which AVRcade checks first. Monitor modes work without it |

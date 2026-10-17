@@ -1,6 +1,8 @@
 using System.IO.Compression;
 using VrClient.Core;
+using VrClient.Core.Model;
 using VrClient.Core.Modpack;
+using VrClient.Core.Safety;
 using VrClient.Core.Unreal;
 using Xunit;
 
@@ -41,13 +43,14 @@ public class UevrToolsTests
         }
     }
 
-    private static UevrGame ImportGame(string sha256, string contentType = "uevr_config")
+    private static UevrGame ImportGame(string sha256, string contentType = "uevr_config",
+        string path = "config.txt")
         => new("rv-there-yet", "rv-there-yet", "RV There Yet?", "3949040",
             "nightly", "Ride.exe", "Ride/Binaries/Win64/Ride-Win64-Shipping.exe",
             false, false, false,
             new UevrProfileSource("https://example.test/repo", new string('a', 40), "profile",
                 "https://example.test/tree", "not_declared", "user_import_only",
-                [new UevrProfileFile("config.txt", sha256, contentType, "import")]));
+                [new UevrProfileFile(path, sha256, contentType, "import")]));
 
     private static string WriteTemp(string content)
     {
@@ -211,6 +214,7 @@ public class UevrToolsTests
             Assert.True(File.Exists(result.ManifestPath));
             Assert.True(UevrTools.IsImportedProfileValid(
                 ImportGame(Hashing.Sha256OfBytes(bytes)), destination));
+            // Existing catalogue games retain their original hash-readiness checks.
             File.WriteAllText(Path.Combine(destination, "config.txt"), "edited after import");
             Assert.False(UevrTools.IsImportedProfileValid(
                 ImportGame(Hashing.Sha256OfBytes(bytes)), destination));
@@ -218,6 +222,113 @@ public class UevrToolsTests
             Assert.Equal("edited after import", File.ReadAllText(Path.Combine(destination, "config.txt")));
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Imported_profile_stays_ready_after_uevr_saves_settings_but_not_when_structure_breaks()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"uevr-profile-{Guid.NewGuid():N}");
+        var archivePath = Path.Combine(root, "profile.zip");
+        var destination = Path.Combine(root, "installed");
+        var config = "UI_Distance=2.000000\n"u8.ToArray();
+        var meta = "{\"name\":\"profile\"}"u8.ToArray();
+        var game = ImportGame(Hashing.Sha256OfBytes(config)) with
+        {
+            Slug = BackroomsTrackedHands.GameSlug,
+            ProfileSource = ImportGame(Hashing.Sha256OfBytes(config)).ProfileSource! with
+            {
+                Files =
+                [
+                    new UevrProfileFile("config.txt", Hashing.Sha256OfBytes(config), "uevr_config", "import"),
+                    new UevrProfileFile("ProfileMeta.json", Hashing.Sha256OfBytes(meta), "metadata", "import")
+                ]
+            }
+        };
+        try
+        {
+            Directory.CreateDirectory(root);
+            WriteZip(archivePath, ("config.txt", config), ("ProfileMeta.json", meta));
+            UevrTools.ImportProfileArchive(game, archivePath, destination);
+            File.WriteAllText(Path.Combine(destination, "config.txt"), "UI_Distance=1.500000\n");
+            Assert.True(UevrTools.IsImportedProfileValid(game, destination));
+
+            File.WriteAllText(Path.Combine(destination, "ProfileMeta.json"), "{\"name\":\"changed\"}");
+            Assert.False(UevrTools.IsImportedProfileValid(game, destination));
+            File.WriteAllBytes(Path.Combine(destination, "ProfileMeta.json"), meta);
+            Assert.True(UevrTools.IsImportedProfileValid(game, destination));
+
+            File.Delete(Path.Combine(destination, "config.txt"));
+            Assert.False(UevrTools.IsImportedProfileValid(game, destination));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Profile_import_applies_headset_tested_config_overrides_and_rolls_them_back()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"uevr-profile-{Guid.NewGuid():N}");
+        var archivePath = Path.Combine(root, "profile.zip");
+        var destination = Path.Combine(root, "installed");
+        var bytes = "A=1\nUI_Distance=2.000000\nUI_Size=2.000000\n"u8.ToArray();
+        var game = ImportGame(Hashing.Sha256OfBytes(bytes)) with
+        {
+            ConfigOverrides = new Dictionary<string, string>
+            {
+                ["UI_Distance"] = "1.500000",
+                ["UI_Size"] = "1.000000"
+            }
+        };
+        try
+        {
+            Directory.CreateDirectory(root);
+            WriteZip(archivePath, ("config.txt", bytes));
+            UevrTools.ImportProfileArchive(game, archivePath, destination);
+            Assert.Equal("A=1\nUI_Distance=1.500000\nUI_Size=1.000000\n",
+                File.ReadAllText(Path.Combine(destination, "config.txt")));
+            Assert.True(UevrTools.IsImportedProfileValid(game, destination));
+            Assert.Equal(1, UevrTools.RollbackImportedProfile(destination));
+            Assert.False(File.Exists(Path.Combine(destination, "config.txt")));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Config_overrides_keep_line_endings_and_append_missing_keys()
+    {
+        var overrides = new Dictionary<string, string> { ["UI_Size"] = "1.000000", ["New_Key"] = "x" };
+        Assert.Equal("UI_Size=1.000000\r\nOther=2\r\nNew_Key=x\r\n",
+            UevrTools.ApplyConfigOverrides("UI_Size=2.000000\r\nOther=2\r\n", overrides));
+        Assert.Equal("UI_Size=1.000000\nNew_Key=x",
+            UevrTools.ApplyConfigOverrides("UI_Size=2.0", overrides));
+    }
+
+    [Fact]
+    public void Escape_the_backrooms_keeps_compact_world_fixed_ui_settings()
+    {
+        var game = UevrTools.LoadGame(Path.Combine(VrClient.Core.Tests.TestRepoRoot.Find(),
+            "config", "unreal", "escape-the-backrooms.uevr.json"));
+        Assert.Equal("1.500000", game.ConfigOverrides!["UI_Distance"]);
+        Assert.Equal("1.000000", game.ConfigOverrides["UI_Size"]);
+        Assert.Equal("false", game.ConfigOverrides["UI_FollowView"]);
+        Assert.Equal("false", game.ConfigOverrides["UI_Framework_FollowView"]);
+        Assert.Equal("false", game.ConfigOverrides["VR_DecoupledPitchUIAdjust"]);
+    }
+
+    [Fact]
+    public void Invalid_config_overrides_are_refused()
+    {
+        var path = WriteTemp("""
+            {
+              "game_slug": "x", "game_id": "x", "display_name": "X", "steam_app_id": "1",
+              "executable_roles": { "launcher_stub": "X.exe", "shipping_binary": "B\\X-Win64-Shipping.exe" },
+              "uevr_profile": { "config_overrides": { "UI_Size": "1\nVR_Evil=1" } }
+            }
+            """);
+        try
+        {
+            Assert.Throws<InvalidDataException>(() => UevrTools.LoadGame(path));
+        }
+        finally { File.Delete(path); }
     }
 
     [Fact]
@@ -296,6 +407,38 @@ public class UevrToolsTests
     }
 
     [Fact]
+    public void Profile_import_accepts_only_json_object_hook_data_under_the_uobjecthook_folder()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"uevr-profile-hook-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(root);
+            var valid = "{\"camera\":{}}"u8.ToArray();
+            var archive = Path.Combine(root, "valid.zip");
+            WriteZip(archive, ("uobjecthook/camera_state.json", valid));
+            var game = ImportGame(Hashing.Sha256OfBytes(valid), "uevr_object_hook",
+                "uobjecthook/camera_state.json");
+            var result = UevrTools.ImportProfileArchive(game, archive, Path.Combine(root, "valid"));
+            Assert.Equal(1, result.FileCount);
+
+            var invalidJson = "not json"u8.ToArray();
+            var invalid = Path.Combine(root, "invalid.zip");
+            WriteZip(invalid, ("uobjecthook/camera_state.json", invalidJson));
+            var invalidGame = ImportGame(Hashing.Sha256OfBytes(invalidJson), "uevr_object_hook",
+                "uobjecthook/camera_state.json");
+            Assert.Throws<InvalidDataException>(() => UevrTools.ImportProfileArchive(
+                invalidGame, invalid, Path.Combine(root, "invalid")));
+
+            var wrongPath = Path.Combine(root, "wrong-path.zip");
+            WriteZip(wrongPath, ("arbitrary.json", valid));
+            var wrongPathGame = ImportGame(Hashing.Sha256OfBytes(valid), "uevr_object_hook", "arbitrary.json");
+            Assert.Throws<InvalidDataException>(() => UevrTools.ImportProfileArchive(
+                wrongPathGame, wrongPath, Path.Combine(root, "wrong-path")));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void Real_catalog_files_parse_end_to_end()
     {
         // Guard: the actual repo data stays loadable (repo root found from test dir).
@@ -316,6 +459,19 @@ public class UevrToolsTests
         Assert.Equal("user_import_only", rv.ProfileSource?.Redistribution);
         Assert.Equal("not_present", rv.Capabilities?.MotionControls);
         Assert.Empty(rv.SupportedBuilds!);
+        var escape = UevrTools.LoadGame(Path.Combine(dir!, "config", "unreal", "escape-the-backrooms.uevr.json"));
+        Assert.Equal("Backrooms-Win64-Shipping", UevrTools.ShippingProcessName(escape));
+        Assert.Equal("EscapeTheBackrooms/Binaries/Win64/Backrooms-Win64-Shipping.exe",
+            escape.ShippingBinaryRelative);
+        Assert.Equal(["-dx11"], escape.SteamLaunchArguments);
+        Assert.Equal("user_import_only", escape.ProfileSource?.Redistribution);
+        Assert.Contains(escape.ProfileSource!.Files, file => file.ContentType == "uevr_object_hook");
+        Assert.False(escape.ProfileVerified);
+        var safety = new SafetyGate().Evaluate(
+            Path.Combine(dir!, "config", "unreal", "escape-the-backrooms.uevr.json"),
+            Path.Combine(dir!, "config", "safety", "default-rules.json"));
+        Assert.Equal(Verdict.Warn, safety.Verdict);
+        Assert.Equal("private_modded_coop_requires_acknowledgement", safety.ReasonCode);
         var dotnet = UevrTools.LoadDotNetDesktopPin(
             Path.Combine(dir!, "config", "unreal", "dotnet-desktop-runtime.json"));
         Assert.Equal("8.0.29", dotnet.Version);

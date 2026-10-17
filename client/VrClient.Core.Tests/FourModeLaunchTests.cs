@@ -185,7 +185,7 @@ public sealed class FourModeLaunchTests : TempTree
             headsetConnected: () => false, gtaSanAndreasLocator: () => null).ListGames();
 
         Assert.Equal(
-            ["big-walk", "content-warning", "cyberpunk-2077", "gta-san-andreas",
+            ["big-walk", "content-warning", "cyberpunk-2077", "escape-the-backrooms", "gta-san-andreas",
              "lethal-company", "peak", "repo", "rv-there-yet", "yapyap"],
             games.Select(game => game.Slug).Order(StringComparer.Ordinal));
         Assert.All(games, game => Assert.Contains(game.Engine,

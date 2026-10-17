@@ -7,3 +7,6 @@ tests/native/supply_chain/fixtures/config-bundle.json text eol=lf
 # its native profile, and the Cyberpunk backend package pins the camera config.
 config/legacy/gta-san-andreas-native.json text eol=lf
 config/redengine/vrcam/vrcam.json text eol=lf
+
+# Backrooms runtime ownership and checkpoint hashes use exact Lua bytes.
+mods/backrooms-vr/*.lua text eol=lf

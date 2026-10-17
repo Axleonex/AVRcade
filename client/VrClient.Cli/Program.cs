@@ -1335,6 +1335,14 @@ try
             var attachTimeout = int.TryParse(GetOption("--attach-timeout"), out var at) ? at : 120;
             var attachDelay = int.TryParse(GetOption("--attach-delay"), out var ad) ? ad : 10;
 
+            // Steam reuses a running game, ignoring the new VR/DX11 launch state.
+            if (uevrGame.Slug == BackroomsTrackedHands.GameSlug && !HasFlag("--dry-run") &&
+                UevrSession.PrepareForNewLaunch(uevrGame) is { } conflict)
+            {
+                Console.WriteLine($"RESULT: error=uevr_session_already_running - {conflict}");
+                return 1;
+            }
+
             if (HasFlag("--dry-run"))
             {
                 Console.WriteLine($"RESULT: uevr-launch-dry-run game={uevrGame.Slug} app={uevrGame.SteamAppId} channel={uevrPin.Channel} tag={uevrPin.Tag} fetched={UevrTools.IsFetched(uevrPin)} attach={attachProcess} injector={UevrTools.InjectorPath(uevrPin)}");
@@ -1374,6 +1382,20 @@ try
             if (uevrGame.Slug == "rv-there-yet")
                 new RvTrackedHands(profileDirectory: uevrGameProfileDir).PrepareForLaunch();
 
+            if (uevrGame.Slug == BackroomsTrackedHands.GameSlug)
+            {
+                try
+                {
+                    BackroomsTrackedHands.PrepareForLaunch(uevrGame.Slug, uevrGameProfileDir);
+                    Console.WriteLine("UEVR-LAUNCH: Backrooms controller hand driver prepared; headset verification pending.");
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+                {
+                    // An optional visual driver must never prevent the game from launching.
+                    Console.WriteLine($"UEVR-LAUNCH: controller hand driver update skipped - {ex.Message}");
+                }
+            }
+
             // Steam is found the same way as every other launch (registry first), so a
             // Steam installed outside Program Files works too.
             var steamRoot = GetOption("--steam-root");
@@ -1401,7 +1423,8 @@ try
             }
 
             Console.WriteLine($"UEVR-LAUNCH: starting app {uevrGame.SteamAppId} via Steam...");
-            var steamStart = new SteamOwnedLauncher().Launch(uevrGame.SteamAppId, steamRoot);
+            var steamStart = new SteamOwnedLauncher().Launch(uevrGame.SteamAppId, steamRoot,
+                launchArguments: uevrGame.SteamLaunchArguments);
             if (!steamStart.Success)
             {
                 Console.WriteLine($"RESULT: error=uevr_steam_launch_failed - {steamStart.FailureText}");

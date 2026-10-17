@@ -1013,6 +1013,9 @@ public sealed partial class AppController
         if (!File.Exists(gamePath))
             return new ActionOutcome(false, $"{slug} is not in the UEVR catalog.");
         var game = UevrTools.LoadGame(gamePath);
+        if (game.Slug == BackroomsTrackedHands.GameSlug && !dryRun &&
+            UevrSession.PrepareForNewLaunch(game) is { } conflict)
+            return new ActionOutcome(false, conflict);
         var steam = new SteamOwnedLauncher().Launch(game.SteamAppId, steamRoot, dryRun);
         return steam.Success
             ? new ActionOutcome(true, dryRun

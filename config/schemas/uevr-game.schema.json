@@ -15,6 +15,11 @@
     "game_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
     "display_name": { "type": "string", "minLength": 1 },
     "steam_app_id": { "type": "string", "pattern": "^[0-9]+$" },
+    "steam_launch_arguments": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
     "engine": { "const": "unreal" },
     "uevr_channel": { "enum": ["stable", "nightly"] },
     "executable_names": {
@@ -52,6 +57,12 @@
           "items": { "type": "string", "minLength": 1 },
           "uniqueItems": true
         },
+        "config_overrides": {
+          "description": "Headset-tested config.txt KEY=VALUE settings applied over the imported upstream profile.",
+          "type": "object",
+          "propertyNames": { "pattern": "^[A-Za-z0-9_]+$" },
+          "additionalProperties": { "type": "string", "pattern": "^[^=\\r\\n]*$" }
+        },
         "source": {
           "type": "object",
           "required": ["repository", "revision", "profile_id", "tree_url", "license", "redistribution", "files"],
@@ -72,7 +83,7 @@
                 "properties": {
                   "path": { "type": "string", "pattern": "^[^/\\\\].*" },
                   "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-                  "content_type": { "enum": ["uevr_config", "camera_config", "imgui_config", "documentation", "metadata"] },
+                  "content_type": { "enum": ["uevr_config", "camera_config", "imgui_config", "documentation", "metadata", "uevr_object_hook"] },
                   "disposition": { "enum": ["import", "inspect_only", "exclude"] }
                 }
               }

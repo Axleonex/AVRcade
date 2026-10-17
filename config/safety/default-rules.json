@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "rule_set_version": "2026-07-16.1",
+  "rule_set_version": "2026-10-17.1",
   "anti_cheat_indicators": [
     "EasyAntiCheat",
     "EAC",
@@ -112,6 +112,15 @@
       "allow_warn_on_uncertain": false,
       "adapter_id": "rv-there-yet-uevr",
       "allowed_launch_modes": ["private_modded_coop", "single_player"],
+      "acceptable_modding_postures": ["community-supported"]
+    },
+    {
+      "game_id": "escape-the-backrooms",
+      "controlled_smoke_target": false,
+      "allow_offline": false,
+      "allow_warn_on_uncertain": false,
+      "adapter_id": "escape-the-backrooms-uevr",
+      "allowed_launch_modes": ["single_player", "private_modded_coop"],
       "acceptable_modding_postures": ["community-supported"]
     },
     {

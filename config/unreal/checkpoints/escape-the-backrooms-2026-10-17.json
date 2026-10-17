@@ -1,0 +1,26 @@
+{
+  "game_slug": "escape-the-backrooms",
+  "checkpoint": "backrooms-vr-tested-2026-10-17",
+  "accepted_on": "2026-10-17",
+  "acceptance": "Owner confirmed the current version works well and requested a local version checkpoint.",
+  "headset_family": "Quest",
+  "uevr_revision": "1b1693e820413a8afb1fdfd8f9da43a19870042e",
+  "source_sha256": {
+    "mods/backrooms-vr/backrooms_hands.lua": "f66161d34b32b6e58030666db02c1798535ce972f574dcfed8289a012f563e77",
+    "mods/backrooms-vr/backrooms_hud.lua": "d20f1b4e855aa2e1e1fffc8b917941af3b73a250371b73b099c6d6d32c0e9fa3",
+    "mods/backrooms-vr/backrooms_lens.lua": "856c1807915bbcf13873b2aeef023f97a373664764dab6b94c8ed443c404f0da",
+    "mods/backrooms-vr/backrooms_menu.lua": "f26048d6db25eebe479185755c00e6be910282f7dbd64e67c494da6d8f52535f",
+    "mods/backrooms-vr/backrooms_names.lua": "b6159314d6a582f36773b0622d2dfc3e287e621f679d9c1158cc29ec82670d2a"
+  },
+  "local_tested_camera_offsets": {
+    "VR_CameraForwardOffset": "8.122789",
+    "VR_CameraRightOffset": "0.000000",
+    "VR_CameraUpOffset": "13.644551"
+  },
+  "calibration_note": "Recorded local settings, not new universal defaults. Keep the existing imported profile when reproducing the accepted setup.",
+  "verification_boundaries": [
+    "Valve Index physical hardware remains unverified.",
+    "Private co-op and other game builds have not been promoted."
+  ],
+  "profile_redistribution": "Upstream community profile remains user-import-only; no game assets or private profile data are included."
+}

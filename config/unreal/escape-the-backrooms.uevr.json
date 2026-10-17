@@ -1,0 +1,74 @@
+{
+  "schema": "uevr-game/1",
+  "game_slug": "escape-the-backrooms",
+  "game_id": "escape-the-backrooms",
+  "display_name": "Escape the Backrooms",
+  "steam_app_id": "1943950",
+  "steam_launch_arguments": ["-dx11"],
+  "engine": "unreal",
+  "uevr_channel": "nightly",
+  "executable_names": ["Backrooms.exe"],
+  "executable_roles": {
+    "launcher_stub": "Backrooms.exe",
+    "shipping_binary": "EscapeTheBackrooms/Binaries/Win64/Backrooms-Win64-Shipping.exe"
+  },
+  "support_policy": {
+    "allowed_sources": ["steam"],
+    "anti_cheat_risk": "none",
+    "anti_cheat_evidence": "2026-10-01, installed Steam build 24997718: standard Steam launch reached the EscapeTheBackrooms window; no Easy Anti-Cheat, BattlEye, or other dedicated anti-cheat files, process, service, or loaded module observed. EOSSDK and EOSOVH were loaded; these do not establish that EOS Anti-Cheat is active. Recheck after a game update.",
+    "online_risk": "private_modded_coop"
+  },
+  "uevr_profile": {
+    "release": "config/unreal/uevr-release.json",
+    "required_uevr_channel": "nightly",
+    "rendering_method": "synchronized_sequential",
+    "supported_builds": [],
+    "source": {
+      "repository": "https://github.com/uevr-profiles/repo",
+      "revision": "975fde4c8e3d4ec12883d67a264742cecf4e9496",
+      "profile_id": "71a47407-5fca-1927-3a47-02cadeae75f7",
+      "tree_url": "https://github.com/uevr-profiles/repo/tree/975fde4c8e3d4ec12883d67a264742cecf4e9496/71a47407-5fca-1927-3a47-02cadeae75f7",
+      "license": "not_declared",
+      "redistribution": "user_import_only",
+      "files": [
+        { "path": "ProfileMeta.json", "sha256": "f1407afb510ffce7d274e64fc78f48fdef199e7ef1e692828e65771ebe6f113c", "content_type": "metadata", "disposition": "import" },
+        { "path": "cameras.txt", "sha256": "ea92615b01591b49b4ba23041ba34b9c886ff3e043c5ce6c856f31f0cfd62250", "content_type": "camera_config", "disposition": "import" },
+        { "path": "config.txt", "sha256": "30e610061a3e045a0e686b98457d4d6f7fa3cd5e9fd42389f0f9675213bddb6c", "content_type": "uevr_config", "disposition": "import" },
+        { "path": "cvars_data.txt", "sha256": "8be5736d72a44ec61ba0b29314c3ba6b773c365e2da9bbe70c321ba4f0238838", "content_type": "uevr_config", "disposition": "import" },
+        { "path": "cvars_standard.txt", "sha256": "580062fcbdcd34cab903ec58b7b078dd520a79113c5e2873333da83da06be7fe", "content_type": "uevr_config", "disposition": "import" },
+        { "path": "imgui.ini", "sha256": "630d2a49fee77c5b01e351d86eadc0b409bb3778b6c57b6a4fcebba842fa0390", "content_type": "imgui_config", "disposition": "import" },
+        { "path": "uobjecthook/12072541570440958579_mc_state.json", "sha256": "85bcb83be94a1f61b77987d725ff631ea6af17dd394fa58660e16d5993941440", "content_type": "uevr_object_hook", "disposition": "import" },
+        { "path": "uobjecthook/12188777272822190141_props.json", "sha256": "4681eb716d3d8baf5054ba28ab6632adc0c2212b3336ddc9619f8f940c46b26c", "content_type": "uevr_object_hook", "disposition": "import" },
+        { "path": "uobjecthook/14058288502396873542_mc_state.json", "sha256": "84d7119a714c3e4d7be9a920d3b421743cce24ebe730a4897f358d54f94f215b", "content_type": "uevr_object_hook", "disposition": "import" },
+        { "path": "uobjecthook/15986478195161917900_props.json", "sha256": "72b09fdb65c1362b203d5dc9d517df79f0fd9e419695267ba335fb8303fe0928", "content_type": "uevr_object_hook", "disposition": "import" },
+        { "path": "uobjecthook/3304667067832883935_props.json", "sha256": "a5bb9dfaf65400aa8db56e059166dc0df23c22cbe66cf9b8d9b45da329df0a80", "content_type": "uevr_object_hook", "disposition": "import" },
+        { "path": "uobjecthook/camera_state.json", "sha256": "e9e1b343611a28320cc1d44f888a66a3008a88e3496ca6338516c8c1b34d7d57", "content_type": "uevr_object_hook", "disposition": "import" }
+      ]
+    },
+    "config_overrides": {
+      "UI_Distance": "1.500000",
+      "UI_Size": "1.000000",
+      "UI_FollowView": "false",
+      "UI_Framework_FollowView": "false",
+      "VR_DecoupledPitchUIAdjust": "false",
+      "FrameworkConfig_EnableL3R3Toggle": "false"
+    },
+    "excluded_files": [
+      { "path": "_EXTRAS.zip", "reason": "Unreviewed archive; not required by the profile." }
+    ],
+    "capabilities": {
+      "headset_stereo": "verified",
+      "head_tracking": "verified",
+      "gamepad": "verified",
+      "motion_controls": "upstream_claimed_unverified",
+      "private_coop": "untested"
+    },
+    "notes": "Community UEVR profile by misterbub is tagged 6DOF and Motion Controls. Profile data is pinned to repository revision 975fde4c8e3d4ec12883d67a264742cecf4e9496 and imported by hash. On installed Steam build 24997718, the user confirmed stereoscopic head-tracked gameplay and controller movement in a singleplayer level using DX11 and the Virtual Desktop OpenXR runtime. The title menu became visible and selectable after adjusting UEVR UI distance and size to 1.5 and 1.0. The earlier headset text-entry limitation was superseded by AVRcade's in-game keyboard. On 2026-10-17 the owner accepted the current local Quest configuration after the world-anchored menus, compact HUD, keyboard, lens guard and body-aligned controller arms with recovery changes. This is a local tested checkpoint; Valve hardware and private co-op remain unverified. Motion gestures, private co-op, and the mod-manager route remain untested. No dedicated anti-cheat was observed in the installed build; recheck after updates and use mods only in private lobbies."
+  },
+  "verification": {
+    "injection_stable": true,
+    "headset_t1": true,
+    "profile_status": "unverified",
+    "evidence": "2026-10-01 headset test on installed Steam build 24997718: Steam launch with -dx11 and AVRcade uevr-launch attached pinned nightly UEVR through Virtual Desktop OpenXR. User confirmed stereoscopic head tracking, a visible and selectable title menu after UEVR UI distance=1.5 and size=1.0, and stereoscopic singleplayer gameplay with controller movement and turning. That historical name-entry limitation is superseded by the local headset keyboard. On 2026-10-17 the owner confirmed the current Backrooms version works well and requested a saved local version. See config/unreal/checkpoints/escape-the-backrooms-2026-10-17.json for exact source hashes and the local calibration record. A dedicated anti-cheat module or process was not observed. Motion gestures, private co-op, and launch through the mod manager were not tested."
+  }
+}

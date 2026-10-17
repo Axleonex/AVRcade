@@ -1,0 +1,49 @@
+{
+  "schema": "controller-map/1",
+  "verification_state": "source_verified",
+  "game_slug": "escape-the-backrooms",
+  "title": "Escape the Backrooms - simple keyboard and popup controls",
+  "note": "Keyboard: left stick chooses a key, right A types, right B finishes. The DONE - Right B key is at the bottom right. Left lower erases; left upper shifts. When the keyboard is closed on a name prompt, left upper or Open keyboard reopens it. Single-button informational popup (including the crossplay notice): right A or right B acknowledges it. Choices are never automatically selected and crossplay settings are unchanged. Both-stick UEVR menu opening is disabled to prevent accidental camera adjustment; desktop Insert still opens settings. These are default UEVR bindings; custom SteamVR bindings or swapped hands can differ. The owner accepted the current local Quest configuration on 2026-10-17. Valve Index hardware confirmation remains pending.",
+  "conversion_credit": {
+    "creator": "praydog; community profile by misterbub; local AVRcade keyboard",
+    "project": "UEVR and AVRcade Backrooms integration",
+    "project_url": "https://github.com/praydog/UEVR",
+    "controls_url": "https://github.com/praydog/UEVR/blob/1b1693e820413a8afb1fdfd8f9da43a19870042e/src/mods/VR.cpp"
+  },
+  "devices": [
+    {
+      "id": "quest-touch",
+      "display_name": "Meta Quest Touch",
+      "bindings": [
+        {"slot":"left_stick","control":"Left stick","action":"Keyboard: choose a key; gameplay: move"},
+        {"slot":"right_stick","control":"Right stick","action":"Gameplay: turn; not used for keyboard navigation"},
+        {"slot":"right_primary","control":"Right A (lower)","action":"Keyboard: type selected key; message popup: OK"},
+        {"slot":"right_secondary","control":"Right B (upper)","action":"Keyboard: Done; single-button message popup: OK","note":"This is Xbox X in UEVR, not Xbox B. Outside these modes the game's Xbox X action remains."},
+        {"slot":"left_primary","control":"Left X (lower)","action":"Keyboard: erase one character","note":"Outside the keyboard, this is the game's Xbox B input."},
+        {"slot":"left_secondary","control":"Left Y (upper)","action":"Open keyboard on a name prompt; Shift while typing"},
+        {"slot":"left_trigger","control":"Left trigger","action":"Game's LT action outside keyboard/popup input capture"},
+        {"slot":"right_trigger","control":"Right trigger","action":"Game's RT action; use right A to select keyboard keys"},
+        {"slot":"left_grip","control":"Left grip","action":"Game's LB action outside keyboard/popup input capture"},
+        {"slot":"right_grip","control":"Right grip","action":"Game's RB action outside keyboard/popup input capture"},
+        {"slot":"both_sticks","control":"Both stick clicks","action":"UEVR menu shortcut disabled for Backrooms"}
+      ]
+    },
+    {
+      "id": "valve-index",
+      "display_name": "Valve Index",
+      "bindings": [
+        {"slot":"left_stick","control":"Left stick","action":"Keyboard: choose a key; gameplay: move"},
+        {"slot":"right_stick","control":"Right stick","action":"Gameplay: turn; not used for keyboard navigation"},
+        {"slot":"right_primary","control":"Right A (lower)","action":"Keyboard: type selected key; message popup: OK"},
+        {"slot":"right_secondary","control":"Right B (upper)","action":"Keyboard: Done; single-button message popup: OK","note":"This is Xbox X in UEVR, not Xbox B. Outside these modes the game's Xbox X action remains."},
+        {"slot":"left_primary","control":"Left A (lower)","action":"Keyboard: erase one character","note":"Outside the keyboard, this is the game's Xbox B input."},
+        {"slot":"left_secondary","control":"Left B (upper)","action":"Open keyboard on a name prompt; Shift while typing"},
+        {"slot":"left_trigger","control":"Left trigger","action":"Game's LT action outside keyboard/popup input capture"},
+        {"slot":"right_trigger","control":"Right trigger","action":"Game's RT action; use right A to select keyboard keys"},
+        {"slot":"left_grip","control":"Squeeze left grip","action":"Game's LB action outside keyboard/popup input capture"},
+        {"slot":"right_grip","control":"Squeeze right grip","action":"Game's RB action outside keyboard/popup input capture"},
+        {"slot":"both_sticks","control":"Both stick clicks","action":"UEVR menu shortcut disabled for Backrooms"}
+      ]
+    }
+  ]
+}
