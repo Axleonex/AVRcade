@@ -7,7 +7,7 @@ namespace VrClient.Core.Tests;
 public sealed class YapyapCatalogueTests : TempTree
 {
     [Fact]
-    public void CatalogueIncludesYapyapWithoutAdvertisingBackrooms()
+    public void CatalogueIncludesYapyapAlongsideBackrooms()
     {
         var controller = new AppController(TestRepoRoot.Find(), (_, _) => null,
             headsetConnected: () => false, gtaSanAndreasLocator: () => null);
@@ -15,7 +15,7 @@ public sealed class YapyapCatalogueTests : TempTree
         var game = Assert.Single(games.Where(g => g.Slug == "yapyap"));
         Assert.Equal("3834090", game.SteamAppId);
         Assert.Equal(GameReadiness.NeedsGame, game.Readiness);
-        Assert.DoesNotContain(games, g => g.Slug == "escape-the-backrooms");
+        Assert.Contains(games, g => g.Slug == "escape-the-backrooms");
         var guide = controller.GetControllerReference("yapyap");
         Assert.NotNull(guide);
         Assert.Equal(new[] { "quest-touch", "valve-index" }, guide!.Devices.Select(d => d.Id));
