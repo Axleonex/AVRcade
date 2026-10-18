@@ -4,6 +4,39 @@ Play the PC games you already own in VR from one library.
 
 AVRcade finds your Steam games, sets up each game's VR conversion for you, and gives every game the same four launch buttons.
 
+## Install on Windows
+
+**[Download AVRcade for Windows (.exe, v0.3.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.3.0/AVRcade-Setup-0.3.0.exe)**
+
+[Portable ZIP (v0.3.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.3.0/AVRcade-0.3.0-win-x64.zip) · [Latest release and checksums](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
+
+1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
+2. **Run** `AVRcade-Setup-0.3.0.exe` and follow the setup wizard. No administrator access is needed.
+3. **Open AVRcade** from the Windows Start menu.
+
+The app includes its .NET runtime. You do not need Git, Visual Studio, or a separate .NET installation.
+
+The installer is unsigned. If Windows SmartScreen shows **Windows protected your PC**, check that you downloaded the file from this repository's release page. If you trust it, choose **More info → Run anyway**.
+
+**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `vrclient-app.exe`.
+
+> **Release and source versions differ.** These downloads are v0.3.0. Newer game integrations described below may require a source build or extra setup. YAPYAP and Escape the Backrooms are source checkpoints and are not included in the v0.3.0 installer. Check the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for what the download includes.
+
+## What you need
+
+- **Windows 10 (1809 or later) or Windows 11, 64-bit.**
+- **[Steam](https://store.steampowered.com/about/) and a supported game you own and have installed.** AVRcade does not include or download games. For classic San Andreas, use **Locate installed game** to select your own copy.
+- **A PC VR headset connected to your computer**, using [SteamVR (free)](https://store.steampowered.com/app/250820/SteamVR/) or [Virtual Desktop](https://www.vrdesktop.net/). Some games require SteamVR even when connected through Virtual Desktop.
+- **Optional: a mod manager**, only for **VR + mods** and **Mods, no VR**. You can start with **VR only** without one for the games included in v0.3.0.
+
+## First VR launch
+
+1. Install a game supported by your AVRcade version through Steam.
+2. Connect your headset and start SteamVR or Virtual Desktop. If both are running, AVRcade uses SteamVR.
+3. Open the game's page in AVRcade and choose **VR only**. If its button offers **Install VR mod** or another setup step, complete that first, then press the play button when it becomes available. An internet connection is needed to download VR components.
+
+If your game is missing, check that it is installed and supported by your version. If a launch is blocked, follow the reason shown on the game's page; some integrations require a specific game build.
+
 ![AVRcade library](docs/images/library.png)
 
 ## Four ways to play every game
@@ -36,28 +69,7 @@ A mode that is not ready says why and offers its one next step, such as *Install
 
 "Installs and launches" means AVRcade downloads the pinned mod, checks its hashes and starts the game with it. Whether a mod still matches the game's current build is up to that mod's author; the game page links to each project.
 
-## What you need
-
-- Windows 10 (1809 or later) or Windows 11, 64-bit.
-- The games, owned and installed through Steam. AVRcade never downloads games. Classic San Andreas is no longer sold on Steam; point AVRcade at your own copy with *Locate installed game*.
-- A PC VR headset connected through SteamVR or Virtual Desktop.
-- For the two modded modes, a mod manager: r2modman, Thunderstore Mod Manager or Vortex for the Unity games, or whichever manager you already use for Cyberpunk 2077, San Andreas and Unreal games.
-
-## Install
-
-1. Download `AVRcade-Setup-<version>.exe` from the Releases page.
-2. Run it. It installs for your user only and does not ask for administrator access.
-3. Open AVRcade from the Start menu.
-
-The installer bundles everything AVRcade itself needs, including its .NET runtime. Builds are not code-signed yet, so Windows SmartScreen may ask you to confirm.
-
-A portable `AVRcade-<version>-win-x64.zip` is published beside the installer: unzip it anywhere and run `vrclient-app.exe`.
-
-## First VR launch
-
-1. Install the game in Steam.
-2. Start SteamVR or Virtual Desktop and connect your headset. If both are running, AVRcade sends the game to SteamVR.
-3. Open the game in AVRcade and press the button on **VR only**. The first press installs the VR mod; the next one plays.
+## Playing VR with mods
 
 YAPYAP currently requires the source-built [VR package](mods/yapyap-vr/) before
 its VR buttons become available; it is not downloaded by the generic Unity installer.
@@ -66,8 +78,6 @@ without a mod manager. **VR + mods** opens your chosen manager so you can select
 a profile containing UUVR and the AVRcade bridge. An extra game mod is optional.
 For **Mods, no VR**, select a profile without those VR plugins. **Vanilla** disables
 the game-folder mod loader for that launch. Existing release installers predate this source update.
-
-## Playing VR with mods
 
 ![The Mods tab](docs/images/game-page-mods.png)
 
