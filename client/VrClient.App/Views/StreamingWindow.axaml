@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VrClient.App.ViewModels"
+        x:Class="VrClient.App.Views.StreamingWindow"
+        x:DataType="vm:StreamingViewModel"
+        Title="Stream &amp; record · AVRcade" Width="440" Height="720"
+        MinWidth="400" MinHeight="480" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource GroundBrush}" Foreground="{DynamicResource InkBrush}">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="24" Spacing="24">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Stream &amp; record" FontSize="22" FontWeight="SemiBold" />
+        <TextBlock Classes="secondary" Text="Share your VR gameplay with OBS." TextWrapping="Wrap" />
+        <TextBlock Text="{Binding ConnectionText}" FontWeight="SemiBold" />
+        <TextBlock Text="{Binding OutputText}" Classes="secondary" />
+      </StackPanel>
+      <Expander Header="OBS connection" IsExpanded="{Binding SetupExpanded, Mode=TwoWay}">
+        <StackPanel Spacing="12" Margin="0,12,0,0">
+          <TextBlock Classes="secondary" TextWrapping="Wrap"
+                     Text="In OBS: Tools → WebSocket Server Settings. Enable the server and copy its password." />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Open OBS" Command="{Binding OpenObsCommand}" />
+            <Button Content="Choose OBS" Click="ChooseObs_Click" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,16,88" IsEnabled="{Binding CanConnect}">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Server password" />
+              <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="●" Watermark="From OBS" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Spacing="8">
+              <TextBlock Text="Port" />
+              <TextBox Text="{Binding Port, Mode=TwoWay}" MaxLength="5" />
+            </StackPanel>
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="primary" Content="Connect" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}" />
+            <Button Content="Disconnect" Command="{Binding DisconnectCommand}" IsVisible="{Binding Connected}" IsEnabled="{Binding CanDisconnect}" />
+            <Button Content="Get OBS" Command="{Binding GetObsCommand}" />
+          </StackPanel>
+          <TextBlock Classes="secondary" FontSize="13" TextWrapping="Wrap"
+                     Text="Same PC only. Your password is kept for this session." />
+        </StackPanel>
+      </Expander>
+      <StackPanel Spacing="12" IsVisible="{Binding Connected}">
+        <TextBlock Text="OBS scene" FontWeight="SemiBold" />
+        <Grid ColumnDefinitions="*,8,Auto" IsEnabled="{Binding CanControl}">
+          <ComboBox ItemsSource="{Binding Scenes}" SelectedItem="{Binding SelectedScene, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+          <Button Grid.Column="2" Content="Use scene" Command="{Binding UseSceneCommand}" />
+        </Grid>
+        <TextBlock Classes="secondary" Text="{Binding CurrentScene, StringFormat='Current: {0}'}" TextWrapping="Wrap" />
+        <Grid ColumnDefinitions="*,12,*" IsEnabled="{Binding CanControl}">
+          <Button HorizontalAlignment="Stretch" Content="{Binding RecordButtonText}" Command="{Binding ToggleRecordCommand}" />
+          <Button Grid.Column="2" HorizontalAlignment="Stretch" Content="{Binding StreamButtonText}" Command="{Binding ToggleStreamCommand}" />
+        </Grid>
+      </StackPanel>
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13" />
+      <StackPanel Spacing="12">
+        <Grid ColumnDefinitions="*,16,Auto">
+          <StackPanel Spacing="4" VerticalAlignment="Center">
+            <TextBlock Text="Spectator steadycam" FontWeight="SemiBold" />
+            <TextBlock Classes="secondary" Text="{Binding SpectatorContextText}" FontSize="13" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button Grid.Column="2" Content="{Binding SteadycamButtonText}"
+                  Command="{Binding ToggleSteadycamCommand}" IsEnabled="{Binding CanToggleSteadycam}" />
+        </Grid>
+        <TextBlock Text="{Binding SteadycamText}" Classes="secondary" TextWrapping="Wrap" FontSize="13" />
+      </StackPanel>
+      <StackPanel Spacing="8">
+        <Expander Header="SteamVR Display VR View (optional)">
+          <StackPanel Spacing="8" Margin="0,12,0,0">
+            <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                       Text="1. Run the game in VR through SteamVR. In SteamVR's desktop status window, open the menu and choose Display VR View (or Show VR View)." />
+            <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                       Text="2. In OBS, add a Window Capture source and select the VR View window. Use the Windows 10 (1903 and up) capture method if Automatic freezes the picture. Keep VR View open and configure game audio and your microphone separately in OBS." />
+            <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                       Text="3. Connect AVRcade to OBS, select your capture scene, then Record or Go live. VR View is the headset mirror; it does not include the game's spectator steadycam." />
+            <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                       Text="If VR View is blank or shows SteamVR Home, confirm the game is rendering through SteamVR. For games using another VR runtime or playing flat, capture the game window or that runtime's mirror instead." />
+          </StackPanel>
+        </Expander>
+        <Button Content="Capture setup guide" Command="{Binding OpenCaptureGuideCommand}" HorizontalAlignment="Left" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13"
+                   Text="{Binding CaptureText}" />
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

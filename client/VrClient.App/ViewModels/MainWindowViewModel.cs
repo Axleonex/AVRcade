@@ -23,6 +23,7 @@ namespace VrClient.App.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
+    public StreamingViewModel Streaming { get; }
     private readonly AppController? _controller;
     private readonly ReleasePackageStore? _releasePackageStore;
     private readonly ReleaseProfileStore? _releaseProfileStore;
@@ -95,7 +96,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         ? "No supported games found."
         : $"{Games.Count} supported games. {Games.Count(game => game.IsInstalled)} installed on this PC.";
 
-    partial void OnSelectedGameChanged(GameItemViewModel? value) => UpdateSelectedGameFacts();
+    partial void OnSelectedGameChanged(GameItemViewModel? value)
+    {
+        Streaming.SetGameContext(ShowGameDetail ? value?.Slug : null);
+        UpdateSelectedGameFacts();
+    }
 
     private void UpdateSelectedGameFacts()
     {
@@ -175,6 +180,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnShowGameDetailChanged(bool value)
     {
+        Streaming.SetGameContext(value ? SelectedGame?.Slug : null);
         if (value)
             ShowSettings = false;
         RaiseSurface();
@@ -182,6 +188,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnShowSettingsChanged(bool value)
     {
+        if (value) Streaming.SetGameContext(null);
         if (value)
             ShowGameDetail = false;
         RaiseSurface();
@@ -196,8 +203,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     /// coverLocator maps a Steam app id to a local cover image; tooling that must
     /// not show publisher artwork passes one that finds nothing.
-    public MainWindowViewModel(Func<string, string?>? coverLocator = null)
+    public MainWindowViewModel(Func<string, string?>? coverLocator = null, StreamingViewModel? streaming = null)
     {
+        Streaming = streaming ?? new();
         _coverLocator = coverLocator ?? (appId => SteamLibraryArtworkLocator.FindPortrait(appId));
         IsDarkTheme = LauncherThemeService.Current.IsDark;
         var root = RepoRoot.Find();
@@ -346,6 +354,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 source => BuildPlayModes(source, runtimeDetected), runtimeDetected, _controller.GetUnrealMods(game));
             Games.Add(item);
         }
+        Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
         ApplyFilter();
         OnPropertyChanged(nameof(FilterAllText));
         OnPropertyChanged(nameof(FilterInstalledText));
@@ -1035,6 +1044,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        Streaming.Dispose();
         foreach (var game in Games)
             game.Dispose();
         foreach (var cover in _covers.Values)

@@ -167,6 +167,10 @@
                 </StackPanel>
               </StackPanel>
             </Border>
+            <Button x:Name="GameStreamButton" Click="Streaming_Click"
+                    Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.ToolbarText}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
+                    ToolTip.Tip="Connect OBS to stream or record this game's VR view" />
           </StackPanel>
 
           <StackPanel Grid.Column="2" Spacing="22">

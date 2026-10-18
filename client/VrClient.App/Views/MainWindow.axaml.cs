@@ -16,6 +16,16 @@ public partial class MainWindow : Window
     private const int ModsTab = 1;
 
     private DateTime _lastRedetect = DateTime.UtcNow;
+    private StreamingWindow? _streamingWindow;
+
+    private void Streaming_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+        if (_streamingWindow is not null) { _streamingWindow.Activate(); return; }
+        _streamingWindow = new StreamingWindow { DataContext = vm.Streaming };
+        _streamingWindow.Closed += (_, _) => _streamingWindow = null;
+        _streamingWindow.Show(this);
+    }
 
     public MainWindow()
     {
