@@ -1,79 +1,60 @@
-# AVRcade desktop app (Windows v0.2)
+# AVRcade desktop app — Windows v0.4.0
 
-> **STATUS: HISTORICAL WINDOWS v0.2 PRODUCT DOCUMENT.**
-> Its UEVR workflow remains a legacy fallback. For current native Meccha work,
-> use `PASSOVER-NATIVE-MECCHA.md`.
+## Install
 
-The desktop app is one library for supported Unity community-mod routes and
-Unreal UEVR routes. It reports the engine, safety posture, install location, and
-the next truthful action without requiring a terminal.
+Download **AVRcade-Setup-0.4.0.exe** from the
+[latest release](https://github.com/Axleonex/AVRcade/releases/latest), run it,
+then open **AVRcade** from the Windows Start menu. The installer runs per user
+without administrator access. An optional desktop shortcut is available.
 
-## Install the packaged app
+For a portable installation, download **AVRcade-0.4.0-win-x64.zip**, extract
+the entire archive, and run `vrclient-app.exe` from the extracted folder.
+Keep its configuration, native helpers and documentation beside the executable.
 
-Run `artifacts/dist/AVRcade-Setup-0.2.0.exe`. The per-user installer retains
-`%LOCALAPPDATA%\Programs\VRClient` to preserve existing installations, creates an AVRcade Start-menu shortcut, and offers
-an optional desktop shortcut. It includes:
+Windows 10 (1809 or later) or Windows 11, 64-bit, is required. AVRcade includes
+its .NET runtime. End users do not need Git, Visual Studio or a separate .NET
+installation. Published SHA-256 files accompany both downloads.
 
-- the self-contained Avalonia app and CLI;
-- the Unity and Unreal catalog/configuration tree;
-- Release-built native safety/signature helpers and their app-local VC runtime;
-- onboarding, safety, and runtime troubleshooting documentation.
+## First launch
 
-The installed app does not depend on the source repository. UEVR and its .NET
-Desktop prerequisite are not bundled; **Prepare UEVR** fetches the configured
-official archives, verifies their hashes, and keeps .NET app-local rather than
-installing an end-of-life global runtime.
-For RV There Yet?, **Download and install VR setup** also fetches the reviewed
-community profile from the pinned upstream commit and verifies each file before
-installation. Its ZIP import is an optional offline fallback.
+1. Install a supported game you own through Steam.
+2. Connect your PC VR headset through SteamVR or Virtual Desktop.
+3. Open the game's page and choose **VR only**. Complete the setup step shown
+   on that button first if the VR conversion is not ready.
 
-## Build and run from source
+Each game offers **VR only**, **VR + mods**, **Mods, no VR**, and **Vanilla**.
+The app explains missing setup and blocked launches on the game's page. VR
+conversions and dependencies are downloaded only when requested, with pinned
+versions and hashes. Games are never included or downloaded by AVRcade.
 
-```powershell
-$env:PATH="G:\AIStorage\dotnet;"+$env:PATH
-dotnet run --project client/VrClient.App -c Release
-```
+YAPYAP requires a separately prepared compatible UUVR/AVRcade bridge package.
+Its launcher integration is included, but those game plugins are not bundled or
+automatically downloaded. Escape the Backrooms requires its game-specific VR
+setup. Existing game mods, mod-manager profiles and save data remain user-owned.
 
-## Build and verify the Windows installer
+## Stream or record
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\ci\build-and-test.ps1 `
-  -BuildDir build/package-native -BuildType Release -Compiler msvc -OpenXR off `
-  -Note "Windows v0.2 unified catalog shipping helpers"
+Install OBS Studio 28 or newer separately. In OBS, enable **Tools → WebSocket
+Server Settings** and copy its password. On any AVRcade game page, choose
+**Stream**, connect to OBS, select your capture scene, and check the picture
+and audio before **Record** or **Go live**. The password is session-only.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\package-windows.ps1 `
-  -Version 0.2.0 -NativeBuildDir build/package-native `
-  -GtaSaBridgePath build\gtasa-x86-hand-fix-v3\vrclient_gtasa_theater.asi
+For SteamVR, open **Display VR View / Show VR View** from its desktop menu and
+select that window in an OBS Window Capture source. Use **Windows 10 (1903 and
+up)** capture if Automatic freezes the image. Keep VR View open. Configure game
+audio and microphone separately in OBS.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\verify-windows-installer.ps1 `
-  -InstallerPath artifacts\dist\AVRcade-Setup-0.2.0.exe
-```
+The [full streaming guide](STREAMING.md) covers setup, runtime mirrors and
+optional spectator steadycam. Closing the panel leaves OBS outputs running.
 
-Inno Setup 6 is a build-time dependency only. Install it with
-`winget install --id JRSoftware.InnoSetup -e --scope user`.
+## Troubleshooting and safety
 
-## Library states
+Follow the reason shown on the game's page when setup or launch is blocked.
+Some integrations require a specific game build. Removing an AVRcade-managed
+conversion does not remove the game or save data. Use modded modes only in
+private sessions with friends who agreed to them. AVRcade refuses games whose
+configured safety policy identifies anti-cheat risk.
 
-- **Needs game** - the catalog supports the game, but Steam did not find it.
-- **Needs VR mod** - a Unity game is installed and its verified mod is available.
-- **Needs UEVR** - an Unreal game needs pinned UEVR/.NET prerequisites fetched.
-- **Needs headset** - its software route is prepared but no VR runtime is active.
-- **Profile unverified** - UEVR is prepared, but game-specific headset evidence is open.
-- **Ready** - the route is installed and all required readiness gates are green.
-- **Blocked** - the safety policy refuses the route and explains why.
-
-Removing a Unity conversion requires confirmation and removes only
-AVRcade-managed files plus that game's Steam wrapper option. It does not remove
-the game or save data.
-
-## Runtime note
-
-On the development PC (integrated graphics), the proven R.E.P.O. path is Virtual Desktop with
-SteamVR closed. The SteamVR and Virtual Desktop paths were both validated on
-the RTX desktop. See `docs/troubleshooting/steamvr-vd-runtime-conflict.md`.
-
-## Adding a game
-
-The v0.2 library ships R.E.P.O., Lethal Company, and MECCHA CHAMELEON. Add a
-community Unity title through `docs/onboarding/ADD-A-GAME.md`; add an Unreal
-title as a validated `config/unreal/*.uevr.json` profile.
+Installed troubleshooting guides are under `docs/troubleshooting/`; the
+[repository README](https://github.com/Axleonex/AVRcade#install-on-windows)
+contains current download links and game-specific setup information.

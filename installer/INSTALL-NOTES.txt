@@ -7,6 +7,10 @@ Supported games in this release:
 * R.E.P.O., Lethal Company, PEAK, Content Warning and Big Walk, through
   community Unity VR mods that AVRcade downloads and verifies for you.
 * RV There Yet?, through UEVR and a community profile (experimental).
+* Escape the Backrooms, through UEVR with its game-specific VR setup
+  (experimental).
+* YAPYAP, for an existing compatible UUVR and AVRcade bridge installation.
+  Its VR components require separate setup; they are not bundled here.
 * Grand Theft Auto: San Andreas (classic), through AVRcade's own VR bridge
   (experimental).
 * Cyberpunk 2077: monitor modes work out of the box. "Install VR backend"
@@ -18,6 +22,11 @@ You provide:
 * A PC VR headset connection through SteamVR or Virtual Desktop.
 * Optionally a mod manager (r2modman, Thunderstore Mod Manager, Vortex, or the
   one you already use) for the two modded modes.
+* Optionally OBS Studio 28 or newer for the Stream and Record controls.
+
+Streaming is available on every game page. Choose a game-window capture or
+SteamVR's Display VR View in OBS, then check the picture and audio before
+recording or going live. The OBS password stays in memory for the session.
 
 AVRcade bundles its own .NET runtime; nothing else needs installing. The
 installer is per-user and does not ask for administrator access.

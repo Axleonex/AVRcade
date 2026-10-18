@@ -85,7 +85,7 @@ try {
         'native\gta-san-andreas\openxr_loader.dll',
         'config\redengine\native\cyberpunk-2077-backend.json',
         'LICENSE', 'THIRD-PARTY-NOTICES.md', 'licenses\README.txt',
-        'native\msvcp140.dll', 'release-manifest.json', 'unins000.exe'
+        'native\msvcp140.dll', 'docs\STREAMING.md', 'release-manifest.json', 'unins000.exe'
     )
     $missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $SmokeRoot $_)) })
     if ($missing.Count -gt 0) { throw "installed payload missing: $($missing -join ', ')" }

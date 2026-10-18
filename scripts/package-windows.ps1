@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$')]
-    [string]$Version = '0.2.0',
+    [string]$Version = '0.4.0',
     [string]$NativeBuildDir = 'build/package-native',
     [string]$FnvNativeBuildDir = 'build/fnv-x86',
     [string]$GtaSaBridgePath = '',
@@ -201,6 +201,7 @@ Copy-Item -LiteralPath (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.md'), (Join-Pat
 
 $docsDest = New-Item -ItemType Directory -Force -Path (Join-Path $PayloadRoot 'docs')
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\app\README.md') -Destination $docsDest.FullName
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\app\STREAMING.md') -Destination $docsDest.FullName
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\onboarding') -Destination $docsDest.FullName -Recurse
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\troubleshooting') -Destination $docsDest.FullName -Recurse
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\safety\unified-safety.md') -Destination $docsDest.FullName

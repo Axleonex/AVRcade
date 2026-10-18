@@ -26,3 +26,16 @@ profile; your manager keeps full ownership of its profiles.
 Modded play is for private sessions with friends who agreed to it.
 
 Troubleshooting guides are installed under docs\.
+
+Stream or record with OBS (optional)
+  1. Install OBS Studio 28 or newer separately.
+  2. In OBS, enable Tools > WebSocket Server Settings and copy its password.
+  3. Open a game page in AVRcade, choose Stream, and connect to OBS.
+  4. Select an OBS scene with the game window or VR runtime mirror as a source.
+  5. Check the picture and audio before choosing Record or Go live.
+
+For SteamVR, open Display VR View / Show VR View from its desktop menu,
+then select VR View in an OBS Window Capture source. If Automatic freezes
+the image, choose Windows 10 (1903 and up) as the capture method.
+Keep VR View open. Configure game audio and microphone separately in OBS.
+The full guide is installed at docs\STREAMING.md.

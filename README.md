@@ -6,12 +6,12 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 ## Install on Windows
 
-**[Download AVRcade for Windows (.exe, v0.3.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.3.0/AVRcade-Setup-0.3.0.exe)**
+**[Download AVRcade for Windows (.exe, v0.4.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.4.0/AVRcade-Setup-0.4.0.exe)**
 
-[Portable ZIP (v0.3.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.3.0/AVRcade-0.3.0-win-x64.zip) · [Latest release and checksums](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
+[Portable ZIP (v0.4.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.4.0/AVRcade-0.4.0-win-x64.zip) · [Latest release and checksums](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
 
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
-2. **Run** `AVRcade-Setup-0.3.0.exe` and follow the setup wizard. No administrator access is needed.
+2. **Run** `AVRcade-Setup-0.4.0.exe` and follow the setup wizard. No administrator access is needed.
 3. **Open AVRcade** from the Windows Start menu.
 
 The app includes its .NET runtime. You do not need Git, Visual Studio, or a separate .NET installation.
@@ -20,14 +20,14 @@ The installer is unsigned. If Windows SmartScreen shows **Windows protected your
 
 **Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `vrclient-app.exe`.
 
-> **Release and source versions differ.** These downloads are v0.3.0. Newer game integrations described below may require a source build or extra setup. YAPYAP and Escape the Backrooms are source checkpoints and are not included in the v0.3.0 installer. Check the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for what the download includes.
+> **v0.4.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 
 - **Windows 10 (1809 or later) or Windows 11, 64-bit.**
 - **[Steam](https://store.steampowered.com/about/) and a supported game you own and have installed.** AVRcade does not include or download games. For classic San Andreas, use **Locate installed game** to select your own copy.
 - **A PC VR headset connected to your computer**, using [SteamVR (free)](https://store.steampowered.com/app/250820/SteamVR/) or [Virtual Desktop](https://www.vrdesktop.net/). Some games require SteamVR even when connected through Virtual Desktop.
-- **Optional: a mod manager**, only for **VR + mods** and **Mods, no VR**. You can start with **VR only** without one for the games included in v0.3.0.
+- **Optional: a mod manager**, only for **VR + mods** and **Mods, no VR**. You can start with **VR only** without one when the game's required VR components are installed.
 
 ## First VR launch
 
@@ -69,6 +69,12 @@ A mode that is not ready says why and offers its one next step, such as *Install
 
 "Installs and launches" means AVRcade downloads the pinned mod, checks its hashes and starts the game with it. Whether a mod still matches the game's current build is up to that mod's author; the game page links to each project.
 
+## Stream or record with OBS
+
+Open any game page and choose **Stream**. Install OBS Studio 28 or newer separately, enable its WebSocket server, and connect using the password shown in OBS. Select a scene containing the game window or a VR runtime mirror, check the picture and audio, then choose **Record** or **Go live**.
+
+For SteamVR, choose **Display VR View / Show VR View** in its desktop menu and capture that window in OBS. If Automatic capture freezes, select **Windows 10 (1903 and up)** in the source properties. Keep VR View open. Game audio and microphone are configured separately in OBS. See the [streaming setup guide](docs/app/STREAMING.md).
+
 ## Playing VR with mods
 
 YAPYAP currently requires the source-built [VR package](mods/yapyap-vr/) before
@@ -77,7 +83,7 @@ It uses SteamVR even through Virtual Desktop. **VR only** launches through Steam
 without a mod manager. **VR + mods** opens your chosen manager so you can select
 a profile containing UUVR and the AVRcade bridge. An extra game mod is optional.
 For **Mods, no VR**, select a profile without those VR plugins. **Vanilla** disables
-the game-folder mod loader for that launch. Existing release installers predate this source update.
+the game-folder mod loader for that launch. The v0.4.0 installer includes the launcher integration, but does not bundle or automatically download the YAPYAP VR package.
 
 ![The Mods tab](docs/images/game-page-mods.png)
 
@@ -106,7 +112,7 @@ dotnet run --project client/VrClient.App -c Release
 
 The app, the `vrclient` command-line tool and their tests live in `client/`. The native C++ parts (the San Andreas bridge and the experimental native adapters) are optional and need Visual Studio Build Tools 2022; see [tools/toolchain.md](tools/toolchain.md).
 
-To build the installer, see [docs/release/WINDOWS-V0.2.md](docs/release/WINDOWS-V0.2.md).
+To build the installer, see [docs/release/WINDOWS-V0.4.md](docs/release/WINDOWS-V0.4.md).
 
 ### Repository layout
 
