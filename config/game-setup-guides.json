@@ -1,0 +1,63 @@
+{
+  "schema": "game-setup-guides/1",
+  "games": {
+    "escape-the-backrooms": {
+      "steps": [
+        "Close the game before preparing its VR setup. Use the install button at the top; AVRcade downloads UEVR, its runtime and the reviewed game profile automatically.",
+        "If the profile download fails, use View profile source and obtain the reviewed profile ZIP. Choose Import VR profile ZIP here; AVRcade validates and places its files. Do not unpack it into the game folder.",
+        "For VR + mods, set -dx11 in your selected mod manager. The ordinary AVRcade VR launch supplies this option itself.",
+        "Connect the headset and start its runtime. Recheck setup after changing files or updating the game. Installed packages do not establish compatibility with a newer game build."
+      ]
+    },
+    "rv-there-yet": {
+      "steps": [
+        "Close the game and use the install button at the top. AVRcade downloads the pinned UEVR tools, runtime and reviewed profile automatically.",
+        "If the profile download fails, use View profile source and obtain its reviewed ZIP. Choose Import VR profile ZIP; AVRcade validates and installs it in the correct profile folder. Do not extract it into the game directory.",
+        "Start your headset runtime before launching. Experimental tracked hands are optional; they are not required to finish package installation."
+      ]
+    },
+    "yapyap": {
+      "source_url": "https://github.com/Axleonex/AVRcade/tree/main/mods/yapyap-vr",
+      "steps": [
+        "This route requires both UUVR and the AVRcade YAPYAP bridge. A generic UUVR install alone does not complete this game's setup. Follow the linked AVRcade bridge package instructions for the supported build, then choose Recheck setup.",
+        "Use SteamVR for headset play, including when Virtual Desktop provides the connection. Package installation and headset connection are reported separately.",
+        "For VR + mods, use a manager profile containing both UUVR and the AVRcade bridge. Select a separate profile without those VR plugins for monitor mods. Close the game before switching modes."
+      ]
+    },
+    "gta-san-andreas": {
+      "steps": [
+        "Locate your installed classic Windows game if it was not found. The bridge supports one specific executable build; the status above explains a build mismatch.",
+        "Close the game and use Install VR bridge at the top. AVRcade places its bridge and OpenXR loader beside the supported game executable.",
+        "For Vanilla, choose a separate clean game folder in the Mods tab when requested. Do not copy a different VR mod over the managed bridge to clear a setup error."
+      ]
+    },
+    "gta-iv": {
+      "steps": [
+        "Close GTA IV and use Install VR package at the top. AVRcade checks the supported executable and downloads the configured package.",
+        "Use the startup and input settings below to select your headset controls. Connect through SteamVR, then choose Recheck setup after an external change.",
+        "If the build check blocks installation, use the supported game version named in the status. Installing a second VR conversion over the managed files will not resolve a mismatch."
+      ]
+    },
+    "gta-v": {
+      "steps": [
+        "Use the supported GTA V Legacy build shown in the status; this package does not support Enhanced. Close the game and use Install VR package at the top.",
+        "Complete normal Rockstar sign-in. Disable BattlEye in Rockstar Launcher for Story Mode, then select the runtime and controller mode in the settings below.",
+        "Keep the package for Story Mode. If setup fails, resolve the reported build or file conflict before retrying; do not add another VR conversion over it."
+      ]
+    },
+    "fallout-3": {
+      "steps": [
+        "This is an experimental native VR route. Read the supported build and preparation status above before attempting a headset launch.",
+        "Use this page's Fallout preparation and Vortex controls for the native adapter. A community VR mod ZIP cannot be imported through the generic installer.",
+        "Close the game before changing its setup. Choose Recheck setup after preparation and confirm the result in the headset; installed files alone are not a headset validation."
+      ]
+    },
+    "fallout-new-vegas": {
+      "steps": [
+        "Use Set up New Vegas VR and Vortex sync on this page. The setup dialog checks the game, native prerequisites and optional one-way Vortex synchronization.",
+        "Resolve each preparation error in the dialog, then close it and choose Recheck setup. Avoid copying an unrelated VR package into the game folder.",
+        "The native VR route is experimental. After preparation, connect the headset and use the native headset-test launch; package status does not imply that this hardware test has passed."
+      ]
+    }
+  }
+}

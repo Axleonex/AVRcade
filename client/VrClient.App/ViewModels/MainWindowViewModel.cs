@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using VrClient.Core;
 using VrClient.Core.App;
+using VrClient.Core.Config;
 using VrClient.Core.Discovery;
 using VrClient.Core.Legacy;
 using VrClient.Core.Model;
@@ -35,6 +36,16 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly Func<string, string?> _coverLocator;
     // Decoded cover art survives a catalogue refresh; only this view model disposes it.
     private readonly Dictionary<string, Bitmap> _covers = new();
+    private readonly Dictionary<string, (string Message, bool Busy, bool Failed)> _gameSetupProgress = new(StringComparer.OrdinalIgnoreCase);
+    private static string SetupKey(string slug, string root) => slug + "|" + Path.GetFullPath(root);
+    private void ReportGameSetup(string slug, string root, string message, bool busy, bool failed = false)
+    {
+        _gameSetupProgress[SetupKey(slug, root)] = (message, busy, failed);
+        foreach (var item in Games.Where(item => item.Slug == slug && string.Equals(item.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)))
+            item.SetSetupProgress(message, busy, failed);
+        if (SelectedGame?.Slug == slug && string.Equals(SelectedGame.View.InstallDir, root, StringComparison.OrdinalIgnoreCase))
+            StatusText = message;
+    }
     private readonly Dictionary<string, (string Message, bool Busy)> _cyberpunkSetupProgress = new(StringComparer.OrdinalIgnoreCase);
     private void ReportCyberpunkSetup(string root, string message, bool busy)
     {
@@ -238,14 +249,29 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public FalloutNewVegasSetupViewModel? CreateFalloutNewVegasSetupViewModel() =>
         _falloutNewVegasService is null ? null : new FalloutNewVegasSetupViewModel(_falloutNewVegasService);
 
-    public void ImportSelectedUevrProfile(string archivePath)
+    public async Task ImportUevrProfileAsync(string slug, string gameRoot, string archivePath)
     {
-        if (_controller is null || SelectedGame is null || !SelectedGame.CanImportUevrProfile)
+        if (_controller is null || Busy || IsInstallingCyberpunkRequirements ||
+            !Games.Any(game => game.Slug == slug && game.View.InstallDir == gameRoot && game.CanImportUevrProfile))
             return;
-        StatusText = $"Checking and importing the VR profile for {SelectedGame.DisplayName}…";
-        var outcome = _controller.ImportUnrealProfile(SelectedGame.Slug, archivePath);
-        RefreshCatalogue(announce: false);
-        StatusText = outcome.Message;
+        Busy = true;
+        var message = "Profile installation did not complete.";
+        var failed = true;
+        ReportGameSetup(slug, gameRoot, "Checking and importing the selected VR profile ZIP...", true);
+        try
+        {
+            var outcome = await Task.Run(() => _controller.ImportUnrealProfile(slug, archivePath));
+            message = outcome.Message;
+            failed = !outcome.Ok;
+        }
+        catch (Exception ex) { message = "Profile import failed: " + ex.Message; }
+        finally
+        {
+            Busy = false;
+            ReportGameSetup(slug, gameRoot, message, false, failed);
+            RefreshCatalogue(announce: false);
+            StatusText = message;
+        }
     }
 
     // Theme changes recolour the shared brushes in place, so nothing is reloaded.
@@ -322,6 +348,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (_controller is null)
             return;
+        if (announce)
+            foreach (var key in _gameSetupProgress.Where(pair => !pair.Value.Busy).Select(pair => pair.Key).ToArray())
+                _gameSetupProgress.Remove(key);
         var selectedSlug = SelectedGame?.Slug;
         var selectedManagerKind = SelectedGame?.Modded?.SelectedManager?.Kind;
         SelectedGame = null;
@@ -334,6 +363,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var runtimeDetected = runtime.SteamVrRunning || runtime.VirtualDesktopRunning;
         var gtaTurnPreference = _controller.GetGtaSanAndreasTurnPreference();
         var dataRoots = _moddedPreferences.LoadDataRoots();
+        var setupGuides = GameSetupGuides.Load(_controller.RepoRoot);
         _installedManagers = _modManagerDiscovery.FindInstalled(dataRoots);
 
         foreach (var game in _controller.ListGames(runtimeDetected)
@@ -361,9 +391,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     modded.SelectedManager = manager;
             }
             item.SetPlayModeSource(
-                source => BuildPlayModes(source, runtimeDetected), runtimeDetected, _controller.GetUnrealMods(game));
+                source => BuildPlayModes(source, runtimeDetected), runtimeDetected, _controller.GetUnrealMods(game), runtime.SteamVrRunning);
             if (item.IsCyberpunk && game.InstallDir is { } cpRoot && _cyberpunkSetupProgress.TryGetValue(cpRoot, out var cpProgress))
                 item.SetCyberpunkSetupProgress(cpProgress.Message, cpProgress.Busy);
+            item.SetSetupGuide(setupGuides.GetValueOrDefault(game.Slug));
+            if (game.InstallDir is { } setupRoot && _gameSetupProgress.TryGetValue(SetupKey(game.Slug, setupRoot), out var setupProgress))
+                item.SetSetupProgress(setupProgress.Message, setupProgress.Busy, setupProgress.Failed);
             Games.Add(item);
         }
         Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
@@ -522,6 +555,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var slug = game.Slug;
         Busy = true;
         var finalStatus = $"Finished preparing {game.DisplayName}.";
+        var setupFailed = true;
         StatusText = game.View.Engine switch
         {
             GameEngine.Unreal => $"Downloading and checking the VR setup for {game.DisplayName}…",
@@ -529,16 +563,21 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             GameEngine.LegacyD3D9 => $"Checking the VR bridge for {game.DisplayName}…",
             _ => $"Installing the VR mod for {game.DisplayName}…"
         };
+        ReportGameSetup(slug, dir, StatusText, true);
         try
         {
             using var http = NewHttp();
             ActionOutcome outcome;
             if (game.View.Engine is GameEngine.Unreal)
             {
+                ReportGameSetup(slug, dir, "Downloading and checking UEVR and its runtime...", true);
                 outcome = await controller.PrepareUnrealAsync(slug, new HttpDownloader(http));
                 // A game whose VR profile is not redistributable has it fetched from its source.
                 if (outcome.Ok && game.View.ProfileImportRequired)
+                {
+                    ReportGameSetup(slug, dir, "Downloading, checking and installing this game's reviewed VR profile...", true);
                     outcome = await controller.DownloadUnrealProfileAsync(slug, new HttpDownloader(http));
+                }
             }
             else if (game.View.Engine is GameEngine.Redengine)
             {
@@ -566,6 +605,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     installLaunchOption: true));
             }
             finalStatus = outcome.Message;
+            setupFailed = !outcome.Ok;
         }
         catch (Exception ex)
         {
@@ -575,6 +615,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             Busy = false;
             if (game.IsCyberpunk) ReportCyberpunkSetup(dir, finalStatus, false);
+            ReportGameSetup(slug, dir, finalStatus, false, setupFailed);
             RefreshCatalogue(announce: false);
             StatusText = finalStatus;
         }

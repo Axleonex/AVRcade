@@ -210,15 +210,26 @@
               </Grid>
             </Border>
 
-            <Border Classes="card" IsVisible="{Binding IsCyberpunk}">
+            <Border Classes="card" IsVisible="{Binding HasSetupCard}">
               <StackPanel Spacing="10">
-                <TextBlock Classes="eyebrow" Text="CYBERPUNK VR SETUP" />
-                <TextBlock Text="{Binding CyberpunkSetupTitle}" Foreground="{Binding CyberpunkSetupBrush}" FontSize="20" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding CyberpunkSetupStatus}" TextWrapping="Wrap" />
-                <ProgressBar IsVisible="{Binding CyberpunkSetupBusy}" IsIndeterminate="True" Height="5" />
-                <TextBlock Classes="secondary" Text="{Binding CyberpunkBackendStatus}" />
-                <TextBlock Classes="secondary" Text="{Binding CyberpunkDependencyStatus}" />
+                <TextBlock Classes="eyebrow" Text="VR SETUP" />
+                <TextBlock Text="{Binding SetupTitle}" Foreground="{Binding SetupBrush}" FontSize="20" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding SetupStatus}" TextWrapping="Wrap" />
+                <ProgressBar IsVisible="{Binding SetupBusy}" IsIndeterminate="True" Height="5" />
+                <TextBlock Classes="secondary" Text="{Binding SetupPackageStatus}" />
+                <TextBlock Classes="secondary" Text="{Binding CyberpunkDependencyStatus}" IsVisible="{Binding IsCyberpunk}" />
+                <TextBlock Classes="secondary" Text="{Binding SetupProfileStatus}" IsVisible="{Binding HasSetupProfileStatus}" />
+                <TextBlock Classes="secondary" Text="{Binding SetupRuntimeStatus}" IsVisible="{Binding ShowSetupRuntimeStatus}" />
                 <WrapPanel>
+                  <Button Classes="primary" Content="{Binding PrepareText}" Margin="0,0,10,8"
+                          IsVisible="{Binding SetupCanInstall}"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}" />
+                  <Button Content="Import VR profile ZIP" Margin="0,0,10,8" Click="ImportUevrProfile_Click"
+                          IsVisible="{Binding SetupNeedsProfileImport}" />
+                  <Button Content="View setup help" Margin="0,0,10,8" Click="OpenSetupHelp_Click"
+                          IsVisible="{Binding SetupNeedsDetails}" />
+                  <Button Content="Set up New Vegas VR and Vortex sync" Margin="0,0,10,8"
+                          Click="OpenFalloutNewVegasSetup_Click" IsVisible="{Binding CanConfigureFalloutNewVegas}" />
                   <Button Classes="primary" Content="Install VR" Margin="0,0,10,0"
                           IsVisible="{Binding CyberpunkCanInstall}"
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}" />
@@ -228,6 +239,8 @@
                   <Button Content="Pause setup" IsVisible="{Binding CyberpunkSetupBusy}"
                           IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsInstallingCyberpunkRequirements}"
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CancelCyberpunkRequirementsCommand}" />
+                  <Button Content="Recheck setup" Margin="0,0,0,8" IsVisible="{Binding !SetupBusy}"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RefreshCommand}" />
                 </WrapPanel>
               </StackPanel>
             </Border>
@@ -333,34 +346,38 @@
 
                 <TabItem Header="VR setup">
                   <StackPanel Spacing="16" Margin="6,14,6,8">
-                    <ItemsControl ItemsSource="{Binding SetupSteps}">
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:SetupStepViewModel">
-                          <StackPanel Spacing="6" Margin="0,0,16,0">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                              <TextBlock Text="{Binding Mark}" Foreground="{Binding MarkBrush}" FontWeight="Bold" />
-                              <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                            </StackPanel>
-                            <TextBlock Classes="secondary" Text="{Binding Detail}" FontSize="13" TextWrapping="Wrap" />
-                          </StackPanel>
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                      <Button Classes="primary" Content="{Binding PrepareText}"
-                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}"
-                              IsVisible="{Binding CanPrepareBelow}" />
-                      <Button Content="{Binding UevrProfileImportText}" Click="ImportUevrProfile_Click"
-                              IsVisible="{Binding CanImportUevrProfile}" />
-                      <Button Content="View profile source" Tag="{Binding UevrProfileSourceUrl}"
-                              Click="OpenExternalUrl_Click" IsVisible="{Binding CanImportUevrProfile}" />
-                    </StackPanel>
-                    <TextBlock Classes="secondary" Text="{Binding UevrProfileStatusText}" TextWrapping="Wrap"
-                               IsVisible="{Binding CanImportUevrProfile}" />
+                    <Expander x:Name="SetupRecovery" Header="Setup help and manual recovery"
+                              IsVisible="{Binding HasSetupHelp}" IsExpanded="False" HorizontalAlignment="Stretch">
+                      <StackPanel Spacing="12" Margin="0,10,0,0">
+                        <ItemsControl ItemsSource="{Binding SetupRecoverySteps}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <WrapPanel>
+                          <Button Content="{Binding UevrProfileImportText}" Click="ImportUevrProfile_Click"
+                                  Margin="0,0,10,8" IsVisible="{Binding SetupCanImportProfile}" />
+                          <Button Content="View profile source" Tag="{Binding UevrProfileSourceUrl}"
+                                  Click="OpenExternalUrl_Click" Margin="0,0,10,8" IsVisible="{Binding CanImportUevrProfile}" />
+                          <Button Content="View package setup source" Tag="{Binding SetupSourceUrl}"
+                                  Click="OpenExternalUrl_Click" Margin="0,0,10,8" IsVisible="{Binding HasSetupSource}" />
+                        </WrapPanel>
+                        <TextBlock Classes="secondary" Text="{Binding UevrProfileStatusText}" TextWrapping="Wrap"
+                                   IsVisible="{Binding CanImportUevrProfile}" />
+                        <ItemsControl ItemsSource="{Binding SetupSteps}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SetupStepViewModel">
+                              <StackPanel Spacing="4" Margin="0,0,0,10">
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock Classes="secondary" Text="{Binding Detail}" TextWrapping="Wrap" />
+                              </StackPanel>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </Expander>
 
                     <Border Classes="inset" IsVisible="{Binding HasModded}">
                       <StackPanel DataContext="{Binding Modded}" x:DataType="vm:ModdedGameViewModel" Spacing="6">

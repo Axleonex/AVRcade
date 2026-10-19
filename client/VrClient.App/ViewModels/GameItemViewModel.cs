@@ -18,7 +18,7 @@ public sealed record SetupStepViewModel(int Number, string Title, string Detail,
     public IBrush MarkBrush => LauncherThemeService.Brush(Done ? "GoodBrush" : "AccentBrush");
 }
 
-public sealed class GameItemViewModel : ObservableObject, IDisposable
+public sealed partial class GameItemViewModel : ObservableObject, IDisposable
 {
     private enum LibraryStatus { Blocked, LibraryOffline, NotInstalled, VrReady, VrReadyExperimental, SetUpVr }
 
@@ -81,10 +81,11 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     /// The window's view model supplies the rules input, because some of it (mod
     /// manager choice, clean folder, detected mods) lives outside this game row.
     public void SetPlayModeSource(Func<GameItemViewModel, IReadOnlyList<PlayModeState>> source,
-        bool runtimeDetected, UnrealModInventory unrealMods)
+        bool runtimeDetected, UnrealModInventory unrealMods, bool steamVrRunning = false)
     {
         _playModeSource = source;
         _runtimeDetected = runtimeDetected;
+        _steamVrRunning = steamVrRunning;
         _unrealMods = unrealMods;
         RefreshPlayModes();
     }
@@ -98,6 +99,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(IsVrReady));
         OnPropertyChanged(nameof(LibraryStatusText));
         OnPropertyChanged(nameof(LibraryStatusBrush));
+        NotifySetupChanged();
     }
 
     public IReadOnlyList<PlayModeViewModel> PlayModes => _playModes;
@@ -166,16 +168,16 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     {
         GameEngine.Unreal => View.ModInstalled && (!View.ProfileImportRequired || View.ProfileImported)
             ? new(2, "VR tools ready", "UEVR, its runtime and the game's VR profile are downloaded and checked.", true)
-            : new(2, "Download the VR setup", "One click below. AVRcade fetches UEVR and this game's VR profile and checks their hashes.", false),
+            : new(2, "Download the VR setup", "Use the install button at the top. AVRcade fetches UEVR and this game's VR profile and checks their hashes.", false),
         GameEngine.Redengine => View.ModInstalled
             ? new(2, "VR backend installed", "The RED4ext VR plugins are in the game folder.", true)
-            : new(2, "Install the VR backend", "One click below. AVRcade copies its VR plugins into the game folder and downloads the modding frameworks they need (RED4ext, Cyber Engine Tweaks and four others), checking every hash. Frameworks you already have are left alone.", false),
+            : new(2, "Install the VR backend", "Use the install button at the top. AVRcade copies its VR plugins into the game folder and downloads the modding frameworks they need (RED4ext, Cyber Engine Tweaks and four others), checking every hash. Frameworks you already have are left alone.", false),
         GameEngine.LegacyD3D9 => View.ModInstalled
             ? new(2, "VR bridge installed", "The stereo bridge and its OpenXR loader sit beside gta_sa.exe.", true)
-            : new(2, "Install the VR bridge", "One click below. AVRcade copies its stereo bridge beside gta_sa.exe without replacing game files.", false),
+            : new(2, "Install the VR bridge", "Use the install button at the top. AVRcade copies its stereo bridge beside gta_sa.exe without replacing game files.", false),
         _ => View.ModInstalled
             ? new(2, "VR mod installed", "AVRcade downloaded the community VR mod and checked its hashes.", true)
-            : new(2, "Install the VR mod", "One click below. AVRcade downloads the community VR mod and checks its hashes.", false)
+            : new(2, "Install the VR mod", "Use the install button at the top. AVRcade downloads the community VR mod and checks its hashes.", false)
     };
 
     // ---- Controls, comfort and per-game extras ---------------------------------
@@ -202,7 +204,6 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     public bool CyberpunkSetupComplete => CyberpunkBackendInstalled && CyberpunkRequirementsInstalled;
     public bool CyberpunkCanInstall => IsCyberpunk && IsInstalled && !CyberpunkBackendInstalled && !_cyberpunkSetupBusy;
     public bool CyberpunkCanAuthorize => CyberpunkBackendInstalled && !CyberpunkRequirementsInstalled && !_cyberpunkSetupBusy;
-    public bool CanPrepareBelow => CanPrepare && !IsCyberpunk;
     public IBrush CyberpunkSetupBrush => LauncherThemeService.Brush(CyberpunkSetupComplete && View.Readiness is not GameReadiness.Blocked ? "GoodBrush" : "WarningBrush");
     public string CyberpunkSetupTitle => _cyberpunkSetupBusy ? "VR setup in progress"
         : View.Readiness is GameReadiness.Blocked ? "VR setup blocked"
@@ -222,6 +223,7 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
         foreach (var property in new[] { nameof(CyberpunkSetupStatus), nameof(CyberpunkSetupBusy), nameof(CyberpunkSetupTitle), nameof(CyberpunkSetupBrush),
             nameof(CyberpunkCanInstall), nameof(CyberpunkCanAuthorize), nameof(CyberpunkBackendStatus), nameof(CyberpunkDependencyStatus) })
             OnPropertyChanged(property);
+        NotifySetupChanged();
     }
     public string CyberpunkBackendNoteText => View.ModInstalled
         ? "CyberpunkVR Port by dariulone is installed. AVRcade activates its official files for VR sessions and parks them for monitor play. Version 0.1.7 still needs a headset acceptance run."

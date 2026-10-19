@@ -192,12 +192,24 @@ public partial class MainWindow : Window
 
     private async void ImportUevrProfile_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainWindowViewModel vm || vm.SelectedGame is null)
+        if (DataContext is not MainWindowViewModel vm || vm.SelectedGame is not { CanImportUevrProfile: true } game ||
+            game.View.InstallDir is not { } root || vm.Busy || vm.IsInstallingCyberpunkRequirements)
             return;
-        if (await PickFileAsync($"Select the reviewed {vm.SelectedGame.DisplayName} profile ZIP",
+        if (await PickFileAsync($"Select the reviewed {game.DisplayName} profile ZIP",
                 new FilePickerFileType("ZIP archive") { Patterns = ["*.zip"] }, FilePickerFileTypes.All)
             is { } path)
-            vm.ImportSelectedUevrProfile(path);
+            await vm.ImportUevrProfileAsync(game.Slug, root, path);
+    }
+
+    private void OpenSetupHelp_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+        vm.DetailTabIndex = VrSetupTab;
+        if (this.FindControl<Expander>("SetupRecovery") is { } recovery)
+        {
+            recovery.IsExpanded = true;
+            recovery.BringIntoView();
+        }
     }
 
     private async void SelectGtaVanillaFolder_Click(object? sender, RoutedEventArgs e)
