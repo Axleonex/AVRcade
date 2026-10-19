@@ -34,23 +34,13 @@ def main() -> int:
         "shipping executable hash must be pinned",
     )
     require(native["game"]["adapter_build_id"] == "steam-1091500-build-20383525", "adapter build must match profile")
-    require(native["verification"]["status"] == "headset_verified", "successful headset evidence must be recorded")
-    require(native["loading"]["state"] == "game_verified", "RED4ext loading must be live-verified")
-    require(native["conversion"]["capabilities"]["red4ext_bridge"] == "game_verified", "bridge capability must be live-verified")
-    require(native["renderer"]["observation_state"] == "game_verified", "D3D12 observation must be live game-verified")
-    require(native["conversion"]["capabilities"]["graphics_bridge"] == "game_verified", "graphics bridge must be live game-verified")
-    require(
-        native["conversion"]["capabilities"]["stereo_views"] == "game_verified",
-        "engine second-view capability must record the successful OpenXR stereo run",
-    )
-    require(
-        native["conversion"]["capabilities"]["head_tracking"] == "game_verified",
-        "HMD tracking must record the successful live run",
-    )
-    require(
-        native["conversion"]["capabilities"]["motion_controls"] == "game_observed",
-        "controller actions must retain the observed-but-not-yet-fully-verified state",
-    )
+    package = json.loads((NATIVE_PROFILE.parent / "cyberpunk-2077-backend.json").read_text())
+    require(package["backend"]["version"] == "0.1.7", "official release version must be pinned")
+    require(package["backend"]["creator"] == "dariulone", "creator attribution must be retained")
+    require(native["verification"]["status"] == "preflight_ready", "0.1.2 headset results cannot verify the new release")
+    require(native["loading"]["activation_mode"] == "managed_session", "ungated upstream files require session isolation")
+    require(all(state == "planned" for state in native["conversion"]["capabilities"].values()),
+            "0.1.7 capabilities require new game/headset evidence")
     dependency_paths = {item["path"].replace("\\", "/").lower() for item in native["dependencies"]}
     require("red4ext/red4ext.dll" in dependency_paths, "RED4ext loader dependency missing")
     require(
@@ -58,8 +48,8 @@ def main() -> int:
         "VRClient-managed engine-aware stereo backend dependency missing",
     )
     require(
-        "red4ext/plugins/cyberpunkvr_hands/cyberpunkvr_hands.dll" in dependency_paths,
-        "VRIK arm-bone hook dependency missing",
+        "red4ext/plugins/cyberpunkvr_hands/cyberpunkvr_hands.dll" not in dependency_paths,
+        "0.1.7 incorporates hands into the stereo DLL",
     )
     require("red4ext/plugins/archivexl/archivexl.dll" in dependency_paths, "ArchiveXL dependency missing")
     require("red4ext/plugins/tweakxl/tweakxl.dll" in dependency_paths, "TweakXL dependency missing")
@@ -69,8 +59,8 @@ def main() -> int:
     require("bin/x64/dxgi.dll" in conflict_paths, "DXGI proxy conflict missing")
     require("red4ext/plugins/vrclient.redengine" in conflict_paths, "retired bridge conflict missing")
     require(
-        "red4ext/plugins/cyberpunkvr_hands" not in conflict_paths,
-        "the supported VRIK arm-bone hook must not be blocked as a conflict",
+        "red4ext/plugins/cyberpunkvr_hands/cyberpunkvr_hands.dll" in conflict_paths,
+        "the old hands DLL must be blocked to prevent duplicate hooks",
     )
 
     game_schema = json.loads(GAME_SCHEMA.read_text(encoding="utf-8"))

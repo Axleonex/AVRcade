@@ -1,6 +1,57 @@
 # Cyberpunk 2077 VR for VRClient
 
-Research status: 2026-08-05
+Current release integration: 2026-10-18. Earlier sections below retain the historical 0.1.2 research and evidence.
+
+## Official 0.1.7 integration
+
+CyberpunkVR Port is created by **dariulone**. AVRcade now downloads the unmodified
+official 0.1.7 release rather than rebuilding its earlier 0.1.2 snapshot. Source:
+https://www.nexusmods.com/cyberpunk2077/mods/30093 and
+https://github.com/dariulone/cyberpunk-vr-port/releases/tag/0.1.7.
+
+The release is pinned to commit `a0c23fe110530bb74a73b3adf1ffa7d83050c43d` and
+archive SHA-256 `A77B211D4DB4E75B61B08951762E9034F60511731F3A441F21B11D1F723C7C84`.
+All 257 gameplay files have individual hashes in the backend manifest. The archive
+is downloaded on the player's PC; AVRcade does not redistribute it as its own port.
+`tools/pin-cyberpunk-upstream.py` reproduces the manifest from the verified archive.
+
+The official plugin has no AVRcade environment activation flag. The full release
+is parked under `.avrcade/cyberpunk-2077/payload` outside game mod scan paths.
+AVRcade publishes those files for a VR session, supervises the game process and
+parks them after it exits. A journal permits recovery on the next managed launch
+if the supervisor is interrupted. If the supervisor is forcibly killed, use an
+AVRcade monitor launch to recover before starting the game externally.
+
+The old standalone Hands DLL and old HUD module are retired with known-hash
+checks and backups outside RED4ext's recursive plugin scan. Unknown changed files
+block migration. A Vortex deployment colliding with the managed release blocks
+activation rather than being overwritten. Keep the VR port disabled in Vortex
+when using AVRcade's managed copy; other deployed mods remain available.
+
+Old `vrport.ini` is backed up. Turning and head offsets migrate; diagnostic and
+renderer overrides do not. The author's first-launch settings merge remains
+enabled, with its upstream backup behavior. The old AVRcade HUD mode buttons are
+replaced by guidance to use the upstream overlay (hold L3+R3 for one second/F10).
+
+**More Occluders (Scripted v0.3), by sosuine, remains a separate required Nexus
+download:** https://www.nexusmods.com/cyberpunk2077/mods/33136. The original mod
+page lists additional framework requirements. The 0.1.2 headset observations
+below do not validate this release; 0.1.7 headset acceptance is pending.
+
+AVRcade's **Install requirements (free)** action opens the official Nexus file
+`157829` for Scripted v0.3. A free account may still need to sign in and click
+Manual download / Slow download. AVRcade detects the completed ZIP in the Windows
+Downloads folder or Vortex's Cyberpunk download cache and imports it automatically.
+It does not request Nexus credentials or require Premium. Download detection can
+be cancelled and resumed from the same action.
+
+The importer accepts only the matching Scripted v0.3 download name and REDscript
+files beneath `r6/scripts`. It rejects ArchiveXL packages, unrelated files, path
+traversal and changed file collisions. The download's SHA-256, creator and source
+URL are recorded locally; Nexus has not supplied a publisher SHA-256 for this
+dependency. Scripts join the Cyberpunk session's parked payload and are never
+installed for other games. Cyberpunk VR launch remains unavailable until this
+requirement is installed; monitor modes are available.
 
 ## Correction and scope
 
@@ -424,3 +475,11 @@ continuous turn rate follows the game's controller sensitivity.
 - [CyberpunkVR Port repository and architecture](https://github.com/dariulone/cyberpunk-vr-port)
 - [CyberpunkVR Port 0.1.0 engineering notes](https://github.com/dariulone/cyberpunk-vr-port/blob/main/docs/RELEASE-0.1.0.txt)
 - [CyberpunkVR Port MIT license](https://github.com/dariulone/cyberpunk-vr-port/blob/main/LICENSE)
+
+### Nexus download authorization
+
+The VR port and its GitHub-hosted frameworks download and install directly. More Occluders Scripted v0.3 is pinned to Nexus file 157829. Nexus requires website-generated download authorization on non-Premium accounts; AVRcade opens that exact file, detects the completed archive, and installs it into the Cyberpunk-only managed payload. The UI labels that step **Authorize Nexus download** rather than claiming it is an unattended install. No paid membership is required by AVRcade. Fully unattended acquisition needs an author-approved direct source or redistribution permission; the current author permissions prohibit rehosting.
+
+### Manual requirement fallback
+
+The Cyberpunk VR setup tab includes a collapsed manual-installation section. Automatic acquisition of the main VR port uses its pinned official release; the requirement watcher scans only the configured Windows Downloads folder and the default Vortex Cyberpunk download folder, non-recursively, during the active 10-minute setup operation. A file picker allows an explicitly selected More Occluders Scripted v0.3 ZIP from elsewhere to use the same validated, transactional, Cyberpunk-only importer. It captures the game root before opening the picker, refuses concurrent setup and requires the managed VR port to be present. The user does not unpack into active game folders. Import results update the top setup status.

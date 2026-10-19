@@ -35,6 +35,16 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly Func<string, string?> _coverLocator;
     // Decoded cover art survives a catalogue refresh; only this view model disposes it.
     private readonly Dictionary<string, Bitmap> _covers = new();
+    private readonly Dictionary<string, (string Message, bool Busy)> _cyberpunkSetupProgress = new(StringComparer.OrdinalIgnoreCase);
+    private void ReportCyberpunkSetup(string root, string message, bool busy)
+    {
+        _cyberpunkSetupProgress[root] = (message, busy);
+        foreach (var item in Games.Where(item => item.IsCyberpunk && string.Equals(item.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)))
+            item.SetCyberpunkSetupProgress(message, busy);
+        if (string.Equals(SelectedGame?.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)) StatusText = message;
+    }
+    private CancellationTokenSource? _cyberpunkRequirementsCancellation;
+    [ObservableProperty] private bool _isInstallingCyberpunkRequirements;
     private IReadOnlyList<ModManagerInstall> _installedManagers = [];
 
     public ObservableCollection<GameItemViewModel> Games { get; } = new();
@@ -336,7 +346,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 _controller.GetHudMode(game),
                 gtaTurnPreference,
                 _controller.GetCyberpunkTurnPreference(game),
-                CoverFor(game.SteamAppId));
+                CoverFor(game.SteamAppId), _controller.GetModCredits(game.Slug));
             if (CommunityVrRoutes.All.TryGetValue(game.Slug, out var route))
             {
                 var modded = new ModdedGameViewModel(_controller.RepoRoot, route, game.InstallDir,
@@ -352,6 +362,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             }
             item.SetPlayModeSource(
                 source => BuildPlayModes(source, runtimeDetected), runtimeDetected, _controller.GetUnrealMods(game));
+            if (item.IsCyberpunk && game.InstallDir is { } cpRoot && _cyberpunkSetupProgress.TryGetValue(cpRoot, out var cpProgress))
+                item.SetCyberpunkSetupProgress(cpProgress.Message, cpProgress.Busy);
             Games.Add(item);
         }
         Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
@@ -424,7 +436,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                             ? "Another VR or graphics hook (dxgi.dll or d3d12.dll) is in the game folder. Remove it first"
                             : "This game build does not match the supported VR backend",
                     view.ModInstalled, runtimeDetected,
-                    _controller?.CyberpunkBackendInstallable == true));
+                    _controller?.CyberpunkBackendInstallable == true,
+                    view.InstallDir is { } cyberpunkDir && CyberpunkNexusRequirements.Installed(cyberpunkDir)));
             case GameEngine.LegacyD3D9:
                 return PlayModePlanner.GtaSanAndreas(new GtaPlayFacts(
                     installed,
@@ -497,7 +510,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task PrepareAsync()
     {
-        if (_controller is null || SelectedGame is not { } game) return;
+        if (_controller is null || SelectedGame is not { } game || Busy || IsInstallingCyberpunkRequirements) return;
         var dir = game.View.InstallDir;
         if (string.IsNullOrEmpty(dir))
         {
@@ -529,7 +542,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             }
             else if (game.View.Engine is GameEngine.Redengine)
             {
+                ReportCyberpunkSetup(dir, "Downloading and installing CyberpunkVR Port...", true);
                 outcome = await controller.InstallCyberpunkVrAsync(dir, new HttpDownloader(http));
+                if (outcome.Ok)
+                {
+                    var requirements = await InstallCyberpunkRequirementsCoreAsync(dir);
+                    outcome = new ActionOutcome(requirements.Ok, requirements.Message);
+                }
             }
             else if (game.View.Engine is GameEngine.LegacyD3D9)
             {
@@ -555,10 +574,95 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         finally
         {
             Busy = false;
+            if (game.IsCyberpunk) ReportCyberpunkSetup(dir, finalStatus, false);
             RefreshCatalogue(announce: false);
             StatusText = finalStatus;
         }
     }
+
+    private async Task<CyberpunkBackendOutcome> InstallCyberpunkRequirementsCoreAsync(string gameRoot)
+    {
+        if (IsInstallingCyberpunkRequirements)
+            return new(false, "Cyberpunk requirements setup is already running.");
+        IsInstallingCyberpunkRequirements = true;
+        ReportCyberpunkSetup(gameRoot, "Checking for the More Occluders download...", true);
+        var acceptProgress = true;
+        _cyberpunkRequirementsCancellation = new CancellationTokenSource();
+        try
+        {
+            var result = await new CyberpunkNexusRequirements().InstallAsync(gameRoot,
+                url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }),
+                progress: new Progress<string>(message => { if (acceptProgress) ReportCyberpunkSetup(gameRoot, message, true); }),
+                ct: _cyberpunkRequirementsCancellation.Token);
+            acceptProgress = false;
+            ReportCyberpunkSetup(gameRoot, result.Ok
+                ? "Installation complete: VR port and More Occluders are installed. Choose a VR mode below; headset validation remains pending."
+                : "Setup incomplete: " + result.Message, false);
+            return result;
+        }
+        catch (OperationCanceledException)
+        {
+            acceptProgress = false;
+            ReportCyberpunkSetup(gameRoot, "Setup paused: installation is incomplete. Resume Nexus download authorization to continue.", false);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            acceptProgress = false;
+            ReportCyberpunkSetup(gameRoot, "Setup failed: " + ex.Message, false);
+            throw;
+        }
+        finally
+        {
+            _cyberpunkRequirementsCancellation.Dispose();
+            _cyberpunkRequirementsCancellation = null;
+            IsInstallingCyberpunkRequirements = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task InstallCyberpunkRequirementsAsync()
+    {
+        // Capture this game's root before awaiting. Switching the selected title
+        // while Nexus downloads cannot redirect the installation to another game.
+        if (IsInstallingCyberpunkRequirements || Busy || SelectedGame?.IsCyberpunk != true || SelectedGame.View.InstallDir is not { } gameRoot) return;
+        string message;
+        try { message = (await InstallCyberpunkRequirementsCoreAsync(gameRoot)).Message; }
+        catch (OperationCanceledException) { message = "Cyberpunk requirements download detection cancelled. Use Install requirements to resume."; }
+        catch (Exception ex) { message = $"Cyberpunk requirements setup: {ex.Message}"; }
+        RefreshCatalogue(announce: false);
+        StatusText = message;
+    }
+
+    public async Task ImportCyberpunkRequirementZipAsync(string gameRoot, string archivePath)
+    {
+        // The root was captured before the file picker opened. Selection changes
+        // cannot redirect this archive to another title.
+        if (!Games.Any(game => game.IsCyberpunk && string.Equals(game.View.InstallDir, gameRoot, StringComparison.OrdinalIgnoreCase))) return;
+        if (Busy || IsInstallingCyberpunkRequirements)
+        { StatusText = "Pause automatic setup before importing a ZIP, then retry."; return; }
+        Busy = true;
+        var message = "Installation did not complete.";
+        ReportCyberpunkSetup(gameRoot, "Validating and installing the selected More Occluders ZIP...", true);
+        try
+        {
+            if (CyberpunkUpstreamSession.ReadState(gameRoot) is null)
+            { message = "Install VR at the top before importing More Occluders."; return; }
+            var result = await Task.Run(() => CyberpunkNexusRequirements.Import(gameRoot, archivePath));
+            message = result.Ok ? "Installation complete. VR port and More Occluders are installed; headset validation remains pending." : result.Message;
+        }
+        catch (Exception ex) { message = "ZIP import failed: " + ex.Message; }
+        finally
+        {
+            Busy = false;
+            ReportCyberpunkSetup(gameRoot, message, false);
+            RefreshCatalogue(announce: false);
+            StatusText = message;
+        }
+    }
+
+    [RelayCommand]
+    private void CancelCyberpunkRequirements() => _cyberpunkRequirementsCancellation?.Cancel();
 
     /// Start the selected game in one of the four play modes. `acknowledge` is the
     /// player's answer to the private-session warning; it is never assumed here.
@@ -581,6 +685,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         StatusText = $"Starting {game.DisplayName}…";
         try
         {
+            if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
+            {
+                var modRoots = mode == PlayMode.VrWithMods && game.Modded?.SelectedProfile?.Directory is { } profileRoot
+                    ? new[] { profileRoot } : null;
+                var controls = new VrClient.Core.Config.ControllerRuntimeBindings().Prepare(_controller.RepoRoot, game.View, modRoots);
+                if (!controls.Ok) { finalStatus = controls.Message; return; }
+            }
             var outcome = game.View.Engine switch
             {
                 _ when game.IsYapyap && mode is (PlayMode.VrOnly or PlayMode.VrWithMods) =>
@@ -1044,6 +1155,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _cyberpunkRequirementsCancellation?.Cancel();
         Streaming.Dispose();
         foreach (var game in Games)
             game.Dispose();

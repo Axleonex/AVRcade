@@ -21,6 +21,10 @@ $root = Split-Path -Parent $PSScriptRoot
 if (-not $OutDir) { $OutDir = Join-Path $root 'build\cyberpunk-backend' }
 $package = Get-Content -LiteralPath (Join-Path $root 'config\redengine\native\cyberpunk-2077-backend.json') -Raw |
     ConvertFrom-Json
+if ($package.backend.upstream_release) {
+    Write-Host "RESULT: collect-cyberpunk-backend download-on-install version=$($package.backend.version) creator=dariulone"
+    exit 0
+}
 
 $searchRoots = @('build', 'artifacts\cyberpunk-dependencies', 'external', 'config\redengine') |
     ForEach-Object { Join-Path $root $_ } |

@@ -6,7 +6,7 @@ public enum PlayMode { VrOnly, VrWithMods, ModsNoVr, Vanilla }
 public enum PlayModeAvailability { Ready, NeedsSetup, Unavailable }
 
 /// What the mode's button does when the mode is not ready to launch.
-public enum PlayModeSetup { None, InstallVr, OpenVrSetup, OpenMods, ChooseCleanFolder }
+public enum PlayModeSetup { None, InstallVr, OpenVrSetup, OpenMods, ChooseCleanFolder, InstallCyberpunkRequirements }
 
 public sealed record PlayModeState(
     PlayMode Mode, PlayModeAvailability Availability, string Status, string Action,
@@ -36,7 +36,7 @@ public sealed record UnrealPlayFacts(
 /// BackendInstallable says this copy of AVRcade carries the backend files to install.
 public sealed record CyberpunkPlayFacts(
     bool GameInstalled, string? VrBlockedReason, bool VrBackendInstalled, bool RuntimeDetected,
-    bool BackendInstallable);
+    bool BackendInstallable, bool RequirementsInstalled = true);
 
 public sealed record GtaPlayFacts(
     bool GameInstalled, string? VrBlockedReason, bool VrBridgeInstalled, bool CleanFolderReady,
@@ -183,6 +183,8 @@ public static class PlayModePlanner
         var runtimeNote = f.RuntimeDetected ? null : NoRuntime;
         PlayModeState Vr(PlayMode mode, string status, string action) =>
             f.VrBlockedReason is { } blocked ? Unavailable(mode, blocked)
+            : f.VrBackendInstalled && !f.RequirementsInstalled
+                ? Setup(mode, "Nexus download authorization needed: More Occluders", "Authorize Nexus download", PlayModeSetup.InstallCyberpunkRequirements)
             : f.VrBackendInstalled ? Ready(mode, status, action, runtimeNote)
             : f.BackendInstallable
                 ? Setup(mode, "VR backend not installed yet", "Install VR backend", PlayModeSetup.InstallVr)

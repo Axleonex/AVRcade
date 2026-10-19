@@ -192,8 +192,10 @@ public sealed partial class AppController
     private string ComfortMapPath(string slug) => Path.Combine(ModpacksDir, $"{slug}.comfort-map.json");
     private string ProfilePath(string slug) => Path.Combine(ProfilesDir, $"{slug}-game-profile.json");
 
+    public IReadOnlyList<GameModCredit> GetModCredits(string slug) => GameModCredits.Load(_repoRoot, slug);
+
     public ControllerReference? GetControllerReference(string slug) =>
-        ControllerReferenceCatalog.Load(_repoRoot, slug);
+        ControllerReferenceCatalog.Load(_repoRoot, slug) ?? ControllerCustomization.Generic(slug);
 
     public CyberpunkHudMode? GetHudMode(GameView game) =>
         game.Engine is GameEngine.Redengine && !string.IsNullOrEmpty(game.InstallDir)
@@ -249,6 +251,8 @@ public sealed partial class AppController
     {
         if (game.Engine is not GameEngine.Redengine || string.IsNullOrEmpty(game.InstallDir))
             return new ActionOutcome(false, "HUD modes are available only for an installed Cyberpunk 2077 conversion.");
+        if (CyberpunkUpstreamSession.ReadState(game.InstallDir) is not null)
+            return new(false, "CyberpunkVR Port 0.1.7 controls its HUD in the headset: hold L3+R3 for one second or press F10.");
         try
         {
             CyberpunkHudSettings.WriteMode(game.InstallDir, mode);
@@ -455,22 +459,31 @@ public sealed partial class AppController
             var manifest = installDir is null ? null : SteamManifestBeside(installDir, appId);
             var preflight = new CyberpunkNativePreflight().Evaluate(
                 cyberpunkProfile, installDir, manifest);
+            var managedPackage = CyberpunkBackend;
+            var conflicts = installDir is not null && managedPackage is not null
+                ? CyberpunkInstallConflicts(preflight, managedPackage, installDir) : preflight.Conflicts;
+            var needsManagedInstall = installDir is not null && managedPackage?.Package.UpstreamRelease is not null &&
+                CyberpunkUpstreamSession.ReadState(installDir) is null;
             var installed = installDir is not null &&
-                preflight.MissingDependencies.Count == 0;
-            var blocked = preflight.Conflicts.Count > 0 || preflight.IdentityMismatch;
+                preflight.MissingDependencies.Count == 0 && !needsManagedInstall;
+            var blocked = conflicts.Count > 0 || preflight.IdentityMismatch;
+            var requirementsMissing = installed && managedPackage?.Package.UpstreamRelease is not null &&
+                !CyberpunkNexusRequirements.Installed(installDir!);
             var readiness = installDir is null ? GameReadiness.NeedsGame
                 : blocked ? GameReadiness.Blocked
                 : !installed ? GameReadiness.NeedsVrMod
+                : requirementsMissing ? GameReadiness.NeedsVrMod
                 : !headset ? GameReadiness.NeedsHeadset
                 : GameReadiness.ProfileUnverified;
             views.Add(new GameView(
                 slug, displayName, appId, installDir, installed,
                 blocked ? "Block" : "Allow",
-                preflight.Conflicts.Count > 0 ? nameof(CyberpunkNativePreflightStatus.ConflictingHooks)
+                conflicts.Count > 0 ? nameof(CyberpunkNativePreflightStatus.ConflictingHooks)
                     : preflight.IdentityMismatch ? nameof(CyberpunkNativePreflightStatus.BuildMismatch)
                     : "cyberpunk_preflight_ready",
                 GameEngine.Redengine, readiness,
-                ReadinessDetail(readiness, GameEngine.Redengine)));
+                requirementsMissing ? "Authorize the More Occluders Scripted v0.3 download to finish Cyberpunk VR setup."
+                    : ReadinessDetail(readiness, GameEngine.Redengine)));
         }
 
         var rdr2Profile = Path.Combine(RageDir, "rdr2.json");
@@ -1040,9 +1053,10 @@ public sealed partial class AppController
         if (preflight.IdentityMismatch)
             return new ActionOutcome(false,
                 $"This Cyberpunk 2077 build is not the one the VR backend supports (Steam build {preflight.ExpectedBuildId}). Nothing was installed.");
-        if (preflight.Conflicts.Count > 0)
+        var installConflicts = CyberpunkInstallConflicts(preflight, backend, gameDir);
+        if (installConflicts.Count > 0)
             return new ActionOutcome(false,
-                $"Remove the conflicting VR or graphics hook first: {string.Join(", ", preflight.Conflicts)}. Nothing was installed.");
+                $"Remove the conflicting VR or graphics hook first: {string.Join(", ", installConflicts)}. Nothing was installed.");
 
         var outcome = await backend.InstallAsync(gameDir, downloader, ct);
         if (!outcome.Ok)
@@ -1062,15 +1076,26 @@ public sealed partial class AppController
         var preflight = EvaluateCyberpunk(gameDir);
         var plan = backend.Plan(gameDir);
         var missingPayload = backend.MissingPayloadFiles();
+        var conflicts = CyberpunkInstallConflicts(preflight, backend, gameDir);
         var ok = preflight.ActualSha256 is not null && !preflight.IdentityMismatch &&
-                 preflight.Conflicts.Count == 0 && missingPayload.Count == 0;
+                 conflicts.Count == 0 && missingPayload.Count == 0;
         return new ActionOutcome(ok,
             $"build_match={!preflight.IdentityMismatch && preflight.ActualSha256 is not null} " +
-            $"conflicts={preflight.Conflicts.Count} payload_missing={missingPayload.Count} " +
+            $"conflicts={conflicts.Count} payload_missing={missingPayload.Count} " +
             $"download=[{string.Join(", ", plan.ToDownload.Select(f => $"{f.Name} {f.Version}"))}] " +
             $"keep=[{string.Join(", ", plan.AlreadyPresent.Select(f => f.Name))}] " +
             $"copy={plan.BackendFilesToCopy} replace={plan.BackendFilesToReplace}");
     }
+
+    private static IReadOnlyList<string> CyberpunkInstallConflicts(
+        CyberpunkNativePreflightResult preflight, CyberpunkBackendInstaller backend, string gameRoot) =>
+        preflight.Conflicts.Where(relative =>
+        {
+            var current = CyberpunkUpstreamSession.Resolve(gameRoot, relative);
+            return backend.Package.UpstreamRelease is not { } release || !File.Exists(current) ||
+                !release.LegacyFiles.Any(f => f.Path.Equals(relative, StringComparison.OrdinalIgnoreCase) &&
+                    f.Sha256.Equals(Hashing.Sha256OfFile(current), StringComparison.OrdinalIgnoreCase));
+        }).ToArray();
 
     public ActionOutcome UninstallCyberpunkVr(string gameDir, bool removeFrameworks = false)
     {
@@ -1126,7 +1151,7 @@ public sealed partial class AppController
         if (cli is null)
             return new ActionOutcome(false, "vrclient.exe was not found beside the app.");
 
-        using var process = new Process();
+        var process = new Process();
         process.StartInfo = new ProcessStartInfo
         {
             FileName = cli,
@@ -1137,23 +1162,47 @@ public sealed partial class AppController
             CreateNoWindow = true
         };
         addArguments(process.StartInfo);
+        var supervisesCyberpunk = process.StartInfo.ArgumentList.Contains("cyberpunk-launch");
+        var processToken = supervisesCyberpunk ? CancellationToken.None : ct;
         process.Start();
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-        var stderrTask = process.StandardError.ReadToEndAsync(ct);
-        try
+        var started = new TaskCompletionSource<ActionOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
+        async Task<string> ReadOutput()
         {
-            await process.WaitForExitAsync(ct);
+            var output = new System.Text.StringBuilder();
+            while (await process.StandardOutput.ReadLineAsync(processToken) is { } line)
+            {
+                output.AppendLine(line);
+                if (line.StartsWith("RESULT: cyberpunk-launch ", StringComparison.Ordinal) &&
+                    line.Contains("started=true", StringComparison.Ordinal))
+                    started.TrySetResult(new ActionOutcome(true, line));
+            }
+            return output.ToString();
         }
-        catch (OperationCanceledException)
+        async Task<ActionOutcome> Complete()
         {
-            if (!process.HasExited) process.Kill(entireProcessTree: true);
-            throw;
+            try
+            {
+                var stdoutTask = ReadOutput();
+                var stderrTask = process.StandardError.ReadToEndAsync(processToken);
+                await process.WaitForExitAsync(processToken);
+                var output = $"{await stdoutTask}\n{await stderrTask}";
+                var result = output.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .LastOrDefault(line => line.StartsWith("RESULT:", StringComparison.Ordinal))
+                    ?.Trim() ?? output.ReplaceLineEndings(" ").Trim();
+                return new ActionOutcome(process.ExitCode == 0, result);
+            }
+            catch (OperationCanceledException)
+            {
+                if (!process.HasExited) process.Kill(entireProcessTree: true);
+                throw;
+            }
+            finally { process.Dispose(); }
         }
-        var output = $"{await stdoutTask}\n{await stderrTask}";
-        var result = output.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .LastOrDefault(line => line.StartsWith("RESULT:", StringComparison.Ordinal))
-            ?.Trim() ?? output.ReplaceLineEndings(" ").Trim();
-        return new ActionOutcome(process.ExitCode == 0, result);
+        var completion = Complete();
+        var first = await Task.WhenAny(completion, started.Task);
+        // Cyberpunk's CLI continues supervising cleanup after the app reports
+        // launch success. Closing the app must not strand or kill the game.
+        return await first;
     }
 
     public RuntimeStatusView GetRuntimeStatus(

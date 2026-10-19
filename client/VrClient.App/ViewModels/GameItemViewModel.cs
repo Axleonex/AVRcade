@@ -31,6 +31,19 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     private bool _runtimeDetected;
     private UnrealModInventory _unrealMods = new(string.Empty, []);
 
+    private readonly ControllerCustomization _controllerSettings = new();
+    private ControllerEditorViewModel? _selectedController;
+    public ControllerEditorViewModel? SelectedController
+    {
+        get => _selectedController;
+        set
+        {
+            if (value == null || value == _selectedController) return;
+            _controllerSettings.SelectDevice(Slug, value.Defaults.Id);
+            SetProperty(ref _selectedController, value);
+        }
+    }
+
     /// coverImage is owned by the window's cover cache, which outlives a catalogue refresh.
     public GameItemViewModel(
         GameView view,
@@ -38,10 +51,18 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
         CyberpunkHudMode? hudMode,
         GtaTurnPreference gtaTurnPreference,
         CyberpunkTurnPreference cyberpunkTurnPreference,
-        Bitmap? coverImage)
+        Bitmap? coverImage, IReadOnlyList<GameModCredit>? modCredits = null)
     {
         View = view;
         ControllerReference = controllerReference;
+        ModCredits = modCredits ?? (controllerReference?.ConversionCredit is { } credit
+            ? [new GameModCredit(credit.Project, credit.Creator, credit.ProjectUrl)] : []);
+        ControllerDevices = (controllerReference ?? ControllerCustomization.Generic(view.Slug)).Devices
+            .Select(device => new ControllerEditorViewModel(view.Slug, device)).ToArray();
+        string device;
+        try { device = _controllerSettings.ActiveDevice(view.Slug); }
+        catch (IOException) { device = "quest-touch"; }
+        _selectedController = ControllerDevices.FirstOrDefault(c => c.Defaults.Id == device) ?? ControllerDevices[0];
         _hudMode = hudMode;
         _gtaTurnPreference = gtaTurnPreference;
         _cyberpunkTurnPreference = cyberpunkTurnPreference;
@@ -159,9 +180,10 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
 
     // ---- Controls, comfort and per-game extras ---------------------------------
 
+    public IReadOnlyList<GameModCredit> ModCredits { get; }
+    public bool HasModCredits => ModCredits.Count > 0;
     public ControllerReference? ControllerReference { get; }
-    public IReadOnlyList<ControllerDeviceReference> ControllerDevices =>
-        ControllerReference?.Devices ?? [];
+    public IReadOnlyList<ControllerEditorViewModel> ControllerDevices { get; }
     public bool HasControllerReference => ControllerDevices.Count > 0;
     public bool NoControllerReference => !HasControllerReference;
     public string ControllerReferenceTitle => ControllerReference?.Title ?? "Controller reference";
@@ -172,12 +194,44 @@ public sealed class GameItemViewModel : ObservableObject, IDisposable
     public string RuntimeNoticeText => "Experimental, unverified UEVR route for the flat game. " +
         (_runtimeDetected ? "" : "Connect a headset through VDXR or SteamVR/OpenXR. ") +
         "Controller-driven local hands are opt-in and have not passed a headset test.";
+    private string? _cyberpunkSetupMessage;
+    private bool _cyberpunkSetupBusy;
+    public bool CyberpunkSetupBusy => _cyberpunkSetupBusy;
+    public bool CyberpunkBackendInstalled => IsCyberpunk && View.ModInstalled;
+    public bool CyberpunkRequirementsInstalled => IsCyberpunk && View.InstallDir is { } root && CyberpunkNexusRequirements.Installed(root);
+    public bool CyberpunkSetupComplete => CyberpunkBackendInstalled && CyberpunkRequirementsInstalled;
+    public bool CyberpunkCanInstall => IsCyberpunk && IsInstalled && !CyberpunkBackendInstalled && !_cyberpunkSetupBusy;
+    public bool CyberpunkCanAuthorize => CyberpunkBackendInstalled && !CyberpunkRequirementsInstalled && !_cyberpunkSetupBusy;
+    public bool CanPrepareBelow => CanPrepare && !IsCyberpunk;
+    public IBrush CyberpunkSetupBrush => LauncherThemeService.Brush(CyberpunkSetupComplete && View.Readiness is not GameReadiness.Blocked ? "GoodBrush" : "WarningBrush");
+    public string CyberpunkSetupTitle => _cyberpunkSetupBusy ? "VR setup in progress"
+        : View.Readiness is GameReadiness.Blocked ? "VR setup blocked"
+        : CyberpunkSetupComplete ? "VR setup complete" : "VR setup incomplete";
+    public string CyberpunkSetupStatus => _cyberpunkSetupMessage ??
+        (View.Readiness is GameReadiness.Blocked ? View.ReadinessDetail
+        : CyberpunkSetupComplete ? "VR port and More Occluders are installed. Choose a VR mode below; headset validation remains pending."
+        : !IsInstalled ? "Install or locate Cyberpunk 2077 first."
+        : CyberpunkBackendInstalled ? "VR port installed. More Occluders is not installed yet. Authorize its Nexus download to finish setup."
+        : "Install the VR port and its required packages to continue.");
+    public string CyberpunkBackendStatus => CyberpunkBackendInstalled ? "VR port: installed" : "VR port: not installed";
+    public string CyberpunkDependencyStatus => CyberpunkRequirementsInstalled ? "More Occluders: installed" : "More Occluders: not installed";
+    public void SetCyberpunkSetupProgress(string message, bool busy)
+    {
+        _cyberpunkSetupMessage = message;
+        _cyberpunkSetupBusy = busy;
+        foreach (var property in new[] { nameof(CyberpunkSetupStatus), nameof(CyberpunkSetupBusy), nameof(CyberpunkSetupTitle), nameof(CyberpunkSetupBrush),
+            nameof(CyberpunkCanInstall), nameof(CyberpunkCanAuthorize), nameof(CyberpunkBackendStatus), nameof(CyberpunkDependencyStatus) })
+            OnPropertyChanged(property);
+    }
     public string CyberpunkBackendNoteText => View.ModInstalled
-        ? "The VR backend is installed in the game folder, matched to this exact game build. AVRcade checks that its files are present before every VR launch."
-        : "VR needs a set of RED4ext plugins in the game folder, matched to one exact game build. Install VR backend copies AVRcade's VR plugins there and downloads the modding frameworks they need from their official releases, checking every hash. The monitor modes work without them.";
+        ? "CyberpunkVR Port by dariulone is installed. AVRcade activates its official files for VR sessions and parks them for monitor play. Version 0.1.7 still needs a headset acceptance run."
+        : "Install VR backend downloads CyberpunkVR Port 0.1.7 directly from dariulone's official release and verifies its hashes. AVRcade also installs the required More Occluders Scripted v0.3 package after Nexus download authorization. This release supports Cyberpunk 2077 2.31.";
     public string CyberpunkBackendCareText => View.ModInstalled
-        ? "Removing the VR backend takes out only AVRcade's own VR files; the modding frameworks stay for your other mods."
+        ? "AVRcade keeps the earlier VR package as a rollback backup. Keep CyberpunkVR Port disabled in Vortex when using AVRcade's managed copy; Vortex can still deploy your other mods."
         : "Frameworks you already have are never overwritten. Cyber Engine Tweaks asks you to pick an overlay key the first time the game starts, so do one monitor launch first.";
+    public string CyberpunkRequirementsText => View.InstallDir is { } gameRoot && CyberpunkNexusRequirements.Installed(gameRoot)
+        ? "More Occluders Scripted v0.3 by sosuine is installed for Cyberpunk VR."
+        : "More Occluders Scripted v0.3 needs Nexus download authorization. AVRcade installs it automatically once downloaded.";
     public bool HasConversionCredit => ControllerReference?.ConversionCredit is not null;
     public string ConversionCreditText => ControllerReference?.ConversionCredit is { } credit
         ? $"{credit.Project} by {credit.Creator}"

@@ -112,9 +112,17 @@ def main() -> int:
     expected_build = profile["game"]["steam_buildid_observed"]
 
     missing_dependencies = []
+    store = game_root / ".avrcade" / "cyberpunk-2077"
+    state_path = store / "install.json"
+    parked_files = set()
+    if state_path.is_file():
+        state = json.loads(state_path.read_text(encoding="utf-8-sig"))
+        parked_files = {name.replace("\\", "/").casefold() for name in state["Files"]}
     for dependency in profile["dependencies"]:
         path = resolve_profile_path(game_root, dependency["path"])
-        if not path.exists():
+        relative = dependency["path"].replace("\\", "/")
+        parked = resolve_profile_path(store / "payload", relative)
+        if not path.exists() and not (relative.casefold() in parked_files and parked.is_file()):
             missing_dependencies.append(
                 {
                     "path": dependency["path"],

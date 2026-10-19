@@ -381,6 +381,16 @@ try
                 new SafetyVerdict(Verdict.Allow, "cyberpunk_preflight_ready", "", "Pinned REDengine backend is ready"));
             var dryRun = HasFlag("--dry-run");
             var session = new CyberpunkLaunchSession();
+            var backendPackagePath = Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json");
+            if (File.Exists(backendPackagePath) && CyberpunkBackendInstaller.LoadPackage(backendPackagePath).UpstreamRelease is not null &&
+                CyberpunkUpstreamSession.ReadState(gameDir!) is null)
+                throw new InvalidOperationException("Install CyberpunkVR Port through AVRcade first so monitor and VR modes can be isolated safely.");
+            if (launchMode is CyberpunkLaunchMode.Vr && CyberpunkUpstreamSession.ReadState(gameDir!) is not null &&
+                !CyberpunkNexusRequirements.Installed(gameDir!))
+                throw new InvalidOperationException("Finish Nexus download authorization in AVRcade's Cyberpunk setup for More Occluders Scripted v0.3 first.");
+            using var upstreamSession = !dryRun && CyberpunkUpstreamSession.ReadState(gameDir!) is not null
+                ? new CyberpunkUpstreamSession(gameDir!, launchMode is CyberpunkLaunchMode.Vr)
+                : null;
             var pid = new GameLauncher().Launch(
                 plan, acknowledgeWarn: true, dryRun, xrRuntime,
                 session.BuildEnvironment(launchMode), session.BuildLaunchArguments(withMods));
@@ -388,8 +398,14 @@ try
             var diagnostics = session.WriteDiagnostics(
                 Path.Combine(repoRoot, "artifacts"), launchMode, activationSource, xrRuntime, pid, withMods);
             Console.WriteLine(
-                $"RESULT: cyberpunk-launch mode={launchMode.ToString().ToLowerInvariant()} pid={pid} " +
+                $"RESULT: cyberpunk-launch mode={launchMode.ToString().ToLowerInvariant()} pid={pid} started=true " +
                 $"xr={xrRuntime?.Name ?? "none"} mods={withMods} vortex={withVortex} backend=CyberpunkVR_Stereo diagnostics={diagnostics}");
+            if (upstreamSession is not null && pid > 0)
+            {
+                // Keep the package lease alive independently of the desktop app.
+                using var gameProcess = System.Diagnostics.Process.GetProcessById(pid);
+                await gameProcess.WaitForExitAsync();
+            }
             return 0;
         }
         case "rdr2-preflight":
@@ -1374,7 +1390,7 @@ try
 
             var controllerGuide = ControllerReferenceCatalog.Load(repoRoot, uevrGame.Slug);
             if (controllerGuide is not null)
-                UevrControllerGuide.Install(controllerGuide, uevrGameProfileDir);
+                UevrControllerGuide.Install(new ControllerCustomization().ApplySaved(controllerGuide), uevrGameProfileDir);
 
             // The RV hand driver is opt-in and must be installed only after
             // first-launch profile deployment, so its data directory cannot

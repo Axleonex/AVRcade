@@ -2,29 +2,1110 @@
   "schema": "avrcade-redengine-backend/1",
   "game_slug": "cyberpunk-2077",
   "backend": {
-    "name": "CyberpunkVR Port (AVRcade-managed build)",
-    "version": "0.1.2+f5e59d7e81a3.avrcade1",
-    "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/f5e59d7e81a35ccf71da1e75b34483335e908174",
+    "name": "CyberpunkVR Port by dariulone",
+    "version": "0.1.7",
+    "creator": "dariulone",
+    "source": "https://github.com/dariulone/cyberpunk-vr-port/commit/a0c23fe110530bb74a73b3adf1ffa7d83050c43d",
+    "project_url": "https://www.nexusmods.com/cyberpunk2077/mods/30093",
     "license": "MIT",
     "payload_dir": "native/cyberpunk-2077",
     "files": [
-      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll", "sha256": "48C79FE01071D18EF0F2140EBBE56DF125D680158CD9CA984522104FD396AD0D" },
-      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil", "sha256": "8AB2E80B42064C2A04695986374FA7F4611B8444AF84E840C98082DEB4239565" },
-      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil", "sha256": "AEA0E213A75B6D921E4D86E267A102D859D0A2609A6F58F500E2F77A523EB12E" },
-      { "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\LICENSE-CyberpunkVRPort-MIT.txt", "sha256": "A9C100B3B7CB0169E14B1AABE6963F724582A0D40C067ADE516BB12A4BB98E5E" },
-      { "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll", "sha256": "7D5B502F50708404B059ADC7CE872FA107856590B9BFEDAD3A94384282D09144" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua", "sha256": "585F911FBC6591F7D61BE4C5CBA0D8E0C28038B913AFA77920BB09EE64546BA1" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua", "sha256": "58AC23EE406D0701CFCE139655E869D08468F0698AE6DB4A5FFE309E835D8888" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\vrcam.json", "sha256": "BC4B964933471D01A49BB2A2BC9564C1215D7D9E0BFEDE547555B8D9A03DFA1C" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua", "sha256": "42834AEC59E73B451ECA49E2BC73BF37E3B4ACC2AE1F05AB6DF3F30B0592F27A" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua", "sha256": "5199046B8E5A79A613D1535BE8BD930A41FD239584415839CF7A3338D39871E5" },
-      { "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini", "sha256": "631C6E8E192C2FB60BE037137644A2290C62ED86DEB662A80C9A9D2692FDBB0C" },
-      { "path": "archive\\pc\\mod\\cyberpunkvrport.archive", "sha256": "848AB2743AA0D7E5B243C5E1394990BBC544DAC985B8ADABA5517F046F1B4F37" },
-      { "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds", "sha256": "8C7D407A7EA3D83EB2021908438E9CF1E0C5AAD9277B12DB03536724C8277C0E" }
+      {
+        "path": "archive\\pc\\mod\\cyberpunkvrport.archive",
+        "sha256": "EDED1057AA7DF6E8DA31CB77F9BF06ABC7B06B675F852C8FF3E2AEFB7D31445C"
+      },
+      {
+        "path": "archive\\pc\\mod\\cyberpunkvrport.archive.xl",
+        "sha256": "6A50B8BA7EC43A3219F6D01F3B356F4BB38C474D95E57EF95B60B62E51B7D89B"
+      },
+      {
+        "path": "archive\\pc\\mod\\VRCigarette.archive.xl",
+        "sha256": "96CA90800123B38092A3EA62F5A1CE6DAFB8BF45B641D8A59A6FF2F9441BBC27"
+      },
+      {
+        "path": "archive\\pc\\mod\\vrport_basketball.archive",
+        "sha256": "5C788A74F0EC6A87A68CA069B6DE81A6C01451A106C83E4A44225DBA229AD84A"
+      },
+      {
+        "path": "archive\\pc\\mod\\vrport_mag.archive",
+        "sha256": "EFAAFA1FE07099504EEDB3A360873D119923DB75214D21E3953CCAE230D2986B"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_LighterGrip_Left.ini",
+        "sha256": "7FCB0F73974EBFF66F124530F2A0FB24FFDA4393B9DA257B02EA852633F1F2AA"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_RestGrip_Left.ini",
+        "sha256": "0DEDF7ADDCEF0C3EBF28D6E99F72B04F994717E62744294DD4B88F505FED1FC8"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_RestGrip_Right.ini",
+        "sha256": "757E71569F2B00B85D3AD3354BC37E6B57BA7A1DFE790B6353004F0B9021497A"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_SmokeGrip_Left.ini",
+        "sha256": "35F9205F8C1B47255AD024149CD99010CBB25BF5731B1E333D431CE7594884F4"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_SmokeGrip_right.ini",
+        "sha256": "12635925362CD22FE76ADC6E7F9E9B42F0EADB2AB20E7403AA5D11C28A3AC6E0"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_achilles.ini",
+        "sha256": "906EAED90D8946B8D6A47C725E2B189E56F416E61599E1BEB7543D0422D463CA"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_ajax.ini",
+        "sha256": "64CB249EBDB06F9CE9957AEB28FA4119656BFFD639D89E4B2750EA844AB8E580"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_ashura.ini",
+        "sha256": "2F1B1FA8AF1EE701CF11DBB640E84FAF6EA04E0C1C6AACA7BB49573427288084"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_bat.ini",
+        "sha256": "06EA7C5982BD8EBEDBF09F8D97C9DE7CFA75F107E90A3F74081091C15C74601A"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_buck.ini",
+        "sha256": "9D691A686693EDE7A3FA600B1E445757DCB8F2EF6F084BC8FFEEE9CAB16EDA4B"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_burya.ini",
+        "sha256": "5A8EB4867A41645D685A3D8469B40C800BE9205740C669887793A4632416F906"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_carnage.ini",
+        "sha256": "CBEDC2C5CD74B02974FEFEE44C355D3E9E842C967728B92D3233409BD6C6D7AF"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_chao.ini",
+        "sha256": "06E34747EAA3C5E13C2AFF0AEFACF84E032A988320B1EE22DD154B01B7CBC6F9"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_copperhead.ini",
+        "sha256": "E91FA4D93D159811A00CD413A2201AFAC3D74482958AEF7F36EDA6CD14ECDD6A"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_crusher.ini",
+        "sha256": "3A7726E38A0C7B2F94F7B974E62E5E1F68384033A3B963E3D7804D71EB904975"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_defender.ini",
+        "sha256": "CB0F2C47C2C90CD63BD82459463982985D219F3459578FC4460D44DCDD0CAAD7"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_dian.ini",
+        "sha256": "E553BA0EC9A522788649AD79219F619B5AA9074878968316D5CA384CD4865729"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_grad.ini",
+        "sha256": "AFE1E68E10D2DBC1179E357884885EF38144323CB74D38FE38FFFE881B8C245C"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_guillotine.ini",
+        "sha256": "55FEE20E0E95D976802A63F724F42AA03F51BC3214AC76AAE15CA7BF3F08B9CA"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_hammer.ini",
+        "sha256": "109F42CCCD160D008A09D91E0D9A35769F3EDA21C5F22F59F6CEE8357540B16A"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_igla.ini",
+        "sha256": "F16C27A5CCEC60715E4E604E393729B254B886F6CD6A7D9D2A5453BDC3589A56"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_itemspreset_katana_takemura.ini",
+        "sha256": "8E757D3619603649934A5B2A1C39029F8FF70668E6393B08CDF76F283E7250AE"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_kanabo.ini",
+        "sha256": "179BD41FFE9036458590FAB1D66A2452FF3C5AFF381C80735E7FDCA6D983825A"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_kappa.ini",
+        "sha256": "20D9D5A289DE366D83AA216999C748B03CA41A2F735BD9C563E2E97F1C05DA32"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_katana.ini",
+        "sha256": "9DB34EF9DEEF7AEBE41727D924D128B875710B578F902C8945487630AE2E288E"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_kenshin.ini",
+        "sha256": "F673F906BF670471C82E09F624E00762EC1C8890AC66A9EC7B94A5B365E3D893"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_kolac.ini",
+        "sha256": "7ED4BBD9ED7B86FED7444A9855A4A91BCB15242F209A601868329E7BE9D1E89E"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_kyubi.ini",
+        "sha256": "387FED0AC3303274A95F46F8A9BC478800E1CDF7A02C4FC051FE99C7BEFA21E6"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_lexington.ini",
+        "sha256": "EFF3FA683864ADEB520FE548593AADCBA2F4FB947545F66F02342F9CA27B7FCA"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_liberty.ini",
+        "sha256": "4A87C06FA942BC23B0286B8F2FC5DEFE7CED4BA8797E35A089403C3F1893779C"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_masamune.ini",
+        "sha256": "63465A97F713F5149E4B54C93D6A5E8711C1731F3BD016979DF16C4583D3E017"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_nekomata.ini",
+        "sha256": "B0D9E10F47581E4FDD7DEBA2EFEE49CB244394FFAC2A42D1A22EEC3D93CE8182"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_nova.ini",
+        "sha256": "8426869BD15968FE1ECA77F53975569C32C71F1D6EE362144658328595C7DEE3"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_nue.ini",
+        "sha256": "4A96A8949F445E69F1BF46F88F66D8B54E3D94634A3E6571DCC871FFFFD01F49"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_omaha.ini",
+        "sha256": "392BB02524AF7B0B501C57EB8B48976E68926281A9A8B609D3CF371A263DDE6F"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_overture.ini",
+        "sha256": "B2E53AA19E41DA286523149E1DD10E3AE503E336297B8421135C8EAF8133544C"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_pozhar.ini",
+        "sha256": "167B1521FE19334573DAFC779D58A12335CAF4FF62A00CE4D817AE6F84A569E4"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_pulsar.ini",
+        "sha256": "45E75701FE2A8F87D0DF6C94FD8154FC8FE84E47F42FDBEC24CEBFB0D4AAF3DC"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_quasar.ini",
+        "sha256": "CAA83F7E1501922504429A3DB708CE6C04DBB8DEDA9FACA44F4178CAAFD87CBE"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_rocketlauncher.ini",
+        "sha256": "CD553EB57C23537817472D9F9864AB862A6C1D9495F1B57B6C319A8ADB03B7A7"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_saratoga.ini",
+        "sha256": "430E36B7DD7E3FB2663ED493B51718951B2825CA1831FECC40A8C17400FEFF65"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_senkoh.ini",
+        "sha256": "A9CBD2DD0A76CEFC1614353C5E85E0FC0248A12CF76E1FB6E9CA0D4564FB2A7E"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_shingen.ini",
+        "sha256": "A3E9A2B744D9FD5ACB45FD58C0E7D8F476A2F585C577DC7B301674D7CAA524B8"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_sidewinder.ini",
+        "sha256": "368F58CA8C29F464B57DC8C0D6DCAFC45EAED5642463343E42C18CB9126B5792"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_silverhand.ini",
+        "sha256": "1EFE9FDF7B8D9700E11A9810B92ED193C8B0DB9FED9DDEE82F06571491A38B1D"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_sor22.ini",
+        "sha256": "CBE06FB1020D4A450B63F6444EE638CA09AF5DDCBF71A6C0E91C10F639381F53"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_tactician.ini",
+        "sha256": "E70E21AD2DFC18C71F662AC5E40E5A77BD846252E32AD33CFC598400828FC47E"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_tamayura.ini",
+        "sha256": "069CD526777D2F7798A66F41C2098AC132DDC9FA7FE02A2F66DB826209B90667"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_testera.ini",
+        "sha256": "49232D84C5D22A8B0E92D8EDD3B8BEF876FCA99D5AA2B73779A75F299EAA616D"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_unity.ini",
+        "sha256": "0ADDFBC86C0E30CCB5388678239B890BAF22323E605C6079A034A58175FE0846"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_yukimura.ini",
+        "sha256": "B10C0D89D0D6313502F6F8513D5F4976446B9E47D930F25010175C8A8AC138BE"
+      },
+      {
+        "path": "bin\\x64\\CyberpunkVR_TwoHandGrip_zhuo.ini",
+        "sha256": "94042EB7A5D8FEB852657BA74DBF577471E046C37EF9AF5F96E2A759138FB56E"
+      },
+      {
+        "path": "bin\\x64\\openvr_api.dll",
+        "sha256": "8C1F385E71A758CD8836887AB69284A740D8966983C1BFF034068607BC71ADC2"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Basketball\\init.lua",
+        "sha256": "C9FAB6251F2B9B054EBF52736002A4700E414FDACECB9C52AB29C04B71BBD85C"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_BraindanceHud\\init.lua",
+        "sha256": "3F36FAABAF53A97EAE7000A529734971D54322F48F6A189322F31DD24663DC36"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Crosshair\\init.lua",
+        "sha256": "CB3A601024FF24541CE35C7CCBB8F0916C937A34E11D49231668DC2E64F0E47E"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Driving\\init.lua",
+        "sha256": "ADA3D43F73549266FC5989B14CE8F7C3B03BCAA5DBBC00B577775AD11359AFA1"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_ForceFPP\\init.lua",
+        "sha256": "20920659265B95D3FE8CBFDB9034BBE971BEE31A2783506910F60DF6241C522C"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HandCollision\\capsules.lua",
+        "sha256": "4A58CBC7C0E9FA061B2255303F1F5512648287ADD6A51400D2F6F6C897FD4EF7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HandCollision\\init.lua",
+        "sha256": "96586A2A6F9C498ADF39F308774C6925650E8D00BF171125A2ACC39974267737"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HandCollision\\weapon_silverhand.lua",
+        "sha256": "A3DAC32731DBB37EA364C13508F86B7E9D6B511EB4E2C2FD503FA246515699BF"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Holster\\init.lua",
+        "sha256": "A956BD96AEF091B3C530E8F5C56D84822A46BCC8B534D7A47307C9E129AEFE80"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Ladder\\init.lua",
+        "sha256": "D6C7DAC7EF2DE9171956B266550FC1909D8E026824E6014401AC1629132A30EF"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\capsules.lua",
+        "sha256": "4A58CBC7C0E9FA061B2255303F1F5512648287ADD6A51400D2F6F6C897FD4EF7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\init.lua",
+        "sha256": "B29D75A005B9C7B971DA01D940886311D01DC4BFD85509E2423D0F294F835125"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\weapon_silverhand.lua",
+        "sha256": "A3DAC32731DBB37EA364C13508F86B7E9D6B511EB4E2C2FD503FA246515699BF"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\reload.lua",
+        "sha256": "FCCA3B88F91953337B837A163B29CDDB1D4A14E5E8597734E085FBC7596A924E"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\revolver.lua",
+        "sha256": "D83951E37B18DF6DBA850DDC811BE874A1ED3DCAC08712B329B2EF9DA293B908"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\rigs.lua",
+        "sha256": "651792DB0DAB082DEDE18899F4A0952E2BA08F3DCAF7C62BE458288F1F3A1434"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\paths\\malorian_mag.lua",
+        "sha256": "C6FAF7308F09C00B663891EBA3E4342ACD2991C883D7DDC0B9EFC7FFADC6EFA5"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\chao_mag_left_carry.lua",
+        "sha256": "E44B3388221425C3B701E89C88B4FB97FF08124B11AF55E068C4942520E91793"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\chao_mag_left_open.lua",
+        "sha256": "249724448BA24EEA70A7EE97B4E4461CF52B2562128A8CF27F9CA24933AF5553"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\grenade_hold.lua",
+        "sha256": "F6418449BC97942C6CF9055782E93D87EB921E802D6FB99D9D7C35A381251E0D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\grenade_pinch.lua",
+        "sha256": "16138350D529826E4FE6E3CBCD21888E60D6563C26F106CCAE994A1D97FFA9DB"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\grenade_pin_left.lua",
+        "sha256": "3C80BA28C1D034C5E46572A2CA67BE03769EFC3B9AF9D1D1C0D32EFDC70270A5"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_palm.lua",
+        "sha256": "622184403C8922ACEB68159C09D9A85BFB2DD74D9A6AECE5F2487AAC5C24847D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_palm_open.lua",
+        "sha256": "41703B8CA424A08F1144CBC2146D3779604E3C732B7657AE4444F651BDA861CD"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_pinch.lua",
+        "sha256": "863D8A9C5AC6018935F15C480C5EFA7F52683A69E6C4698A9FD46A85A17A062A"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_pinch_open.lua",
+        "sha256": "88B414DB0759BACD30AEA2C2C60B5E1A4D2821BD9F144EB81D39E28B4B9A138D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_pinch_seated.lua",
+        "sha256": "7EB8580C620945D463E36847BE16D06C04744C5308EE25CF5A03845F0C31D583"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kappa_mag_left_seated.lua",
+        "sha256": "98815DE254D0A52CCA2E3FEEEC0035E43A15C4303FC8BC1F32801857F2CD3A57"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left.lua",
+        "sha256": "59579CE6BA889E5AA8459FC9B546BD5392C12C5E7C485E09606E4404FC44472D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d003.lua",
+        "sha256": "6C911B9DE27350968A0CFAA7625DC0ED2F3ECC04758EF9355221EBBDDC93777D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d022.lua",
+        "sha256": "EA2568A9D9ECD414E50245A0D72ADAFA792F50411C2D5799DECDA5778C820E49"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d038.lua",
+        "sha256": "EFAB32AA1B24FBF84BCB545720B635B24DE513AD38649EA99F399A5E096F324F"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d114.lua",
+        "sha256": "5FD91628DCDC72B8AB4816CDB5E43F0830731123D0F27288F2C624EEA85F028A"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d122.lua",
+        "sha256": "B991AB3723F8448E357C2FD3004732256317376EA4C2007251ACD4858227E81B"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_mag_left_d122_b.lua",
+        "sha256": "3E28BEA7CF29E68B5490163BC4398151998796B654E9A5A29C86A723C1044E04"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\kenshin_slide_left_behind.lua",
+        "sha256": "41F15E2EAE8D19B6E741408103E3C9D94EF788B1F77DA13672593E3A9790457A"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_mag_left_carry.lua",
+        "sha256": "4CE864BE527BB8C3493CC2CC23D382C49CBF71D6BFE31837C69877928EAF979E"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_mag_left_carry_b.lua",
+        "sha256": "4DF1F197EF4680761EC6D2A18E4F2B967897FE689633C9E7A3D244C6EE006563"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_mag_left_d000.lua",
+        "sha256": "A9346C8B930A766E8D5A0F77D05768B424F096F5B893186EA6E4D645CFB3BB4D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_mag_left_d040.lua",
+        "sha256": "DFFAAD626AFE7305CBBD19ED5DF7DF51A76B550B3E19DC501AA8033BD1E25A74"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_mag_left_d078.lua",
+        "sha256": "B7DE1F2D59CF1E93330E52EC62B3FB15CD57EDF7D5BEDA5DE61255D856358EA1"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\lexington_slide_left_behind.lua",
+        "sha256": "615B3A6B5D21936EA410EEB698D2214491D676A1819530ED3D65DC8A254CD4B4"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\liberty_slide_left_palm.lua",
+        "sha256": "E5D8D379D0866CB206330DEEA7B8D35A23CC10EDC682386601F6C219A5E9FD96"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\malorian_mag_left.lua",
+        "sha256": "E5CAC01930318144755167AED08703416BEF3A0B287DD85A13A2D6046ABCE1EC"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\malorian_slide_left_behind.lua",
+        "sha256": "4BF6FA86055666A0359BD0904C4B4731373511BCABF6F601C0E1552DEAAD1ABA"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\malorian_slide_left_palm.lua",
+        "sha256": "BF8D6DA085D6270C38155F9481858BE603D6DB5A6F6F5FBC0B62DDBD3E63CA66"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\omaha_mag_left_d000.lua",
+        "sha256": "FFFE1BBED570D419F38ADD56748E20D6C6AA41F956FFEDDB76B9837162FE40E6"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\omaha_mag_left_d035.lua",
+        "sha256": "38F6FE50814C018524C2DF64226F42B198D7DEEE80FAFB091C9B5B6AB8C62A40"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\omaha_mag_left_d080.lua",
+        "sha256": "12D4845B64FE070FA7262F68BEE1F432182EADD4B769979AD10FE9027C5AF83B"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\omaha_mag_left_d125.lua",
+        "sha256": "570B584318299BD0A45DD7AA864DAEC94CC59AF6C2435A87EF24F91458D4E0D5"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_index_pull.lua",
+        "sha256": "8BC021308CD9AD66946AFB8BCE761FF1521D9140DF47A8CA49BC902A727A2929"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_load_left_carry.lua",
+        "sha256": "876A832A9E3AC9CC11AFEC3BA166ACC04F14D70C7F59C10B0E855EBEF44E9761"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_load_left_seated.lua",
+        "sha256": "513C88BD8FB6C580B8CB009E5BCAEC7B81E6A85EDDADE77200DE37246E5EA22C"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_spin_left.lua",
+        "sha256": "3BE0B847DE590FC216C0AB1CD9354A3A790663141FF56FA4DFF457A73014F3D8"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_thumb_hold.lua",
+        "sha256": "64A0914683F04899C9BC17BBBAF552066726964B4A4A254A19D88363F0F09782"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_thumb_over.lua",
+        "sha256": "186585E27990A22A3120EC4179B5B3A5CE793CE739141E464275AA605E21BB32"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\overture_thumb_press.lua",
+        "sha256": "93907C978E988C738DEBE4DD440CEC66071599BD62290D8BBD232360A897DDC0"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\ticon_mag_left_carry.lua",
+        "sha256": "4ED5DC72FCD81A8770E4E4F617E44F14A799CD16A8C37EE4DA6A8C9F52C49FC2"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\ticon_mag_left_open.lua",
+        "sha256": "905AB49CDEC543E9D9A257819680CD2CCAD12D3149967E6AF163B4ACA64D1DB7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\ticon_mag_left_seated.lua",
+        "sha256": "DF6A9B16287FB0BDC211C73F1F0C382B49AE0AACFB4BB9B81BC6773FFA7AE311"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\ticon_slide_left_palm.lua",
+        "sha256": "1148E500EC438F7EABECB7D76DE6CA45EDB023D53D943D7DA8F3356EE183A07E"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\ticon_thumb_press.lua",
+        "sha256": "2CC21BC71676533A799A7C33BCB9D291EC4B1FA5DA3C4C02BC2F7A2666B26832"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left.lua",
+        "sha256": "17CE94BF47963A195F30B0C44775F6102E981DE4BA107686A52120670D07F344"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_d000.lua",
+        "sha256": "90BCFF176B5BB531CFFEBEA26374FF239EF4A94B28B29F1A7E6AED811C170E65"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_d025.lua",
+        "sha256": "2443CC04551AC75430607BCDDB7DD06745C50E60BEB760AF5CDA3D950E78E2E2"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_d050.lua",
+        "sha256": "F87E8E2C3583C5B0B948AFDD548B70D76E435B6DC882B37D09350963665DD288"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_d080.lua",
+        "sha256": "F57E1C26EC32017BC12503EBC73C6D885006968AA9FD4769D0F4E69F30158839"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_d115.lua",
+        "sha256": "EE5FA6233BD51BC2EDF116A508FFE72CCE03E5C660863F97FE1E18EAA517EDFD"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_mag_left_insert.lua",
+        "sha256": "21E225CA72E7778626220281DEE05FB15198CB461587B40F727F97A35FF84932"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_slide_left_behind.lua",
+        "sha256": "2560ACD1BC91AB5E2DCA4F965394AEAF91C09404A9A6F8AF83D9A247FE677A2D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\poses\\unity_slide_left_palm.lua",
+        "sha256": "91247514ED98B31FAC10FD7936D155902C6CBA5B4291B3093A8B8F31B4C8285D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\reload_record_01.lua",
+        "sha256": "E84A2D54EC6146099B78C72E95B6817482CD5770170C3A33097C35CD781FF013"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\reload_record_02.lua",
+        "sha256": "A81FF4BCEC91F1BEF1215AC196DFEB411A6EC3622808A32AABE1F8EE74146523"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\reload_record_RELOADTRUE.lua",
+        "sha256": "0C9184C60313B922E750DBC01F9B294067F5D2402469812DEDEC210A2D3174AE"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\v1_frombacktwofingers.lua",
+        "sha256": "81571FD1B6F717A4B4DEEA4C8040A959296F82FA228F0C0BA6CE73466C5D85B9"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\v1_withpalm.lua",
+        "sha256": "73905BA81DC971534DD7F52095380D96E330AA1C41C2C3103965C10E956BEBA9"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\v2_behind_twofingers.lua",
+        "sha256": "62F97B84D41DA20927207314113DFC98269FD38AFF0A5BCD1ABC95987B4FDCC7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\records\\v2_palm.lua",
+        "sha256": "3C72732105D9C8B02AD71FFED5303E79D0189A5922445FC313CB8DEE23EC7022"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\arasaka_kenshin.lua",
+        "sha256": "EE5528621C21CAF93C543035AC0C9AD9DB7FE1B99F6D840D38DD509123E9F854"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\arasaka_tamayura.lua",
+        "sha256": "AE1F54C3818206D556C614B25EE83FCA832728858ADA15AD59F019126D6B6CB2"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\arasaka_yukimura.lua",
+        "sha256": "F1457C5E569BDDE7D55AE14CD967EB1E4F451E9DE1253FDA977BBCFF2061BF46"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\constitutional_liberty.lua",
+        "sha256": "BD0D0F822543D457C9144E6D680A3755A5A0A6319E853106CCA83BEC0A42C80D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\constitutional_unity.lua",
+        "sha256": "A43CF8DC1363C869E6B586B6292A6249080DC14025167CE0C8B4ADF7B756FF3C"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\index.lua",
+        "sha256": "15703A6AAC84FBE60CD40A65FD0FDC37BE562C3C444D4291DC38FEF50353C9DA"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\kangtao_chao.lua",
+        "sha256": "22AE3330739567081B08E9F158037BD789B9790F9E15169BC89B2D3BB44BF77D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\malorian_overture.lua",
+        "sha256": "DF43E7A3C444E2B7F1C95E5BD47803DDB44EE760A9DAC573152EC08A941EC58B"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\malorian_silverhand.lua",
+        "sha256": "21175A998AD4F1D56726718368D1C1D7BE02B6B398E7BBEF3FEC0CE3761612B8"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\militech_lexington.lua",
+        "sha256": "70DA70F84C8377E4B5AC5509D801E6788BDD04E05EFCCBF3BD85D46A04E6D36E"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\militech_omaha.lua",
+        "sha256": "5D4BF1AB766A265DF988A2E796F678512747A3C63C1B5D74913C1F18827AF754"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\militech_ticon.lua",
+        "sha256": "A6AE8F6EA7939CB426084D656F95A1FF3033E4357E3FD2D9ADFB2C50A3C8170D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\tsunami_kappa.lua",
+        "sha256": "6751630D0882FC0D4AF43DDAD6DE687F1F3DD1204C39C92B703AA7577461CF64"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Reload\\reload\\weapons\\tsunami_nue.lua",
+        "sha256": "5DEE969ABA0834EF9B14EE763E44DA745EB526F3F3BEEC60ABCB21C398009BA9"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Smoking\\init.lua",
+        "sha256": "88BA92B36AE593EB202A5709EFEDFBA681F6E6722EB39CD5BAA5045BA56B35E6"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua",
+        "sha256": "762F9150C091D1F64C40F58CC15D88BBDAF21ECF4D5B91325C86F605C82B22AB"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\vrcam.json",
+        "sha256": "309C5882E1F106000A0341432CCDD90B2BD87B2DA3C8EF1412A9F961A4AA1E56"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge\\.gitkeep",
+        "sha256": "5A0222EAEFEB791DC68C31D0BADBA2F6FFECADB71EE0C4270F7905E817DF9F9F"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\hud_panel.lua",
+        "sha256": "FEFE9C97E3843BB162FD6C2FC6F2FE4119D881087AB604C2E895EEB293EB7AE0"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\keypad_input.lua",
+        "sha256": "0F0033BB824CE1DEDA23635B73570C52C5ED197AF2EFD96CBDDB583458016E81"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\story_attention.lua",
+        "sha256": "871B3362C11109B68BF7D932A80B3F33DBAC876881C10A3AF91CF60F4546A0FC"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua",
+        "sha256": "F11E16C2C230FB83E2716D942863A454031CF253D5D6B0F324FBF5DD3AFBBB34"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vr_overlay.lua",
+        "sha256": "AE4F50BDC6E0306DD4B12019F7A075CFF6F033126DF4FA1F2EA69A02A19BD7E7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Swimming\\init.lua",
+        "sha256": "F5508A7B7A246C61F8D040B33777C5CF5BB4C3DA8917BD34492E02DDBF23BA35"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\init.lua",
+        "sha256": "1C6A1D4479310EBA8D54628A4CC6B574C0FBEADD8553738CA7C1DAAAC8D40CCE"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\mark_component.lua",
+        "sha256": "C9A2DE54E7A2865EDF8DE9B957CA05828937A54A5ED314C0A8B1F1D866E778F3"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\startup_clothing.lua",
+        "sha256": "5356C72302F0F603CF351112286B9FD057CBFABAD7CD66554253DE2A848C3261"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\flight.lua",
+        "sha256": "A21123741F549C88F44D0F40070555556FF94ED5ADE072E0B5A14BC60070EBD4"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\grenade.lua",
+        "sha256": "8CC02822C662B362358F53E69C9DAD2F524D809E0CA43EB6FA7EFAA07694E557"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\biohazard_hold.lua",
+        "sha256": "A5612A20DEB5D9426E381F85B8E2F10EC741E8ECCE10ED900562B9FD268355E5"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\biohazard_pin.lua",
+        "sha256": "7A5C9DE4CC733C081BE03F28E43C2209CC04FA19B4754696793514C6E7006347"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\biohazard_pinch.lua",
+        "sha256": "ADF9B4D27FCEF2E493733087EB934BC122855397E6BABBCD8DC299FF049BFB66"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\biohazard_thumb.lua",
+        "sha256": "2E501CB3794D3DD87625D9771DB137722FFCDCAC15F31F2387D4542508E12333"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\cutting_hold.lua",
+        "sha256": "2DA317EE034DB06FF82990B4B6A565A193CEC034760F872D703BA1433BF4B500"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\cutting_pinch.lua",
+        "sha256": "F87B0CD59CCCDD05EF4FFC2011F592881A7D6B4997259D60D731E7BAB44FDFE8"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\cutting_press.lua",
+        "sha256": "5E0A2C8F3D0578C02246AE469200BD0A3DE6DC95C272A834BDA49C83C3518328"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\cutting_thumb.lua",
+        "sha256": "9D9DCCB3821835150D828512916CB5D64EE2EC80DA7F7B4BBE7E0D1F8F9BBD92"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\emp_hold.lua",
+        "sha256": "4B7D152991A933502546CF6BA7BF5D8D6B182E452D2F3BD2E8E75F4B1F0843D3"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\emp_pinch.lua",
+        "sha256": "BF3618237F4AAD5AD96B07431828AF48ACD280B8A61F0FD6BEB95384E8B29AC3"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\emp_press.lua",
+        "sha256": "B20D78DAB33D4C66B0A06B52A49A40ED73215F3F310C172E90DED21893572CA2"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\emp_thumb.lua",
+        "sha256": "94F977E75E84B5C0868CB2BAA3B028D4FD41C094E1FDBCD147D0DBA09532D003"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\flash_hold.lua",
+        "sha256": "93D3FC0712C7EFCBECCE75A5FC3AB17A29A3B88D6594A29F22635FAFE42F9C82"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\flash_pin.lua",
+        "sha256": "1365C71306A59B3E4B39FD38459BEA06C83E15E4F455FDBE1810AA5D7FE38ECA"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\flash_pinch.lua",
+        "sha256": "2D5C92CA145B14C1939F3D86D9C9DE1AA98C144497291A77979CCF5BD22EBF27"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\flash_thumb.lua",
+        "sha256": "E6DFC18FEC452A79FA93D29B17F5B3F591146151246EC262DF8CB6A66339F407"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\frag_hold.lua",
+        "sha256": "F6AE89222899B8748FE813B26EBB0108A194C23359503CAAC51972FB3CE772DE"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\frag_pin.lua",
+        "sha256": "3EE7F79CFEBAC3CA9AA51A146E3343AFEAAAC53A2226C8F091F265EBB4731E7D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\frag_pinch.lua",
+        "sha256": "CE9EB103E053BCF27DDE032369F69C61CCF651E599D773320338376FE33B365B"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\frag_thumb.lua",
+        "sha256": "197F7F3D54C75447968004601E0AF62343EDC2A29638F115E2CB1F1CD5A00687"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\grenade_hold.lua",
+        "sha256": "F6418449BC97942C6CF9055782E93D87EB921E802D6FB99D9D7C35A381251E0D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\grenade_pinch.lua",
+        "sha256": "16138350D529826E4FE6E3CBCD21888E60D6563C26F106CCAE994A1D97FFA9DB"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\grenade_pin_left.lua",
+        "sha256": "3C80BA28C1D034C5E46572A2CA67BE03769EFC3B9AF9D1D1C0D32EFDC70270A5"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\incendiary_hold.lua",
+        "sha256": "558BEC8C787F61672CB51E70B3EC812A68C3B72E08915743585990696A77090B"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\incendiary_pin.lua",
+        "sha256": "81413CD111EE9F16C8B3AB01A29C3CB18969AE9D2A164F5ABDB7B2B6A5CE3861"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\incendiary_pinch.lua",
+        "sha256": "A1614A9D9F99CEACBF7DE861D338812DCCFADD662C76D0B9DB9787FB3B9FB93D"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\incendiary_thumb.lua",
+        "sha256": "FEC623C9C0191740D1FA6201C15F916BAA42D40CD22E94C41621B919637D7079"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\recon_hold.lua",
+        "sha256": "ED67B27BFB275B040D5027D5AFE0F94DA9CB2CAF2F86198B9DDB0C71D4E394CC"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\recon_pinch.lua",
+        "sha256": "D1CABE68ECA21F9DC454F6E9174E47BF0372F153B64FD14B3F944441DFD1F960"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\recon_press.lua",
+        "sha256": "CF7731C04372221EE2396230DDC2A440D9D6011589B9A11A13B1C1FB20A30D3A"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\recon_thumb.lua",
+        "sha256": "71B7E6CC69BFDCA345DBA9DF141BDD163C177A97243A051FC55E83416D059680"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\smoke_hold.lua",
+        "sha256": "C47BB8C9DD5EA71F53F6D47F51C6E67589C8AF21185D0509B1EA3B785471DD38"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\smoke_pin.lua",
+        "sha256": "A35BBD01E3E7F14088E12E5C2CC18D42F0F27BDCA09B806E43B2C69086EC90D4"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\smoke_pinch.lua",
+        "sha256": "FC8781DE0EC3C6B7F35BB6835B70260D82512977235F7F355B205F6DD37B3C00"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\smoke_thumb.lua",
+        "sha256": "B16A5F4285B3C8D27078EBAA86D15AB895BE9DF54C3689E96246341A3214F7B7"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_TacticalBelt\\grenade\\poses\\types.lua",
+        "sha256": "F10698C5F2361C69495584A9C6260BC1D20761B649B9DAF1B89FC54905D318D0"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua",
+        "sha256": "48991C8EDCB7F32D9E82E87C1483EAB8BD2ABCA60074C8FFA5BF0D1CA8597A49"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Weapon\\init.lua",
+        "sha256": "DD189AB6CD6C32CA15A3E292FDCA435E6F8C69F1598BA993D4F62C949A8A036A"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_WorldMap\\init.lua",
+        "sha256": "CFDCDCE1DB97A2249EF8F945F2D4AC185C785E572EEF689375C027F5A487F456"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_WristHud\\init.lua",
+        "sha256": "F4A12AF03DF5672ED4F79947A9743744161C2E515CF5F7B546A9268D65DF1746"
+      },
+      {
+        "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_WristHud\\wrist.cfg",
+        "sha256": "0414F3F4A38C58E2E203F87A2EFE32EEB56501BA28D5F2F0519FAE00470C856E"
+      },
+      {
+        "path": "engine\\config\\platform\\pc\\vrcam_cpu_tweaks.ini",
+        "sha256": "415882C0FFA429045D63C2AB5436D5C0589DE03CD14BE15513FCD2D4B3002D58"
+      },
+      {
+        "path": "r6\\input\\CyberpunkVRPort_ScannerHud.xml",
+        "sha256": "60F96023B0C7CA98C7EC2F32C734110924F0F9A5C419432B58BD16DB284AB2B9"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_Basketball\\vrport_basketball.reds",
+        "sha256": "394BCAA9B7EBCA59EA03127EF7A069936AE782D70B44C32142DB5CCF0FE34C8A"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_DeviceCam\\vrport_device_cam.reds",
+        "sha256": "5B911AB47B116811E5B93ADAEF68E81E21772D6A9885F4CF46B9CE2B46DFC85D"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_DeviceCam\\vrport_device_natives.reds",
+        "sha256": "6ED809CB3DFBEBD075FBCCDFC9B080DC2304934C68AB50AFED6A975275558879"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_Hold\\vrport_hold.reds",
+        "sha256": "FFECFEC51BC164A1873F157C64F6C2948B2FA132FA8A9287B07873288790986D"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_Holster\\vrport_holster.reds",
+        "sha256": "0674C0167E2C665692D3BF1CF9735EFEC21E12C17DBF27462FD1BA8B89F6C8BF"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_Melee\\vrport_melee.reds",
+        "sha256": "B8A04CE152F4E920473228C0DFF22F8A13214589E9D644988FBAE4B3BB8FA7AA"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\ControlLowerAndHolsterWeapons.reds",
+        "sha256": "FCA930A2BD398DDC5731948DC7E7CB49B08F1927ECA25C61A29C80BADC465096"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\manualReload.reds",
+        "sha256": "7B61FAF200DB61E578287086B53A04475BC690408166E453215831D3097D7439"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds",
+        "sha256": "F53ADFA826502FBA4C4D2C1FA24D2233328C3D9C28BC798B965E06105FB8C7E8"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_weapon_pose_state.reds",
+        "sha256": "B59D0F7BCE87880513B57AB34165AE08B7D61BA8F62D5EB8378838ACE18F75E1"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_ScannerHud\\vrport_scanner_hud.reds",
+        "sha256": "14E208D62ED4B87356192DD00DCCA5ED5D94CA6F5296DBEA7EA8C08D25341055"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_Smoking\\vrport_smoking.reds",
+        "sha256": "B6511B6C1947FC72DEF976BE10C4AD007A43DA34CF42705C2737FCF143A4730F"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_StoryAttention\\vrport_story_attention.reds",
+        "sha256": "68C0847BCB7C4DD0F4359634564B80AD17558F2A351A41D55572F349A6748C3E"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_WeaponUp\\vrport_weapon_up.reds",
+        "sha256": "FC49310EDEA3F7BBCDA4818EA540B2E27BCC268F3E96CF64D1A222D8001B1482"
+      },
+      {
+        "path": "r6\\scripts\\CyberpunkVRPort_WorldMap\\vrport_worldmap.reds",
+        "sha256": "AE6F34925FAD163AB0F160FC572268BCFF3C75E23A79264266B40031B9EC826C"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\AttachmentSlots.WeaponRight.yaml",
+        "sha256": "1DB431F846D7725C0572885744D974A1DE72BC126DC0CCA3BF22D8822E623BB3"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\EquipmentArea.Consumable.yaml",
+        "sha256": "B174C980FCC760FABACC6C8F735E95B2D2B47A505A1E6937A7676775F784CEF7"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\EquipmentArea.LeftArm.yaml",
+        "sha256": "7EF42BBF438B079D936ABA9A8AF283F1BE697E26104D0D58F4851238D2396C4F"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\EquipmentArea.Splinter.yaml",
+        "sha256": "E8367933D70D848EFBC22B65D385912524CDF60E17C3D1C8D0C0CFDEA0DC60C4"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\EquipmentArea.Weapon.yaml",
+        "sha256": "33ADCFA0390DD70D23E20D4248F7025F0C80C12BCBEBF0780A5E10731205BEA8"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\EquipmentArea.WeaponLeft.yaml",
+        "sha256": "291C92C6D40A044B4B533E5995CB25D80E22C32C00497364784FD4293EAAE5C9"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\Items.cigarette_i_stick.yaml",
+        "sha256": "8E19E0D81573E5D107E8D47BBFAF93C08EAB7EE1E2B79C6DCE594A72CE3CFDD3"
+      },
+      {
+        "path": "r6\\tweaks\\vrcigarette\\Items.VRSmokeWheel.yaml",
+        "sha256": "18BE9F736FB7B4A5CDEF31A53A6C893CB080A8B8D73DDAFB6045E2EE3FD263CB"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt1.yaml",
+        "sha256": "7767FB554B82B4A2D98DEC77E38FD3CBCE6CC0E271200080BA9477F0DB177EA4"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt2.yaml",
+        "sha256": "5BC6AF705FB3445BA24ECBC8AB490C701A6368434E6EA3E910C2B9B6D2D681FA"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt3.yaml",
+        "sha256": "4F123C5CE1EA528C41668D94C2D1E9916EC20A2F99E25E932EEAA3965BDFED5D"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt4.yaml",
+        "sha256": "300335EFFD80DD479094811A2DF381666E0A4884507C7EC51CBC25EDDB11BF18"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt5.yaml",
+        "sha256": "F07CE09C098F5630F2D2D41060DC05A02967B9BEB5A34E937D8062C5D46B2C99"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBelt6.yaml",
+        "sha256": "3542C60F0A48AD44C1D9A5AE92170D03D410F90AFE73FB10F5EE1352C789A3FB"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortBeltR.yaml",
+        "sha256": "3402A4528F72F0A0924BE5A054A8BC8267DDDDF0FC8AD1923FFECD1DA8B49870"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\AttachmentSlots.VRPortCarryLeft.yaml",
+        "sha256": "68CA45B5EC4769F9E1278BDD0B5771F4313C126BD20C4B53D75CC15F8CA54B77"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Attacks.VRPortLaser.yaml",
+        "sha256": "EA8A6651EA376C3DFC76A277F296CDAFD538C5D6937E95E330DD03DF834E6EDD"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Character.Player_Puppet_Base.yaml",
+        "sha256": "E5698CA338B9E5181D146535C39282AA64F8F33F66E2C9F3909612147E9B9F76"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortGrenade.yaml",
+        "sha256": "E299985A3E5228561C8CC22D6B1413149F2D5F77040FE3E4F68CA5D6EFF5F132"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortHlTest.yaml",
+        "sha256": "D976FAE264A227F97B29A33422D1AEF7DABEC485BE21AE166263C3E6BA1BC257"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortLoadOverture.yaml",
+        "sha256": "AD5E23BF236B7BE4AEE16FFA272AD157FE1CE3A1655894050664F6D2CA509AC7"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortProp1.yaml",
+        "sha256": "5816391033ED772B879FA2FBFF40F8EEF12264DE6616279C482C8C42546F9AD9"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortProp2.yaml",
+        "sha256": "A8CDABF7C2FEC28210054570AADD85F4695EAC55D1B4599E0A97E8A8FFB5037F"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortProp3.yaml",
+        "sha256": "B54BAA6865E7132122DDAD519A75779CA683C6563C242FAA62620BAAA0D93914"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortProp4.yaml",
+        "sha256": "3855CEA5C7205155F665B6650F4B6C0DACCEA1BAF20C3E2228A5196FDAB20146"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortProp5.yaml",
+        "sha256": "05E8DA4CF5479DB04395048D72BCDFDE809261685F4B3380350FF80E0BFB0894"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.VRPortPropR.yaml",
+        "sha256": "8729141522DC41470EFB8B90CB31AB7F2634F38F4183A45B0F7C89685D6C90A2"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\Items.vrp_belt.yaml",
+        "sha256": "71699996BBA68BBA3C7B8DCC04C30F08B9ABA45BACDA209ABC7D65C1348CC0E1"
+      },
+      {
+        "path": "r6\\tweaks\\vrport\\LCDScreens.VRPortWristTattoo.yaml",
+        "sha256": "E793F8699A18A3A4B84A10F3C6F49B811FA5CF24E8C6C9255F1D75EEECC0902B"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil",
+        "sha256": "8AB2E80B42064C2A04695986374FA7F4611B8444AF84E840C98082DEB4239565"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil",
+        "sha256": "AEA0E213A75B6D921E4D86E267A102D859D0A2609A6F58F500E2F77A523EB12E"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+        "sha256": "CD8F1D97DD5A327283D830F37E838DF6D1263969513A478133ECFCC75E1A63DA"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_VisionCs.dxil",
+        "sha256": "F3C6A0CF9040E4965E0A6F036BFE56AD397BF09B4B697F54AF54A7C48FCFB53C"
+      },
+      {
+        "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\UserSettings.json",
+        "sha256": "9750F55B4AA89498D022B8547397B5E3F7CFBE7318BF4DF01D2A7213330E5ADC"
+      }
     ],
-    "directories": [
-      "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge"
-    ]
+    "directories": [],
+    "upstream_release": {
+      "download_url": "https://github.com/dariulone/cyberpunk-vr-port/releases/download/0.1.7/CyberpunkVRPort-0.1.7.zip",
+      "archive_sha256": "A77B211D4DB4E75B61B08951762E9034F60511731F3A441F21B11D1F723C7C84",
+      "legacy_files": [
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+          "sha256": "48C79FE01071D18EF0F2140EBBE56DF125D680158CD9CA984522104FD396AD0D"
+        },
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightPs.dxil",
+          "sha256": "8AB2E80B42064C2A04695986374FA7F4611B8444AF84E840C98082DEB4239565"
+        },
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_SightVs.dxil",
+          "sha256": "AEA0E213A75B6D921E4D86E267A102D859D0A2609A6F58F500E2F77A523EB12E"
+        },
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\LICENSE-CyberpunkVRPort-MIT.txt",
+          "sha256": "A9C100B3B7CB0169E14B1AABE6963F724582A0D40C067ADE516BB12A4BB98E5E"
+        },
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Hands\\CyberpunkVR_Hands.dll",
+          "sha256": "7D5B502F50708404B059ADC7CE872FA107856590B9BFEDAD3A94384282D09144"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua",
+          "sha256": "585F911FBC6591F7D61BE4C5CBA0D8E0C28038B913AFA77920BB09EE64546BA1"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\modules\\vrcam_select.lua",
+          "sha256": "58AC23EE406D0701CFCE139655E869D08468F0698AE6DB4A5FFE309E835D8888"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\vrcam.json",
+          "sha256": "BC4B964933471D01A49BB2A2BC9564C1215D7D9E0BFEDE547555B8D9A03DFA1C"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua",
+          "sha256": "42834AEC59E73B451ECA49E2BC73BF37E3B4ACC2AE1F05AB6DF3F30B0592F27A"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\init.lua",
+          "sha256": "5199046B8E5A79A613D1535BE8BD930A41FD239584415839CF7A3338D39871E5"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_HUD\\hud_layout.ini",
+          "sha256": "631C6E8E192C2FB60BE037137644A2290C62ED86DEB662A80C9A9D2692FDBB0C"
+        },
+        {
+          "path": "archive\\pc\\mod\\cyberpunkvrport.archive",
+          "sha256": "848AB2743AA0D7E5B243C5E1394990BBC544DAC985B8ADABA5517F046F1B4F37"
+        },
+        {
+          "path": "r6\\scripts\\CyberpunkVRPort_NoAnims\\vrport_no_anims.reds",
+          "sha256": "8C7D407A7EA3D83EB2021908438E9CF1E0C5AAD9277B12DB03536724C8277C0E"
+        },
+        {
+          "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_Stereo.dll",
+          "sha256": "B379E84EDEF521F0195AF571110ED00E6D6443E2DE8F25264F72D43934A0B344"
+        },
+        {
+          "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\bridge\\.gitkeep",
+          "sha256": "04679A195263DEB63AB0D02DF17F0A3DB09709B186950DE77695D71C16D87DED"
+        }
+      ]
+    }
   },
   "frameworks": [
     {
@@ -80,6 +1161,18 @@
       "download_url": "https://github.com/jac3km4/redscript/releases/download/v0.5.31/redscript-v0.5.31-windows.zip",
       "archive_sha256": "799BBD88863F6728616F8D723C941EA15DFF71ED5BBFD50C525F0D39EA0BF46B",
       "marker": "engine\\tools\\scc.exe"
+    }
+  ],
+  "nexus_requirements": [
+    {
+      "name": "More Occluders (Scripted v0.3)",
+      "creator": "sosuine",
+      "url": "https://www.nexusmods.com/cyberpunk2077/mods/33136",
+      "reason": "Required by CyberpunkVR Port 0.1.7; Nexus requires download authorization; AVRcade installs the completed download automatically.",
+      "install_scope": "cyberpunk-2077-vr-only",
+      "cost": "free",
+      "file_id": 157829,
+      "acquisition": "official-browser-auto-import"
     }
   ]
 }

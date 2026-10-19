@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VrClient.App.ViewModels"
         xmlns:services="using:VrClient.App.Services"
+        xmlns:views="using:VrClient.App.Views"
         xmlns:config="using:VrClient.Core.Config"
         xmlns:mod="using:VrClient.Core.ModManagers"
         x:Class="VrClient.App.Views.MainWindow"
@@ -20,7 +21,7 @@
         <TextBlock Grid.Column="1" FontSize="22" FontWeight="Bold" LetterSpacing="-0.3" VerticalAlignment="Center">
           <Run Text="A" /><Run Text="VR" Foreground="{DynamicResource AccentBrush}" /><Run Text="cade" />
         </TextBlock>
-        <TextBox Grid.Column="3" Width="340" MinHeight="40" HorizontalAlignment="Left" VerticalContentAlignment="Center"
+        <TextBox Grid.Column="3" MaxWidth="340" MinWidth="140" MinHeight="40" HorizontalAlignment="Stretch" VerticalContentAlignment="Center"
                  IsVisible="{Binding ShowLibrary}" Watermark="Search games"
                  Text="{Binding SearchText, Mode=TwoWay}" />
         <Border Grid.Column="5" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
@@ -134,6 +135,28 @@
         <Grid DataContext="{Binding SelectedGame}" ColumnDefinitions="260,32,*" Margin="28,24,28,24">
 
           <StackPanel Spacing="16">
+            <Button x:Name="GameStreamButton" Click="Streaming_Click"
+                    Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.ToolbarText}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
+                    ToolTip.Tip="Connect OBS to stream or record this game's VR view" />
+            <TextBlock Text="{Binding DisplayName}" FontSize="28" FontWeight="SemiBold"
+                       TextWrapping="Wrap" />
+            <StackPanel Spacing="8" IsVisible="{Binding HasModCredits}">
+              <TextBlock Classes="eyebrow" Text="MODDER CREDITS" />
+              <ItemsControl ItemsSource="{Binding ModCredits}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="config:GameModCredit">
+                    <Button Tag="{Binding Url}" Click="OpenExternalUrl_Click" Margin="0,0,0,6"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Background="Transparent" BorderThickness="0" Padding="0"
+                            ToolTip.Tip="Open the mod creator's project">
+                      <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" MaxWidth="254"
+                                 FontSize="14" />
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
             <Border Width="260" Height="390" Background="{Binding CoverBrush}" CornerRadius="10" ClipToBounds="True">
               <Grid>
                 <Image Source="{Binding CoverImage}" Stretch="UniformToFill"
@@ -161,22 +184,14 @@
                   <TextBlock Classes="eyebrow" Text="INSTALLED AT" />
                   <TextBlock Text="{Binding InstallText}" FontSize="12" TextWrapping="Wrap" />
                 </StackPanel>
-                <StackPanel Spacing="3" IsVisible="{Binding HasConversionCredit}">
-                  <TextBlock Classes="eyebrow" Text="VR CONVERSION" />
-                  <TextBlock Text="{Binding ConversionCreditText}" FontSize="13" TextWrapping="Wrap" />
-                </StackPanel>
+
               </StackPanel>
             </Border>
-            <Button x:Name="GameStreamButton" Click="Streaming_Click"
-                    Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.ToolbarText}"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
-                    ToolTip.Tip="Connect OBS to stream or record this game's VR view" />
+
           </StackPanel>
 
           <StackPanel Grid.Column="2" Spacing="22">
             <StackPanel Spacing="6">
-              <TextBlock Text="{Binding DisplayName}" FontSize="34" FontWeight="SemiBold" LetterSpacing="-0.5"
-                         TextWrapping="Wrap" />
               <TextBlock Classes="secondary" Text="{Binding RouteText}" FontSize="14" TextWrapping="Wrap" />
             </StackPanel>
 
@@ -193,6 +208,28 @@
                           Click="OpenExternalUrl_Click" IsVisible="{Binding HasStorePage}" />
                 </StackPanel>
               </Grid>
+            </Border>
+
+            <Border Classes="card" IsVisible="{Binding IsCyberpunk}">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="eyebrow" Text="CYBERPUNK VR SETUP" />
+                <TextBlock Text="{Binding CyberpunkSetupTitle}" Foreground="{Binding CyberpunkSetupBrush}" FontSize="20" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CyberpunkSetupStatus}" TextWrapping="Wrap" />
+                <ProgressBar IsVisible="{Binding CyberpunkSetupBusy}" IsIndeterminate="True" Height="5" />
+                <TextBlock Classes="secondary" Text="{Binding CyberpunkBackendStatus}" />
+                <TextBlock Classes="secondary" Text="{Binding CyberpunkDependencyStatus}" />
+                <WrapPanel>
+                  <Button Classes="primary" Content="Install VR" Margin="0,0,10,0"
+                          IsVisible="{Binding CyberpunkCanInstall}"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}" />
+                  <Button Classes="primary" Content="Authorize Nexus download" Margin="0,0,10,0"
+                          IsVisible="{Binding CyberpunkCanAuthorize}"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).InstallCyberpunkRequirementsCommand}" />
+                  <Button Content="Pause setup" IsVisible="{Binding CyberpunkSetupBusy}"
+                          IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsInstallingCyberpunkRequirements}"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CancelCyberpunkRequirementsCommand}" />
+                </WrapPanel>
+              </StackPanel>
             </Border>
 
             <!-- The four ways to play: the same block on every game. -->
@@ -228,6 +265,25 @@
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
             </StackPanel>
+
+            <Border Classes="card" IsVisible="{Binding HasControllerReference}">
+              <StackPanel Spacing="14">
+                <TextBlock Classes="heading" Text="{Binding ControllerReferenceTitle}" />
+                <TextBlock Classes="secondary" Text="Select a button on the guide to change its action. Assignments are saved independently for this game and controller." TextWrapping="Wrap" />
+                <TabControl ItemsSource="{Binding ControllerDevices}" SelectedItem="{Binding SelectedController, Mode=TwoWay}">
+                  <TabControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ControllerEditorViewModel">
+                      <TextBlock Text="{Binding DisplayName}" />
+                    </DataTemplate>
+                  </TabControl.ItemTemplate>
+                  <TabControl.ContentTemplate>
+                    <DataTemplate x:DataType="vm:ControllerEditorViewModel">
+                      <views:ControllerDiagram Margin="0,12,0,0" />
+                    </DataTemplate>
+                  </TabControl.ContentTemplate>
+                </TabControl>
+              </StackPanel>
+            </Border>
 
             <!-- Deferred engines keep their experimental panels; their games are not
                  listed in the catalogue yet. -->
@@ -297,7 +353,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="10">
                       <Button Classes="primary" Content="{Binding PrepareText}"
                               Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCommand}"
-                              IsVisible="{Binding CanPrepare}" />
+                              IsVisible="{Binding CanPrepareBelow}" />
                       <Button Content="{Binding UevrProfileImportText}" Click="ImportUevrProfile_Click"
                               IsVisible="{Binding CanImportUevrProfile}" />
                       <Button Content="View profile source" Tag="{Binding UevrProfileSourceUrl}"
@@ -327,8 +383,32 @@
                         <TextBlock Text="About the Cyberpunk 2077 VR backend" FontWeight="SemiBold" />
                         <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding CyberpunkBackendNoteText}" />
                         <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding CyberpunkBackendCareText}" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding CyberpunkRequirementsText}" />
                       </StackPanel>
                     </Border>
+
+                    <Expander Header="Manual installation if download detection fails"
+                              IsVisible="{Binding IsCyberpunk}" IsExpanded="False"
+                              HorizontalAlignment="Stretch">
+                      <StackPanel Spacing="10" Margin="0,10,0,0">
+                        <TextBlock Text="The VR port downloads directly. Automatic ZIP detection is only for More Occluders Scripted v0.3. While setup is running, AVRcade checks your configured Downloads folder and Vortex's default Cyberpunk download folder once per second for up to 10 minutes. It does not search other folders or scan the whole PC."
+                                   Classes="secondary" TextWrapping="Wrap" />
+                        <TextBlock Text="1. Close Cyberpunk 2077. If automatic setup is still waiting, choose Pause setup at the top first."
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="2. Download More Occluders (Scripted), version 0.3, using the link below. Keep the ZIP and its original filename; do not extract it or copy files into the game folder. The ArchiveXL version is a different package."
+                                   TextWrapping="Wrap" />
+                        <Button Content="Download More Occluders Scripted v0.3" HorizontalAlignment="Left"
+                                Click="OpenCyberpunkRequirementDownload_Click" />
+                        <TextBlock Text="3. If Install VR is shown at the top, install the VR port first. Then choose the downloaded ZIP below, wherever you saved it. AVRcade validates the archive and installs its scripts in the Cyberpunk-only managed package."
+                                   TextWrapping="Wrap" />
+                        <Button Content="Choose downloaded ZIP and install" HorizontalAlignment="Left"
+                                Click="ImportCyberpunkRequirementZip_Click" />
+                        <TextBlock Text="4. The top status changes to VR setup complete when both packages are installed. If import fails, the reason appears there. Nothing needs to be placed manually; this keeps VR files separate from monitor play."
+                                   TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Expander>
+
+
 
                     <Border Classes="inset" IsVisible="{Binding IsRvThereYet}">
                       <StackPanel Spacing="8">
@@ -484,8 +564,13 @@
 
                     <!-- Cyberpunk 2077 and Unreal games: mods deployed into the game folder -->
                     <StackPanel Spacing="12" IsVisible="{Binding UsesFolderMods}">
-                      <TextBlock Classes="secondary" TextWrapping="Wrap"
-                                 Text="This game loads mods from its own folder, so any mod manager works. Install or deploy your mods with it, then use VR + mods or Mods, no VR here." />
+                      <StackPanel Spacing="6" IsVisible="{Binding IsCyberpunk}">
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Hold both stick clicks for one second, or press F10, to open the mod's VR settings. HUD, frame generation, driving and controller bindings are configured there." />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Installed only for Cyberpunk 2077 VR." />
+                      </StackPanel>
+                      <TextBlock Classes="secondary" TextWrapping="Wrap" Text="This game loads mods from its game folder. Deploy your mods with your mod manager before launching." />
                       <TextBlock Classes="heading" Text="Your mod manager" />
                       <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GameModManagerText}"
                                  Classes="secondary" TextWrapping="Wrap" />
@@ -502,11 +587,11 @@
                       </WrapPanel>
                       <TextBlock Text="{Binding UnrealModsText}" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsUnreal}" />
                       <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsUnreal}"
-                                 Text="Unreal has no per-launch switch for mods. While mods are in the game folder, VR only and Vanilla are unavailable; with none there, the two modded modes are. Refresh after changing mods." />
+                                 Text="Unreal has no per-launch switch for game-folder mods. VR + mods can open a selected manager even with an empty profile; AVRcade waits for the game and then attaches UEVR. Refresh after changing mods." />
                       <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsCyberpunk}"
                                  Text="The two modded modes start the game with REDmod's -modded argument. Mods copied straight into the archive folder load in every mode; AVRcade cannot verify which mods were deployed or that each one works in VR." />
                       <TextBlock Classes="secondary" TextWrapping="Wrap" FontSize="13" IsVisible="{Binding IsCyberpunkRedmodMissing}"
-                                 Text="REDmod is not installed. Add the free Cyberpunk 2077 REDmod DLC in Steam to use REDmod-packaged mods." />
+                                 Text="REDmod is not installed. Add the Cyberpunk 2077 REDmod DLC in Steam to use REDmod-packaged mods." />
                     </StackPanel>
 
                     <!-- GTA San Andreas: mods edit the shared game folder -->
@@ -651,87 +736,16 @@
                     <StackPanel Spacing="14" IsVisible="{Binding HasControllerReference}">
                       <TextBlock Classes="heading" Text="{Binding ControllerReferenceTitle}" />
                       <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding ControllerGuidance}" />
-                      <TabControl ItemsSource="{Binding ControllerDevices}">
+                      <TabControl ItemsSource="{Binding ControllerDevices}" SelectedItem="{Binding SelectedController, Mode=TwoWay}">
                         <TabControl.ItemTemplate>
-                          <DataTemplate x:DataType="config:ControllerDeviceReference">
+                          <DataTemplate x:DataType="vm:ControllerEditorViewModel">
                             <TextBlock Text="{Binding DisplayName}" />
                           </DataTemplate>
                         </TabControl.ItemTemplate>
                         <TabControl.ContentTemplate>
-                          <DataTemplate x:DataType="config:ControllerDeviceReference">
+                          <DataTemplate x:DataType="vm:ControllerEditorViewModel">
                             <StackPanel Spacing="14" Margin="0,14,0,8">
-                              <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                                <Border Background="#0E1B24" CornerRadius="10" Padding="8" HorizontalAlignment="Left">
-                                  <Canvas Width="650" Height="340">
-                                    <Image Canvas.Left="176" Canvas.Top="38" Width="298" Height="205"
-                                           Source="{Binding DiagramAssetUri, Converter={StaticResource ControllerDiagramConverter}}" Stretch="Uniform" />
-                                    <Line IsVisible="{Binding LeftTrigger.IsAssigned}" StartPoint="160,31" EndPoint="220,69" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding LeftSecondary.IsAssigned}" StartPoint="160,91" EndPoint="240,89" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding LeftPrimary.IsAssigned}" StartPoint="160,151" EndPoint="257,110" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding LeftStick.IsAssigned}" StartPoint="160,211" EndPoint="232,143" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding LeftGrip.IsAssigned}" StartPoint="160,271" EndPoint="220,196" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding RightTrigger.IsAssigned}" StartPoint="490,31" EndPoint="430,69" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding RightSecondary.IsAssigned}" StartPoint="490,91" EndPoint="410,89" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding RightPrimary.IsAssigned}" StartPoint="490,151" EndPoint="393,110" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding RightStick.IsAssigned}" StartPoint="490,211" EndPoint="417,143" Stroke="#65CDE8" StrokeThickness="1" />
-                                    <Line IsVisible="{Binding RightGrip.IsAssigned}" StartPoint="490,271" EndPoint="430,196" Stroke="#65CDE8" StrokeThickness="1" />
-
-                                    <Border IsVisible="{Binding LeftTrigger.IsAssigned}" Canvas.Left="0" Canvas.Top="5" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding LeftTrigger.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftTrigger.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding LeftSecondary.IsAssigned}" Canvas.Left="0" Canvas.Top="65" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding LeftSecondary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftSecondary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding LeftPrimary.IsAssigned}" Canvas.Left="0" Canvas.Top="125" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding LeftPrimary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftPrimary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding LeftStick.IsAssigned}" Canvas.Left="0" Canvas.Top="185" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding LeftStick.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftStick.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding LeftGrip.IsAssigned}" Canvas.Left="0" Canvas.Top="245" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding LeftGrip.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding LeftGrip.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding RightTrigger.IsAssigned}" Canvas.Left="490" Canvas.Top="5" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding RightTrigger.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightTrigger.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding RightSecondary.IsAssigned}" Canvas.Left="490" Canvas.Top="65" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding RightSecondary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightSecondary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding RightPrimary.IsAssigned}" Canvas.Left="490" Canvas.Top="125" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding RightPrimary.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightPrimary.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding RightStick.IsAssigned}" Canvas.Left="490" Canvas.Top="185" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding RightStick.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightStick.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding RightGrip.IsAssigned}" Canvas.Left="490" Canvas.Top="245" Width="160" Padding="8,5" CornerRadius="5" Background="#18313F">
-                                      <StackPanel><TextBlock Text="{Binding RightGrip.Action}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding RightGrip.Control}" Foreground="#A9E8F4" FontSize="10"/></StackPanel>
-                                    </Border>
-                                    <TextBlock Canvas.Left="275" Canvas.Top="15" Width="100" TextAlignment="Center" Foreground="White"
-                                               Text="{Binding DisplayName}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                    <Border IsVisible="{Binding Menu.IsAssigned}" Canvas.Left="180" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
-                                      <StackPanel><TextBlock Text="{Binding Menu.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding Menu.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding BothSticks.IsAssigned}" Canvas.Left="279" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
-                                      <StackPanel><TextBlock Text="{Binding BothSticks.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding BothSticks.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
-                                    </Border>
-                                    <Border IsVisible="{Binding BothGrips.IsAssigned}" Canvas.Left="378" Canvas.Top="275" Width="92" Padding="6,4" CornerRadius="5" Background="#176B87">
-                                      <StackPanel><TextBlock Text="{Binding BothGrips.Action}" Foreground="White" TextAlignment="Center" FontWeight="SemiBold"/><TextBlock Text="{Binding BothGrips.Control}" Foreground="#D8F5FA" FontSize="9" TextAlignment="Center"/></StackPanel>
-                                    </Border>
-                                  </Canvas>
-                                </Border>
-                              </ScrollViewer>
-                              <ItemsControl ItemsSource="{Binding Bindings}">
-                                <ItemsControl.ItemTemplate>
-                                  <DataTemplate x:DataType="config:ControllerBindingReference">
-                                    <Grid ColumnDefinitions="150,16,*,Auto" Margin="2,5">
-                                      <TextBlock Text="{Binding Control}" FontWeight="SemiBold" />
-                                      <TextBlock Grid.Column="2" Text="{Binding Action}" TextWrapping="Wrap" />
-                                      <TextBlock Grid.Column="3" Text="{Binding Note}" Classes="secondary"
-                                                 FontSize="11" Margin="12,0,0,0" />
-                                    </Grid>
-                                  </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                              </ItemsControl>
+                              <views:ControllerDiagram />
                             </StackPanel>
                           </DataTemplate>
                         </TabControl.ContentTemplate>
@@ -757,21 +771,7 @@
                       <TextBlock Grid.Row="6" Classes="secondary" Text="Installed at" />
                       <TextBlock Grid.Row="6" Grid.Column="2" Text="{Binding InstallText}" TextWrapping="Wrap" />
                     </Grid>
-                    <Border Classes="inset" IsVisible="{Binding HasConversionCredit}">
-                      <Grid ColumnDefinitions="*,14,Auto">
-                        <StackPanel Spacing="4">
-                          <TextBlock Classes="eyebrow" Text="COMMUNITY VR CONVERSION" />
-                          <TextBlock Text="{Binding ConversionCreditText}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
-                          <TextBlock Classes="secondary" Text="{Binding ConversionCreditDescription}" TextWrapping="Wrap" FontSize="13" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <Button Content="Official project" Tag="{Binding ConversionProjectUrl}"
-                                  Click="OpenExternalUrl_Click" />
-                          <Button Content="Controller guide" Tag="{Binding ControllerGuideUrl}"
-                                  Click="OpenExternalUrl_Click" />
-                        </StackPanel>
-                      </Grid>
-                    </Border>
+
                   </StackPanel>
                 </TabItem>
               </TabControl>

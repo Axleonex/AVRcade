@@ -1,0 +1,11 @@
+{
+  "file_format_version": "1.0.0",
+  "api_layer": {
+    "name": "XR_APILAYER_AVRCADE_game_controls",
+    "library_path": "./avrcade-controller-remap.dll",
+    "api_version": "1.0",
+    "implementation_version": "1",
+    "description": "AVRcade per-game controller assignments; exact executable scope only",
+    "disable_environment": "AVRCADE_DISABLE_CONTROLLER_REMAP"
+  }
+}

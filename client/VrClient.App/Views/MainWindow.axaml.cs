@@ -72,6 +72,10 @@ public partial class MainWindow : Window
                     vm.DetailTabIndex = VrSetupTab;
                     vm.PrepareCommand.Execute(null);
                     break;
+                case PlayModeSetup.InstallCyberpunkRequirements:
+                    vm.DetailTabIndex = VrSetupTab;
+                    vm.InstallCyberpunkRequirementsCommand.Execute(null);
+                    break;
                 case PlayModeSetup.OpenVrSetup:
                     vm.DetailTabIndex = VrSetupTab;
                     vm.StatusText = $"{mode.Title}: {mode.Status}. See VR setup below.";
@@ -166,6 +170,24 @@ public partial class MainWindow : Window
         {
             vm.StatusText = $"Could not use that mod manager: {ex.Message}";
         }
+    }
+
+    private void OpenCyberpunkRequirementDownload_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel { SelectedGame.IsCyberpunk: true })
+            Process.Start(new ProcessStartInfo(VrClient.Core.Redengine.CyberpunkNexusRequirements.DownloadUrl)
+                { UseShellExecute = true });
+    }
+
+    private async void ImportCyberpunkRequirementZip_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel { SelectedGame.IsCyberpunk: true } vm ||
+            vm.SelectedGame.View.InstallDir is not { } gameRoot) return;
+        if (vm.Busy || vm.IsInstallingCyberpunkRequirements)
+        { vm.StatusText = "Pause automatic setup before choosing a ZIP, then retry."; return; }
+        if (await PickFileAsync("Choose More Occluders Scripted v0.3 ZIP",
+                new FilePickerFileType("ZIP archive") { Patterns = ["*.zip"] }) is { } path)
+            await vm.ImportCyberpunkRequirementZipAsync(gameRoot, path);
     }
 
     private async void ImportUevrProfile_Click(object? sender, RoutedEventArgs e)

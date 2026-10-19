@@ -16,7 +16,8 @@ public sealed record CyberpunkBackendPackage(
     string Version,
     IReadOnlyList<CyberpunkBackendFile> Files,
     IReadOnlyList<string> Directories,
-    IReadOnlyList<CyberpunkFramework> Frameworks);
+    IReadOnlyList<CyberpunkFramework> Frameworks,
+    CyberpunkUpstreamRelease? UpstreamRelease = null);
 
 /// `Framework` names the framework a file came from; null for the VR backend's own files.
 public sealed record CyberpunkInstalledFile(
@@ -79,12 +80,18 @@ public sealed class CyberpunkBackendInstaller
                 item.GetProperty("version").GetString()!,
                 item.GetProperty("download_url").GetString()!,
                 item.GetProperty("archive_sha256").GetString()!,
-                item.GetProperty("marker").GetString()!)).ToArray());
+                item.GetProperty("marker").GetString()!)).ToArray(),
+            backend.TryGetProperty("upstream_release", out var release)
+                ? new CyberpunkUpstreamRelease(release.GetProperty("download_url").GetString()!,
+                    release.GetProperty("archive_sha256").GetString()!,
+                    release.GetProperty("legacy_files").EnumerateArray().Select(f =>
+                        new CyberpunkBackendFile(f.GetProperty("path").GetString()!, f.GetProperty("sha256").GetString()!)).ToArray())
+                : null);
     }
 
     /// Backend files this copy of AVRcade does not carry, or carries with the wrong
     /// contents. Hashing is done once; the payload does not change while the app runs.
-    public IReadOnlyList<string> MissingPayloadFiles() => _missingPayload ??= Package.Files
+    public IReadOnlyList<string> MissingPayloadFiles() => Package.UpstreamRelease is not null ? [] : _missingPayload ??= Package.Files
         .Where(file =>
         {
             var source = Resolve(_payloadDir, file.Path);
@@ -135,6 +142,9 @@ public sealed class CyberpunkBackendInstaller
         if (!PayloadReady)
             return new(false,
                 $"This copy of AVRcade does not include the complete Cyberpunk VR backend ({MissingPayloadFiles().Count} file(s) missing or changed). Nothing was installed.");
+
+        if (Package.UpstreamRelease is not null)
+            return await InstallUpstreamAsync(gameRoot, downloader, ct);
 
         var plan = Plan(gameRoot);
 
@@ -207,6 +217,16 @@ public sealed class CyberpunkBackendInstaller
         if (_gameRunning())
             return new(false, "Close Cyberpunk 2077 before removing the VR backend.");
 
+        if (Package.UpstreamRelease is not null)
+        {
+            try
+            {
+                CyberpunkUpstreamInstaller.RestorePrevious(gameRoot);
+                CyberpunkNexusRequirements.RemoveStoredFiles(gameRoot);
+            }
+            catch (IOException ex) { return new(false, ex.Message); }
+        }
+
         var removed = 0;
         var changed = 0;
         var kept = new List<CyberpunkInstalledFile>();
@@ -277,6 +297,43 @@ public sealed class CyberpunkBackendInstaller
             installed.Add(new CyberpunkInstalledFile(relative, Hashing.Sha256OfBytes(data), framework.Name, null));
             Directory.CreateDirectory(Path.GetDirectoryName(target)!);
             File.WriteAllBytes(target, data);
+        }
+    }
+
+    private async Task<CyberpunkBackendOutcome> InstallUpstreamAsync(
+        string gameRoot, IHttpDownloader downloader, CancellationToken ct)
+    {
+        var archives = new List<(CyberpunkFramework Framework, byte[] Bytes)>();
+        foreach (var framework in Plan(gameRoot).ToDownload)
+        {
+            var bytes = await downloader.GetBytesAsync(framework.DownloadUrl, ct);
+            if (!HashEquals(Hashing.Sha256OfBytes(bytes), framework.ArchiveSha256))
+                throw new HashMismatchException($"{framework.Name} archive SHA-256 mismatch");
+            archives.Add((framework, bytes));
+        }
+        var installed = new List<CyberpunkInstalledFile>();
+        var previous = ReadRecord();
+        var wasInstalled = CyberpunkUpstreamSession.ReadState(gameRoot) is not null;
+        try
+        {
+            installed.AddRange(await CyberpunkUpstreamInstaller.InstallAsync(gameRoot, Package, downloader, ct));
+            foreach (var (framework, bytes) in archives)
+                ExtractFramework(framework, bytes, gameRoot, installed);
+            // The old package is preserved by the upstream migration, not by
+            // canonical-path records that would delete it during uninstall.
+            var frameworkRecord = previous is null ? null : previous with
+                { Files = previous.Files.Where(f => f.Framework is not null).ToArray() };
+            WriteRecord(gameRoot, MergeWithPrevious(frameworkRecord, gameRoot, installed));
+            return new(true, $"CyberpunkVR Port {Package.Version} by dariulone downloaded, verified and installed. AVRcade activates it only for VR sessions. Nexus download authorization is needed for More Occluders Scripted v0.3. New release headset validation is pending.");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            // A failed first migration restores the older package. A reinstall
+            // keeps its existing store and backups for recovery.
+            if (!wasInstalled && CyberpunkUpstreamSession.ReadState(gameRoot) is not null)
+                CyberpunkUpstreamInstaller.RestorePrevious(gameRoot);
+            Undo(gameRoot, installed.Where(f => f.Framework is not null));
+            return new(false, $"Cyberpunk VR update failed: {ex.Message}");
         }
     }
 

@@ -1,0 +1,112 @@
+{
+  "schema": "mod-credits/1",
+  "games": {
+    "big-walk": [
+      {
+        "project": "Big Walk VR",
+        "creator": "CircuitLord",
+        "url": "https://github.com/CircuitLord/BigWalkVRInstaller"
+      }
+    ],
+    "content-warning": [
+      {
+        "project": "CWVR",
+        "creator": "DaXcess",
+        "url": "https://thunderstore.io/c/content-warning/p/DaXcess/CWVR/"
+      }
+    ],
+    "cyberpunk-2077": [
+      {
+        "project": "CyberpunkVR Port 0.1.7",
+        "creator": "dariulone",
+        "url": "https://www.nexusmods.com/cyberpunk2077/mods/30093"
+      },
+      {
+        "project": "More Occluders (Scripted v0.3)",
+        "creator": "sosuine",
+        "url": "https://www.nexusmods.com/cyberpunk2077/mods/33136"
+      }
+    ],
+    "escape-the-backrooms": [
+      {
+        "project": "UEVR",
+        "creator": "praydog",
+        "url": "https://github.com/praydog/UEVR"
+      },
+      {
+        "project": "Community VR profile",
+        "creator": "misterbub",
+        "url": "https://github.com/uevr-profiles/repo/tree/975fde4c8e3d4ec12883d67a264742cecf4e9496/71a47407-5fca-1927-3a47-02cadeae75f7"
+      }
+    ],
+    "gta-iv": [
+      {
+        "project": "GTA IV VR",
+        "creator": "Hochgeschwindigkeitsrennfahrer",
+        "url": "https://github.com/Hochgeschwindigkeitsrennfahrer/Grand-Theft-Auto-IV-VR-Mod/releases/tag/v0.9.09-hud4"
+      }
+    ],
+    "gta-v": [
+      {
+        "project": "GTAVR",
+        "creator": "DeployAbi",
+        "url": "https://github.com/DeployAbi/GTAVR/releases/tag/v0.11.19-ffb-test"
+      },
+      {
+        "project": "Script Hook V",
+        "creator": "Alexander Blade",
+        "url": "https://www.dev-c.com/gtav/scripthookv/"
+      }
+    ],
+    "lethal-company": [
+      {
+        "project": "LethalCompanyVR (LCVR)",
+        "creator": "DaXcess",
+        "url": "https://thunderstore.io/c/lethal-company/p/DaXcess/LethalCompanyVR/"
+      },
+      {
+        "project": "BepInExPack",
+        "creator": "BepInEx",
+        "url": "https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/"
+      }
+    ],
+    "peak": [
+      {
+        "project": "PeakVR",
+        "creator": "Andrey04o",
+        "url": "https://thunderstore.io/c/peak/p/Andrey04o/PeakVR/"
+      }
+    ],
+    "repo": [
+      {
+        "project": "RepoXR",
+        "creator": "DaXcess",
+        "url": "https://thunderstore.io/c/repo/p/DaXcess/RepoXR/"
+      },
+      {
+        "project": "BepInExPack",
+        "creator": "BepInEx",
+        "url": "https://thunderstore.io/c/repo/p/BepInEx/BepInExPack/"
+      }
+    ],
+    "rv-there-yet": [
+      {
+        "project": "UEVR",
+        "creator": "praydog",
+        "url": "https://github.com/praydog/UEVR"
+      },
+      {
+        "project": "Community VR profile",
+        "creator": "d_rey86",
+        "url": "https://github.com/uevr-profiles/repo/tree/975fde4c8e3d4ec12883d67a264742cecf4e9496/a5d68bf1-cb90-09ba-0ef0-659645fb5007"
+      }
+    ],
+    "yapyap": [
+      {
+        "project": "UUVR",
+        "creator": "Raicuparta",
+        "url": "https://github.com/Raicuparta/uuvr"
+      }
+    ]
+  }
+}

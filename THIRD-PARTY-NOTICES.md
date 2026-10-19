@@ -16,7 +16,6 @@ AVRcade uses the components below. Each remains under its own license. The full 
 | OpenXR loader (Khronos), with jsoncpp | Loaded by the native VR bridges | Apache-2.0; jsoncpp MIT / public domain |
 | MinHook | Function hooking in the native VR bridges | BSD-2-Clause |
 | Microsoft Visual C++ runtime | Runs the native helpers | Microsoft redistributable terms |
-| cyberpunk-vr-port by dariulone, built with the patches in `patches/cyberpunk-vr-port/` | The Cyberpunk 2077 VR backend that **Install VR backend** copies into the game folder | MIT |
 | RED4ext.SDK, Dear ImGui, im3d | Compiled into the Cyberpunk 2077 VR backend | MIT |
 
 ## Downloaded on your PC when you press a setup button
@@ -34,6 +33,7 @@ AVRcade does not redistribute these. It downloads the pinned version from the au
 | Cyber Engine Tweaks | maximegmd and contributors | Scripting for the Cyberpunk 2077 VR backend |
 | Codeware, ArchiveXL, TweakXL | psiberx | Frameworks the Cyberpunk 2077 VR backend needs |
 | redscript | jac3km4 | Script compiler the Cyberpunk 2077 VR backend needs |
+| CyberpunkVR Port 0.1.7 | dariulone | Cyberpunk 2077 VR conversion, downloaded directly from the official release |
 | UEVR | praydog | VR injection for Unreal Engine games |
 | UEVR profile for RV There Yet? | d_rey86 | Game-specific VR settings |
 | .NET Desktop Runtime | Microsoft | Runs the UEVR injector |
@@ -49,3 +49,14 @@ The pinned versions and hashes are in `config/modpacks/*.lock.json`, `config/unr
 ## Artwork and names
 
 The controller diagrams in `client/VrClient.App/Assets/Controllers/` are original drawings made for AVRcade. "Meta Quest", "Valve Index", game titles and other product names are trademarks of their owners and are used only to identify compatible hardware and games. Game cover art is read from the player's local Steam cache at run time and is not part of this repository.
+
+## CyberpunkVR Port attribution
+
+CyberpunkVR Port 0.1.7 is created by **dariulone**. The VR renderer, avatar, motion controls and game-specific conversion belong to that upstream project. AVRcade provides package verification and launch management.
+
+- Original mod: https://www.nexusmods.com/cyberpunk2077/mods/30093
+- Official release: https://github.com/dariulone/cyberpunk-vr-port/releases/tag/0.1.7
+- Source at a0c23fe110530bb74a73b3adf1ffa7d83050c43d; MIT copyright notice retained in `licenses/cyberpunk-vr-port-LICENSE.txt`.
+- More Occluders by sosuine is a separate required download: https://www.nexusmods.com/cyberpunk2077/mods/33136. Select Scripted v0.3.
+
+The official archive is downloaded on the user's PC and is not redistributed as an AVRcade-authored conversion. Historical AVRcade 0.1.2 patches remain reference material and are not applied to 0.1.7.

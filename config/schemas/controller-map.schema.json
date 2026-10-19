@@ -47,12 +47,12 @@
                 "slot": {
                   "type": "string",
                   "enum": [
-                    "left_stick", "right_stick",
+                    "left_stick", "right_stick", "left_stick_click", "right_stick_click",
                     "left_primary", "left_secondary",
                     "right_primary", "right_secondary",
                     "left_trigger", "right_trigger",
                     "left_grip", "right_grip",
-                    "menu", "both_sticks", "both_grips"
+                    "menu", "both_sticks", "both_grips", "cyberware"
                   ]
                 },
                 "control": { "type": "string", "minLength": 1 },

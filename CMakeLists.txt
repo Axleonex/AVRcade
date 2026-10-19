@@ -1295,12 +1295,10 @@ if(VRCLIENT_BUILD_TESTS)
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/cyberpunk_adapter_static_tests.py)
   add_test(NAME rdr2_adapter_static_checks
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/rdr2_adapter_static_tests.py)
-  add_test(NAME cyberpunk_openxr_readiness_patch
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/cyberpunk_openxr_readiness_patch_tests.py)
-  add_test(NAME cyberpunk_vr_hands_install
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/cyberpunk_vr_hands_install_tests.py)
-  add_test(NAME cyberpunk_stereo_arm_safety
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/cyberpunk_stereo_arm_safety_tests.py)
+  # 0.1.7 is the author's unmodified release. The old 0.1.2 patch and installed
+  # two-DLL checks remain historical scripts, not current release assertions.
+  add_test(NAME cyberpunk_upstream_release
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/cyberpunk_upstream_release_tests.py)
   add_test(NAME unreal_native_profile_schema
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native/adapters/validate_unreal_native_profile.py)
   add_test(NAME meccha_native_preflight

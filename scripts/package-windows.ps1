@@ -170,6 +170,20 @@ Copy-Item -LiteralPath (Join-Path $RepoRoot 'adapters\fallout_new_vegas\dependen
 $nativeDest = New-Item -ItemType Directory -Force -Path (Join-Path $PayloadRoot 'native')
 Copy-Item -LiteralPath $safetyCli, $signCli -Destination $nativeDest.FullName
 Copy-VcRuntime $nativeDest.FullName
+
+# Per-game input permutations require both loader architectures in the installed app.
+foreach ($arch in @('x64', 'x86')) {
+    & (Join-Path $RepoRoot 'tools\build-controller-remap.ps1') -Architecture $arch
+    if ($LASTEXITCODE -ne 0) { throw "Controller remap build failed: $arch" }
+}
+$controlDest = Join-Path $nativeDest.FullName 'controller-remap\package'
+New-Item -ItemType Directory -Force -Path $controlDest | Out-Null
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'native\controller-remap\package\avrcade-controller-remap.dll'), (Join-Path $RepoRoot 'native\controller-remap\package\layer.json') -Destination $controlDest
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'native\controller-remap\package\x86') -Destination $controlDest -Recurse
+$leasePublish = Join-Path $PackageRoot 'publish-controller-lease'
+Invoke-Checked $DotNet (@('publish', (Join-Path $RepoRoot 'client\VrClient.ControllerLease\VrClient.ControllerLease.csproj')) + $publishCommon + @('-o', $leasePublish)) 'controller lease publish'
+Copy-Item -LiteralPath (Join-Path $leasePublish 'avrcade-controller-lease.exe') -Destination $controlDest
+
 # The GTA San Andreas VR bridge is installed into the game folder by the app
 # ("Install VR bridge"), so the tested x86 bridge and its OpenXR loader ship
 # beside the other native helpers.
@@ -184,8 +198,11 @@ Copy-Item -LiteralPath $gtaBridgeFull, $gtaLoaderFull -Destination $gtaNativeDes
 # ("Install VR backend"). It ships only as a complete, hash-verified set; without
 # it the app says so and keeps the monitor modes.
 $cyberpunkBackend = Join-Path $RepoRoot 'build\cyberpunk-backend'
+$cyberpunkPackage = Get-Content (Join-Path $RepoRoot 'config\redengine\native\cyberpunk-2077-backend.json') -Raw | ConvertFrom-Json
 & (Join-Path $PSScriptRoot 'collect-cyberpunk-backend.ps1') -OutDir $cyberpunkBackend | Out-Host
-if ($LASTEXITCODE -eq 0) {
+if ($cyberpunkPackage.backend.upstream_release) {
+    Write-Host 'CyberpunkVR Port by dariulone is downloaded from the official release when installed.'
+} elseif ($LASTEXITCODE -eq 0) {
     Copy-Item -LiteralPath $cyberpunkBackend -Destination (Join-Path $nativeDest.FullName 'cyberpunk-2077') -Recurse
 } else {
     Write-Warning 'Cyberpunk 2077 VR backend is incomplete; this package ships without it.'

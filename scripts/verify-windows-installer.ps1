@@ -84,6 +84,12 @@ try {
         'native\gta-san-andreas\vrclient_gtasa_theater.asi',
         'native\gta-san-andreas\openxr_loader.dll',
         'config\redengine\native\cyberpunk-2077-backend.json',
+        'config\mod-credits.json',
+        'native\controller-remap\package\avrcade-controller-remap.dll',
+        'native\controller-remap\package\layer.json',
+        'native\controller-remap\package\x86\avrcade-controller-remap.dll',
+        'native\controller-remap\package\x86\layer.json',
+        'native\controller-remap\package\avrcade-controller-lease.exe',
         'LICENSE', 'THIRD-PARTY-NOTICES.md', 'licenses\README.txt',
         'native\msvcp140.dll', 'docs\STREAMING.md', 'release-manifest.json', 'unins000.exe'
     )
@@ -102,9 +108,11 @@ try {
     # The Cyberpunk VR backend is optional in a package, but never partial.
     $cyberpunkBackend = 'absent'
     $cyberpunkPayload = Join-Path $SmokeRoot 'native\cyberpunk-2077'
-    if (Test-Path -LiteralPath $cyberpunkPayload) {
-        $backendPackage = Get-Content -LiteralPath (Join-Path $SmokeRoot 'config\redengine\native\cyberpunk-2077-backend.json') -Raw |
-            ConvertFrom-Json
+    $backendPackage = Get-Content -LiteralPath (Join-Path $SmokeRoot 'config\redengine\native\cyberpunk-2077-backend.json') -Raw |
+        ConvertFrom-Json
+    if ($backendPackage.backend.upstream_release) {
+        $cyberpunkBackend = 'download-on-install'
+    } elseif (Test-Path -LiteralPath $cyberpunkPayload) {
         foreach ($file in $backendPackage.backend.files) {
             $installedFile = Join-Path $cyberpunkPayload $file.path
             if (-not (Test-Path -LiteralPath $installedFile) -or

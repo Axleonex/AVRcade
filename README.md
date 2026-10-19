@@ -69,6 +69,12 @@ A mode that is not ready says why and offers its one next step, such as *Install
 
 "Installs and launches" means AVRcade downloads the pinned mod, checks its hashes and starts the game with it. Whether a mod still matches the game's current build is up to that mod's author; the game page links to each project.
 
+## Cyberpunk 2077 VR setup
+
+For a source build containing this update, open Cyberpunk 2077 and choose **Install VR** at the top. AVRcade downloads CyberpunkVR Port 0.1.7 and opens the required More Occluders Scripted v0.3 download on Nexus. Sign in and confirm the download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
+
+If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
+
 ## Stream or record with OBS
 
 Open any game page and choose **Stream**. Install OBS Studio 28 or newer separately, enable its WebSocket server, and connect using the password shown in OBS. Select a scene containing the game window or a VR runtime mirror, check the picture and audio, then choose **Record** or **Go live**.

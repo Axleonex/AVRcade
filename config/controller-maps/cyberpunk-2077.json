@@ -1,6 +1,6 @@
 {
   "schema": "controller-map/1",
-  "verification_state": "verified",
+  "verification_state": "source_verified",
   "game_slug": "cyberpunk-2077",
   "title": "Cyberpunk 2077 VR controls",
   "devices": [
@@ -8,39 +8,192 @@
       "id": "quest-touch",
       "display_name": "Meta Quest Touch",
       "bindings": [
-        { "slot": "left_stick", "control": "Left stick", "action": "Move / run", "note": "Push fully forward to sprint" },
-        { "slot": "right_stick", "control": "Right stick", "action": "Turn / look" },
-        { "slot": "right_primary", "control": "A", "action": "Jump / confirm" },
-        { "slot": "right_secondary", "control": "B", "action": "Dodge / cancel" },
-        { "slot": "left_primary", "control": "X", "action": "Interact / reload" },
-        { "slot": "left_secondary", "control": "Y", "action": "Switch weapon" },
-        { "slot": "right_trigger", "control": "Right trigger", "action": "Fire" },
-        { "slot": "left_trigger", "control": "Left trigger", "action": "Aim" },
-        { "slot": "right_grip", "control": "Right grip", "action": "Holster / draw weapon" },
-        { "slot": "left_grip", "control": "Left grip", "action": "Crouch / shoulder action" },
-        { "slot": "menu", "control": "Left Menu", "action": "Pause menu" },
-        { "slot": "both_sticks", "control": "Both stick clicks", "action": "Hub / map" },
-        { "slot": "both_grips", "control": "Both grips", "action": "Recenter VR view" }
-      ]
+        {
+          "slot": "left_stick",
+          "control": "Left stick",
+          "action": "Move / run",
+          "note": "Move at one speed. Hold fully forward for 0.2 seconds to sprint. With scanner open, push fully up/down to page quickhacks."
+        },
+        {
+          "slot": "right_stick",
+          "control": "Right stick",
+          "action": "Turn; fully up: dash; fully down: crouch"
+        },
+        {
+          "slot": "right_primary",
+          "control": "A",
+          "action": "Jump / confirm"
+        },
+        {
+          "slot": "right_secondary",
+          "control": "B",
+          "action": "Drop magazine / cancel",
+          "note": "With a weapon drawn: drops magazine. With phone, radio or vehicle list open: closes it. Push right stick fully up to dash."
+        },
+        {
+          "slot": "left_primary",
+          "control": "X",
+          "action": "Interact / reload",
+          "note": "Applies the selected quickhack while the scanner is open."
+        },
+        {
+          "slot": "left_secondary",
+          "control": "Y",
+          "action": "Switch weapon"
+        },
+        {
+          "slot": "right_trigger",
+          "control": "Right trigger",
+          "action": "Fire",
+          "note": "Tags a target while scanning; fires during normal gameplay."
+        },
+        {
+          "slot": "left_trigger",
+          "control": "Left trigger",
+          "action": "Aim",
+          "note": "Also melee block. Hold with right stick to zoom while scanning."
+        },
+        {
+          "slot": "right_grip",
+          "control": "Right grip",
+          "action": "Hand-to-holster equip / unequip; melee power modifier"
+        },
+        {
+          "slot": "left_grip",
+          "control": "Left grip",
+          "action": "Grab magazine / toggle scanner at left ear"
+        },
+        {
+          "slot": "menu",
+          "control": "Left Menu",
+          "action": "Pause menu"
+        },
+        {
+          "slot": "both_sticks",
+          "control": "Both stick clicks, hold 1 second",
+          "action": "Toggle VR settings overlay",
+          "note": "Hold both stick clicks for one second. F10 opens the same overlay."
+        },
+        {
+          "slot": "right_stick_click",
+          "control": "Right stick click",
+          "action": "Rack weapon",
+          "note": "Slide release during physical reload. Changes scanner tab while the scanner is open."
+        },
+        {
+          "slot": "left_stick_click",
+          "control": "Left stick click",
+          "action": "Cyberware / VR overlay chord modifier",
+          "note": "Combine with left grip for iconic cyberware, or right stick click for VR settings."
+        },
+        {
+          "slot": "cyberware",
+          "control": "Left stick click + left grip",
+          "action": "Activate iconic cyberware",
+          "note": "Hold for 0.5 seconds during gameplay; requires Input Loader."
+        }
+      ],
+      "context": "Default actions from CyberpunkVR Port 0.1.7. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
+      "custom_context": "Your saved AVRcade assignments. Scanner and gesture actions follow their remapped controls. In-game prompts can still show original buttons."
     },
     {
       "id": "valve-index",
       "display_name": "Valve Index Controllers",
       "bindings": [
-        { "slot": "left_stick", "control": "Left thumbstick", "action": "Move / run", "note": "Push fully forward to sprint" },
-        { "slot": "right_stick", "control": "Right thumbstick", "action": "Turn / look" },
-        { "slot": "right_primary", "control": "Right A", "action": "Jump / confirm" },
-        { "slot": "right_secondary", "control": "Right B", "action": "Dodge / cancel" },
-        { "slot": "left_primary", "control": "Left A", "action": "Interact / reload" },
-        { "slot": "left_secondary", "control": "Left B", "action": "Switch weapon" },
-        { "slot": "right_trigger", "control": "Right trigger", "action": "Fire" },
-        { "slot": "left_trigger", "control": "Left trigger", "action": "Aim" },
-        { "slot": "right_grip", "control": "Right grip", "action": "Holster / draw weapon" },
-        { "slot": "left_grip", "control": "Left grip", "action": "Crouch / shoulder action" },
-        { "slot": "menu", "control": "Left system", "action": "Pause menu" },
-        { "slot": "both_sticks", "control": "Both stick clicks", "action": "Hub / map" },
-        { "slot": "both_grips", "control": "Both grips", "action": "Recenter VR view" }
-      ]
+        {
+          "slot": "left_stick",
+          "control": "Left thumbstick",
+          "action": "Move / run",
+          "note": "Move at one speed. Hold fully forward for 0.2 seconds to sprint. With scanner open, push fully up/down to page quickhacks."
+        },
+        {
+          "slot": "right_stick",
+          "control": "Right thumbstick",
+          "action": "Turn; fully up: dash; fully down: crouch"
+        },
+        {
+          "slot": "right_primary",
+          "control": "Right A",
+          "action": "Jump / confirm"
+        },
+        {
+          "slot": "right_secondary",
+          "control": "Right B",
+          "action": "Drop magazine / cancel",
+          "note": "With a weapon drawn: drops magazine. With phone, radio or vehicle list open: closes it. Push right stick fully up to dash."
+        },
+        {
+          "slot": "left_primary",
+          "control": "Left A",
+          "action": "Interact / reload",
+          "note": "Applies the selected quickhack while the scanner is open."
+        },
+        {
+          "slot": "left_secondary",
+          "control": "Left B",
+          "action": "Switch weapon"
+        },
+        {
+          "slot": "right_trigger",
+          "control": "Right trigger",
+          "action": "Fire",
+          "note": "Tags a target while scanning; fires during normal gameplay."
+        },
+        {
+          "slot": "left_trigger",
+          "control": "Left trigger",
+          "action": "Aim",
+          "note": "Also melee block. Hold with right stick to zoom while scanning."
+        },
+        {
+          "slot": "right_grip",
+          "control": "Right grip",
+          "action": "Hand-to-holster equip / unequip; melee power modifier"
+        },
+        {
+          "slot": "left_grip",
+          "control": "Left grip",
+          "action": "Grab magazine / toggle scanner at left ear"
+        },
+        {
+          "slot": "menu",
+          "control": "Left system",
+          "action": "Pause menu"
+        },
+        {
+          "slot": "both_sticks",
+          "control": "Both stick clicks, hold 1 second",
+          "action": "Toggle VR settings overlay",
+          "note": "Hold both stick clicks for one second. F10 opens the same overlay."
+        },
+        {
+          "slot": "right_stick_click",
+          "control": "Right stick click",
+          "action": "Rack weapon",
+          "note": "Slide release during physical reload. Changes scanner tab while the scanner is open."
+        },
+        {
+          "slot": "left_stick_click",
+          "control": "Left stick click",
+          "action": "Cyberware / VR overlay chord modifier",
+          "note": "Combine with left grip for iconic cyberware, or right stick click for VR settings."
+        },
+        {
+          "slot": "cyberware",
+          "control": "Left stick click + left grip",
+          "action": "Activate iconic cyberware",
+          "note": "Hold for 0.5 seconds during gameplay; requires Input Loader."
+        }
+      ],
+      "context": "Default actions from CyberpunkVR Port 0.1.7. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
+      "custom_context": "Your saved AVRcade assignments. Scanner and gesture actions follow their remapped controls. In-game prompts can still show original buttons."
     }
-  ]
+  ],
+  "conversion_credit": {
+    "creator": "dariulone",
+    "project": "CyberpunkVR Port 0.1.7",
+    "project_url": "https://www.nexusmods.com/cyberpunk2077/mods/30093",
+    "controls_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#controls"
+  },
+  "note": "Source checked against dariulone's CyberpunkVR Port 0.1.7 controls. Edit compatible bindings here before launching. Save your preferred layout as your defaults for this game and controller. F10 or the listed stick-click chord opens the upstream HUD settings. Physical gestures and stick tilt retain the conversion's behavior; in-game rebinding can change the actions behind these defaults. Headset validation of custom layouts is pending."
 }

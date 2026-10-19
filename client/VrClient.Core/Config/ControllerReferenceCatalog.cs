@@ -15,7 +15,9 @@ public sealed record ControllerBindingReference(
 public sealed record ControllerDeviceReference(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("display_name")] string DisplayName,
-    [property: JsonPropertyName("bindings")] IReadOnlyList<ControllerBindingReference> Bindings)
+    [property: JsonPropertyName("bindings")] IReadOnlyList<ControllerBindingReference> Bindings,
+    [property: JsonPropertyName("context")] string? Context = null,
+    [property: JsonPropertyName("custom_context")] string? CustomContext = null)
 {
     private static readonly ControllerBindingReference Unassigned =
         new("unassigned", "", "Unassigned");

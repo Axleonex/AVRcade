@@ -70,7 +70,7 @@ public sealed class CyberpunkNativePreflight
 
         var missing = root.GetProperty("dependencies").EnumerateArray()
             .Select(item => item.GetProperty("path").GetString()!)
-            .Where(relative => !Path.Exists(Resolve(gameRoot, relative)))
+            .Where(relative => !CyberpunkUpstreamSession.HasDependency(gameRoot, relative))
             .ToArray();
         var conflicts = root.GetProperty("conflicts").EnumerateArray()
             .Select(item => item.GetProperty("path").GetString()!)

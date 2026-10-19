@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="VrClient.App.Views.ControllerDiagram">
+  <Border x:Name="DiagramSurface" CornerRadius="10" Padding="16">
+    <StackPanel Spacing="16">
+      <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center">
+        <Canvas x:Name="DiagramCanvas" Width="920" Height="624" />
+      </Viewbox>
+      <TextBlock x:Name="ContextText" FontSize="16" TextWrapping="Wrap" />
+      <ThemeVariantScope RequestedThemeVariant="Dark">
+        <StackPanel x:Name="EditorPanel" Spacing="10" IsVisible="False" />
+      </ThemeVariantScope>
+    </StackPanel>
+  </Border>
+</UserControl>
