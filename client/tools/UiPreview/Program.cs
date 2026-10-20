@@ -93,11 +93,11 @@ if (fixtureBridge is not null)
         Dispatcher.UIThread.RunJobs();
         var streamButton = window.FindControl<Button>("GameStreamButton")
             ?? throw new InvalidOperationException("Game page has no Stream button.");
-        if (!streamButton.IsEffectivelyVisible || !Equals(streamButton.Content, model.ToolbarText))
+        if (!streamButton.IsEffectivelyVisible || !Equals(streamButton.Content, game.StreamButtonLabel))
             throw new InvalidOperationException("Game page Stream button binding is incorrect for " + game.Slug);
         model.Recording = true;
         Dispatcher.UIThread.RunJobs();
-        if (!Equals(streamButton.Content, "Recording"))
+        if (!Equals(streamButton.Content, game.StreamButtonLabel) || !model.HasActiveOutput)
             throw new InvalidOperationException("Game page Stream button did not update recording status for " + game.Slug);
         model.Recording = false;
         if (!model.CanControl || model.SpectatorContextText != game.DisplayName || model.CanToggleSteadycam)

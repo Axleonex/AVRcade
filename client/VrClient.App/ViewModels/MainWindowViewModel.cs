@@ -36,6 +36,23 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly Func<string, string?> _coverLocator;
     // Decoded cover art survives a catalogue refresh; only this view model disposes it.
     private readonly Dictionary<string, Bitmap> _covers = new();
+    private readonly Dictionary<string, (string Message, bool Busy, bool Failed)> _modUpdateProgress = new(StringComparer.OrdinalIgnoreCase);
+    private CancellationTokenSource? _modUpdateCancellation;
+    private void ClearFinishedModUpdate(string slug, string root)
+    {
+        var key = SetupKey(slug, root);
+        if (_modUpdateProgress.TryGetValue(key, out var active) && active.Busy) return;
+        _modUpdateProgress.Remove(key);
+        foreach (var item in Games.Where(item => item.Slug == slug && string.Equals(item.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)))
+            item.SetModUpdateProgress(string.Empty, false);
+    }
+    private void ReportModUpdate(string slug, string root, string message, bool busy, bool failed = false)
+    {
+        _modUpdateProgress[SetupKey(slug, root)] = (message, busy, failed);
+        foreach (var item in Games.Where(item => item.Slug == slug && string.Equals(item.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)))
+            item.SetModUpdateProgress(message, busy, failed);
+        if (SelectedGame?.Slug == slug && string.Equals(SelectedGame.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)) StatusText = message;
+    }
     private readonly Dictionary<string, (string Message, bool Busy, bool Failed)> _gameSetupProgress = new(StringComparer.OrdinalIgnoreCase);
     private static string SetupKey(string slug, string root) => slug + "|" + Path.GetFullPath(root);
     private void ReportGameSetup(string slug, string root, string message, bool busy, bool failed = false)
@@ -51,7 +68,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         _cyberpunkSetupProgress[root] = (message, busy);
         foreach (var item in Games.Where(item => item.IsCyberpunk && string.Equals(item.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)))
+        {
             item.SetCyberpunkSetupProgress(message, busy);
+            if (item.ModUpdateBusy) ReportModUpdate(item.Slug, root, message, true);
+        }
         if (string.Equals(SelectedGame?.View.InstallDir, root, StringComparison.OrdinalIgnoreCase)) StatusText = message;
     }
     private CancellationTokenSource? _cyberpunkRequirementsCancellation;
@@ -119,9 +139,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnSelectedGameChanged(GameItemViewModel? value)
     {
+        OnPropertyChanged(nameof(CanUpdateSelectedMods));
         Streaming.SetGameContext(ShowGameDetail ? value?.Slug : null);
         UpdateSelectedGameFacts();
     }
+
+    public bool CanUpdateSelectedMods => !Busy && !IsInstallingCyberpunkRequirements && SelectedGame?.CanUpdateMods == true;
+    partial void OnBusyChanged(bool value) => OnPropertyChanged(nameof(CanUpdateSelectedMods));
+    partial void OnIsInstallingCyberpunkRequirementsChanged(bool value) => OnPropertyChanged(nameof(CanUpdateSelectedMods));
 
     private void UpdateSelectedGameFacts()
     {
@@ -254,6 +279,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (_controller is null || Busy || IsInstallingCyberpunkRequirements ||
             !Games.Any(game => game.Slug == slug && game.View.InstallDir == gameRoot && game.CanImportUevrProfile))
             return;
+        ClearFinishedModUpdate(slug, gameRoot);
         Busy = true;
         var message = "Profile installation did not complete.";
         var failed = true;
@@ -349,8 +375,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (_controller is null)
             return;
         if (announce)
+        {
             foreach (var key in _gameSetupProgress.Where(pair => !pair.Value.Busy).Select(pair => pair.Key).ToArray())
                 _gameSetupProgress.Remove(key);
+            foreach (var key in _modUpdateProgress.Where(pair => !pair.Value.Busy).Select(pair => pair.Key).ToArray())
+                _modUpdateProgress.Remove(key);
+        }
         var selectedSlug = SelectedGame?.Slug;
         var selectedManagerKind = SelectedGame?.Modded?.SelectedManager?.Kind;
         SelectedGame = null;
@@ -397,6 +427,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             item.SetSetupGuide(setupGuides.GetValueOrDefault(game.Slug));
             if (game.InstallDir is { } setupRoot && _gameSetupProgress.TryGetValue(SetupKey(game.Slug, setupRoot), out var setupProgress))
                 item.SetSetupProgress(setupProgress.Message, setupProgress.Busy, setupProgress.Failed);
+            if (game.InstallDir is { } updateRoot && _modUpdateProgress.TryGetValue(SetupKey(game.Slug, updateRoot), out var updateProgress))
+                item.SetModUpdateProgress(updateProgress.Message, updateProgress.Busy, updateProgress.Failed);
             Games.Add(item);
         }
         Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
@@ -541,6 +573,48 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private async Task UpdateGameModsAsync()
+    {
+        if (_controller is null || SelectedGame is not { CanUpdateMods: true } game ||
+            game.View.InstallDir is not { } root || Busy || IsInstallingCyberpunkRequirements) return;
+        var slug = game.Slug;
+        Busy = true;
+        var message = "The mod update did not complete.";
+        var failed = true;
+        var acceptProgress = true;
+        _modUpdateCancellation = new CancellationTokenSource();
+        ReportModUpdate(slug, root, "Checking this game's upstream mod releases...", true);
+        try
+        {
+            using var http = NewHttp();
+            var progress = new Progress<string>(text => { if (acceptProgress) ReportModUpdate(slug, root, text, true); });
+            var result = await Task.Run(() => new GameModUpdater(_controller.RepoRoot, http)
+                .UpdateAsync(game.View, _controller, progress, _modUpdateCancellation.Token));
+            acceptProgress = false;
+            message = result.Message;
+            failed = !result.Ok;
+            if (result.Ok && game.IsCyberpunk && !CyberpunkNexusRequirements.Installed(root))
+            {
+                var requirement = await InstallCyberpunkRequirementsCoreAsync(root);
+                failed = !requirement.Ok;
+                message += "\n" + requirement.Message;
+            }
+        }
+        catch (OperationCanceledException) { message = "Mod update cancelled. Completed file transactions are retained; unfinished transactions recover before the next update."; }
+        catch (Exception ex) { message = "Mod update failed: " + ex.Message; }
+        finally
+        {
+            acceptProgress = false;
+            _modUpdateCancellation.Dispose();
+            _modUpdateCancellation = null;
+            Busy = false;
+            ReportModUpdate(slug, root, message, false, failed);
+            RefreshCatalogue(announce: false);
+            StatusText = message;
+        }
+    }
+
+    [RelayCommand]
     private async Task PrepareAsync()
     {
         if (_controller is null || SelectedGame is not { } game || Busy || IsInstallingCyberpunkRequirements) return;
@@ -553,6 +627,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         var controller = _controller;
         var slug = game.Slug;
+        ClearFinishedModUpdate(slug, dir);
         Busy = true;
         var finalStatus = $"Finished preparing {game.DisplayName}.";
         var setupFailed = true;
@@ -625,6 +700,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (IsInstallingCyberpunkRequirements)
             return new(false, "Cyberpunk requirements setup is already running.");
+        ClearFinishedModUpdate("cyberpunk-2077", gameRoot);
         IsInstallingCyberpunkRequirements = true;
         ReportCyberpunkSetup(gameRoot, "Checking for the More Occluders download...", true);
         var acceptProgress = true;
@@ -682,6 +758,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (!Games.Any(game => game.IsCyberpunk && string.Equals(game.View.InstallDir, gameRoot, StringComparison.OrdinalIgnoreCase))) return;
         if (Busy || IsInstallingCyberpunkRequirements)
         { StatusText = "Pause automatic setup before importing a ZIP, then retry."; return; }
+        ClearFinishedModUpdate("cyberpunk-2077", gameRoot);
         Busy = true;
         var message = "Installation did not complete.";
         ReportCyberpunkSetup(gameRoot, "Validating and installing the selected More Occluders ZIP...", true);
@@ -728,6 +805,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
             {
+                if (File.Exists(Path.Combine(dir, ".avrcade", "mod-updates", "pending.json")))
+                { finalStatus = "An interrupted mod update needs recovery. Close the game and choose Update mods before launching VR."; return; }
                 var modRoots = mode == PlayMode.VrWithMods && game.Modded?.SelectedProfile?.Directory is { } profileRoot
                     ? new[] { profileRoot } : null;
                 var controls = new VrClient.Core.Config.ControllerRuntimeBindings().Prepare(_controller.RepoRoot, game.View, modRoots);
@@ -1196,6 +1275,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _modUpdateCancellation?.Cancel();
         _cyberpunkRequirementsCancellation?.Cancel();
         Streaming.Dispose();
         foreach (var game in Games)

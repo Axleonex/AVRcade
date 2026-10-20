@@ -14,20 +14,20 @@ public sealed partial class GameItemViewModel
     private bool _setupFailed;
 
     public bool HasSetupCard => true; // Every current public catalogue entry has a VR route.
-    public bool SetupBusy => IsCyberpunk ? CyberpunkSetupBusy : _setupBusy;
+    public bool SetupBusy => ModUpdateBusy || (IsCyberpunk ? CyberpunkSetupBusy : _setupBusy);
     public bool SetupBlocked => View.Readiness is GameReadiness.Blocked;
     public bool SetupPackagesInstalled => IsCyberpunk ? CyberpunkSetupComplete
         : IsInstalled && View.ModInstalled && (!View.ProfileImportRequired || View.ProfileImported);
-    public string SetupTitle => IsCyberpunk ? CyberpunkSetupTitle
+    public string SetupTitle => ModUpdateBusy ? "Updating VR components" : ModUpdateFailed ? "Mod update needs attention" : IsCyberpunk ? CyberpunkSetupTitle
         : SetupBusy ? "VR setup in progress"
         : !IsInstalled ? "Game installation needed"
         : SetupBlocked ? "VR setup blocked"
         : _setupFailed ? "VR setup needs attention"
         : SetupPackagesInstalled ? "VR packages installed" : "VR setup incomplete";
-    public IBrush SetupBrush => IsCyberpunk ? CyberpunkSetupBrush
+    public IBrush SetupBrush => ModUpdateFailed ? LauncherThemeService.Brush("WarningBrush") : IsCyberpunk ? CyberpunkSetupBrush
         : LauncherThemeService.Brush(SetupBlocked || _setupFailed ? "WarningBrush"
             : SetupPackagesInstalled && !SetupBusy ? "GoodBrush" : "AccentBrush");
-    public string SetupStatus => IsCyberpunk ? CyberpunkSetupStatus
+    public string SetupStatus => HasModUpdateMessage ? ModUpdateMessage : IsCyberpunk ? CyberpunkSetupStatus
         : _setupMessage ?? (!IsInstalled ? NotInstalledText
         : SetupBlocked ? View.ReadinessDetail
         : SetupPackagesInstalled ? "The required packages are present. Headset connection and each launch mode are checked separately below."

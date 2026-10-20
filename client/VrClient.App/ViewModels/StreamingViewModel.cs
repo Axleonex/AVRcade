@@ -45,6 +45,7 @@ public partial class StreamingViewModel : ObservableObject, IDisposable
     private const string DefaultCaptureText = "Capture the game's desktop window or your VR runtime's mirror. Check the preview and audio in OBS. Closing this panel leaves your outputs running.";
     public ObservableCollection<string> Scenes { get; } = new();
     public string ToolbarText => !Connected ? "Stream" : Streaming && Recording ? "LIVE + REC" : Streaming ? "LIVE" : Recording ? "Recording" : "Stream · OBS";
+    public bool HasActiveOutput => Streaming || Recording;
     public string StreamButtonText => Streaming ? "Stop stream" : "Go live";
     public string RecordButtonText => Recording ? "Stop recording" : "Record";
     public string OutputText => !Connected ? "Output status unavailable"
@@ -78,7 +79,7 @@ public partial class StreamingViewModel : ObservableObject, IDisposable
     private void RaiseState()
     {
         foreach (var property in new[] { nameof(ToolbarText), nameof(StreamButtonText), nameof(RecordButtonText),
-                     nameof(OutputText), nameof(CanControl), nameof(CanConnect), nameof(CanDisconnect) })
+                     nameof(OutputText), nameof(HasActiveOutput), nameof(CanControl), nameof(CanConnect), nameof(CanDisconnect) })
             OnPropertyChanged(property);
     }
 

@@ -69,11 +69,15 @@ public static class CyberpunkUpstreamInstaller
             {
                 var destination = CyberpunkUpstreamSession.PayloadPath(gameRoot, relative);
                 changedPayload[destination] = File.Exists(destination) ? File.ReadAllBytes(destination) : null;
+                // The authored default was verified above. A managed camera selection
+                // is user state and survives supported package updates/reinstalls.
+                var contents = previousState is not null && IsCameraSelection(relative, destination)
+                    ? File.ReadAllBytes(destination) : data;
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-                File.WriteAllBytes(destination, data);
+                File.WriteAllBytes(destination, contents);
                 added.Add(new CyberpunkInstalledFile(
                     $"{CyberpunkUpstreamSession.StoreDirectory}/payload/{relative}",
-                    Hashing.Sha256OfBytes(data), null, null));
+                    Hashing.Sha256OfBytes(contents), null, null));
             }
             foreach (var group in candidates)
             {

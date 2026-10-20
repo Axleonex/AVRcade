@@ -2,9 +2,10 @@ using System.Text.Json;
 
 namespace VrClient.Core.Config;
 
-public sealed record GameModCredit(string Project, string Creator, string Url)
+public sealed record GameModCredit(string Project, string Creator, string Url, string Role = "VR mod")
 {
     public string DisplayText => $"{Project} by {Creator}";
+    public string CreatorInitial => string.IsNullOrWhiteSpace(Creator) ? "?" : Creator[..1].ToUpperInvariant();
 }
 
 /// Attribution is catalogue metadata, independent of controller guides and install state.

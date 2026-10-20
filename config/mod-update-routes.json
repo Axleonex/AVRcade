@@ -1,0 +1,93 @@
+{
+  "schema": "mod-update-routes/1",
+  "games": {
+    "big-walk": {
+      "adapter": "thunderstore",
+      "process_names": [
+        "Big Walk"
+      ],
+      "sources": []
+    },
+    "content-warning": {
+      "adapter": "thunderstore",
+      "process_names": [
+        "Content Warning"
+      ],
+      "sources": []
+    },
+    "lethal-company": {
+      "adapter": "thunderstore",
+      "process_names": [
+        "Lethal Company"
+      ],
+      "sources": []
+    },
+    "peak": {
+      "adapter": "thunderstore",
+      "process_names": [
+        "PEAK"
+      ],
+      "sources": []
+    },
+    "repo": {
+      "adapter": "thunderstore",
+      "process_names": [
+        "REPO"
+      ],
+      "sources": []
+    },
+    "cyberpunk-2077": {
+      "adapter": "cyberpunk",
+      "process_names": [
+        "Cyberpunk2077"
+      ],
+      "sources": [
+        {
+          "name": "CyberpunkVR Port",
+          "repository": "dariulone/cyberpunk-vr-port"
+        }
+      ]
+    },
+    "escape-the-backrooms": {
+      "adapter": "uevr",
+      "process_names": [
+        "Backrooms",
+        "Backrooms-Win64-Shipping"
+      ],
+      "sources": [
+        {
+          "name": "UEVR nightly",
+          "repository": "praydog/UEVR-nightly"
+        }
+      ]
+    },
+    "rv-there-yet": {
+      "adapter": "uevr",
+      "process_names": [
+        "Ride",
+        "Ride-Win64-Shipping"
+      ],
+      "sources": [
+        {
+          "name": "UEVR nightly",
+          "repository": "praydog/UEVR-nightly"
+        }
+      ]
+    },
+    "yapyap": {
+      "adapter": "paired",
+      "process_names": [
+        "yapyap"
+      ],
+      "sources": [
+        {
+          "name": "UUVR",
+          "repository": "Raicuparta/uuvr",
+          "kind": "commits",
+          "reviewed_reference": "de8e9218f8a9310778f2f57c189bef9ccc8c4dc8",
+          "branch": "main"
+        }
+      ]
+    }
+  }
+}

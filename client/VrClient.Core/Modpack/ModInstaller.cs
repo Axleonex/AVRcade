@@ -22,6 +22,9 @@ public sealed class ModInstaller
     public InstallResult Install(
         IReadOnlyList<string> verifiedZipPaths, string gameDir, IReadOnlyList<string>? executableNames = null)
     {
+        if (File.Exists(Path.Combine(gameDir, ".avrcade", "mod-updates", "pending.json")))
+            return new InstallResult(false, Array.Empty<string>(),
+                "An interrupted mod update needs recovery. Choose Update mods before reinstalling this conversion.");
         var expectedExes = executableNames is { Count: > 0 } ? executableNames : new[] { "REPO.exe" };
         if (!expectedExes.Any(name => File.Exists(Path.Combine(gameDir, name))))
             return new InstallResult(false, Array.Empty<string>(),
@@ -139,6 +142,8 @@ public sealed class ModInstaller
     /// (data-driven — works for any BepInEx VR mod, not just RepoXR/LCVR).
     public bool IsInstalled(string gameDir)
     {
+        if (File.Exists(Path.Combine(gameDir, ".avrcade", "mod-updates", "pending.json")))
+            return false;
         if (!File.Exists(Path.Combine(gameDir, "winhttp.dll")))
             return false;
         if (!File.Exists(Path.Combine(gameDir, ManifestRelativePath)))

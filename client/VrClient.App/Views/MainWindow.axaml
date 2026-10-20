@@ -135,28 +135,63 @@
         <Grid DataContext="{Binding SelectedGame}" ColumnDefinitions="260,32,*" Margin="28,24,28,24">
 
           <StackPanel Spacing="16">
-            <Button x:Name="GameStreamButton" Click="Streaming_Click"
-                    Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.ToolbarText}"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
-                    ToolTip.Tip="Connect OBS to stream or record this game's VR view" />
+            <StackPanel Spacing="8">
+              <Button x:Name="GameStreamButton" Click="Streaming_Click"
+                      Content="{Binding StreamButtonLabel}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
+                      ToolTip.Tip="Connect OBS to stream or record this game's VR view" />
+              <TextBlock Classes="secondary" FontSize="12" TextWrapping="Wrap" HorizontalAlignment="Center"
+                         IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.HasActiveOutput}"
+                         Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Streaming.OutputText}" />
+              <Button x:Name="GameModUpdateButton" IsVisible="{Binding HasPublicModUpdate}"
+                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).UpdateGameModsCommand}"
+                      IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanUpdateSelectedMods}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" MinHeight="44"
+                      BorderBrush="{DynamicResource AccentBrush}" Foreground="{DynamicResource AccentBrush}"
+                      ToolTip.Tip="{Binding ModUpdateButtonHint}">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Text="⟳" FontSize="20" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding ModUpdateButtonText}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                </StackPanel>
+              </Button>
+              <TextBlock Classes="secondary" FontSize="12" HorizontalAlignment="Center" TextWrapping="Wrap"
+                         IsVisible="{Binding HasPublicModUpdate}" Text="This game's VR components only" />
+            </StackPanel>
             <TextBlock Text="{Binding DisplayName}" FontSize="28" FontWeight="SemiBold"
                        TextWrapping="Wrap" />
-            <StackPanel Spacing="8" IsVisible="{Binding HasModCredits}">
-              <TextBlock Classes="eyebrow" Text="MODDER CREDITS" />
+            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1" CornerRadius="14" Padding="16" IsVisible="{Binding HasModCredits}">
+              <StackPanel Spacing="16">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="♡" Foreground="{DynamicResource AccentBrush}" FontSize="17" VerticalAlignment="Center" />
+                <TextBlock Classes="eyebrow" Text="MOD CREATORS" VerticalAlignment="Center" />
+              </StackPanel>
               <ItemsControl ItemsSource="{Binding ModCredits}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="config:GameModCredit">
-                    <Button Tag="{Binding Url}" Click="OpenExternalUrl_Click" Margin="0,0,0,6"
+                    <Button Tag="{Binding Url}" Click="OpenExternalUrl_Click" Margin="0,0,0,14"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Background="Transparent" BorderThickness="0" Padding="0"
                             ToolTip.Tip="Open the mod creator's project">
-                      <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" MaxWidth="254"
-                                 FontSize="14" />
+                      <Grid ColumnDefinitions="34,10,*,22">
+                        <Border Width="34" Height="34" CornerRadius="10" Background="{DynamicResource GroundBrush}"
+                                VerticalAlignment="Top">
+                          <TextBlock Text="{Binding CreatorInitial}" Foreground="{DynamicResource AccentBrush}"
+                                     FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                          <TextBlock Text="{Binding Creator}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Project}" Classes="secondary" FontSize="12" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Role}" Foreground="{DynamicResource AccentBrush}" FontSize="11" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="3" Text="↗" Classes="secondary" FontSize="15" VerticalAlignment="Top" Margin="6,0,0,0" />
+                      </Grid>
                     </Button>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-            </StackPanel>
+              </StackPanel>
+            </Border>
             <Border Width="260" Height="390" Background="{Binding CoverBrush}" CornerRadius="10" ClipToBounds="True">
               <Grid>
                 <Image Source="{Binding CoverImage}" Stretch="UniformToFill"
