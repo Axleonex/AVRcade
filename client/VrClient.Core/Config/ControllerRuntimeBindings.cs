@@ -55,8 +55,13 @@ public sealed class ControllerRuntimeBindings(ControllerCustomization? settings 
             var adapter = _adapters.GetValueOrDefault(game.Slug, ControllerBindingAdapters.OpenXr);
             var routesFile = Path.Combine(runtime, "routes.txt");
             var routes = File.Exists(routesFile) ? File.ReadAllLines(routesFile).ToList() : [];
-            // Remove this game's previous exact paths, including a moved installation.
-            routes.RemoveAll(line => line.EndsWith("|" + file, StringComparison.OrdinalIgnoreCase));
+            // Settings migration copies routes verbatim. This game's legacy binding
+            // path is still its own route, not a conflict with another game.
+            var legacyFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "VRClient", "controllers", "runtime", game.Slug + ".bindings");
+            routes.RemoveAll(line => line.EndsWith("|" + file, StringComparison.OrdinalIgnoreCase) ||
+                line.EndsWith("|" + legacyFile, StringComparison.OrdinalIgnoreCase));
             if (adapter.UsesOpenXr && game.InstallDir != null)
                 foreach (var executable in Executables(repoRoot, game))
                 {
