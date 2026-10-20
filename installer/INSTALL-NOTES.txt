@@ -13,9 +13,11 @@ Supported games in this release:
   Its VR components require separate setup; they are not bundled here.
 * Grand Theft Auto: San Andreas (classic), through AVRcade's own VR bridge
   (experimental).
-* Cyberpunk 2077: monitor modes work out of the box. "Install VR backend"
-  adds the VR plugins and downloads the modding frameworks they need
-  (experimental; one specific game build).
+* Cyberpunk 2077: choose Install VR on the game page. AVRcade downloads and
+  places its supported CyberpunkVR Port package. If More Occluders is missing,
+  authorize its Nexus download; AVRcade detects and installs the supported ZIP.
+  Nexus requires an account for that download. Manual ZIP import is available.
+  (Experimental; one specific game build.)
 
 You provide:
 * The game, owned and installed through Steam.

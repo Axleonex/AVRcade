@@ -19,7 +19,9 @@ Before the first VR launch
   3. Open the game in AVRcade and press the button on "VR only".
 
 AVRcade downloads third-party files (VR mods, UEVR) only when you press the
-matching setup button. Every download is version-pinned and hash-verified.
+matching setup button. Supported port packages use their configured versions
+and verification rules. Update mods checks this game's supported updates;
+Thunderstore routes resolve current dependencies when you request an update.
 AVRcade never downloads games and never installs mods into a mod manager
 profile; your manager keeps full ownership of its profiles.
 
@@ -30,7 +32,7 @@ Troubleshooting guides are installed under docs\.
 Stream or record with OBS (optional)
   1. Install OBS Studio 28 or newer separately.
   2. In OBS, enable Tools > WebSocket Server Settings and copy its password.
-  3. Open a game page in AVRcade, choose Stream, and connect to OBS.
+  3. Open a game page, choose OBS Stream (Stream on native routes), and connect.
   4. Select an OBS scene with the game window or VR runtime mirror as a source.
   5. Check the picture and audio before choosing Record or Go live.
 

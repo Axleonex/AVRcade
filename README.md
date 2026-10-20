@@ -6,19 +6,21 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 ## Install on Windows
 
-**[Download AVRcade for Windows (.exe, v0.4.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.4.0/AVRcade-Setup-0.4.0.exe)**
+**[Download AVRcade for Windows (.exe)](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe)**
 
-[Portable ZIP (v0.4.0)](https://github.com/Axleonex/AVRcade/releases/download/v0.4.0/AVRcade-0.4.0-win-x64.zip) · [Latest release and checksums](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
+[Portable ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip) · [SHA-256 checksums](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt) · [Latest release notes](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
+
+These download links always select the latest published release.
 
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
-2. **Run** `AVRcade-Setup-0.4.0.exe` and follow the setup wizard. No administrator access is needed.
+2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. No administrator access is needed.
 3. **Open AVRcade** from the Windows Start menu.
 
 The app includes its .NET runtime. You do not need Git, Visual Studio, or a separate .NET installation.
 
 The installer is unsigned. If Windows SmartScreen shows **Windows protected your PC**, check that you downloaded the file from this repository's release page. If you trust it, choose **More info → Run anyway**.
 
-**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe` (`vrclient-app.exe` in the existing v0.4.0 download).
+**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe`.
 
 > **v0.4.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 

@@ -1,15 +1,18 @@
-# AVRcade desktop app — Windows v0.4.0
+# AVRcade desktop app — Windows v0.5.0
 
 ## Install
 
-Download **AVRcade-Setup-0.4.0.exe** from the
-[latest release](https://github.com/Axleonex/AVRcade/releases/latest), run it,
-then open **AVRcade** from the Windows Start menu. The installer runs per user
-without administrator access. An optional desktop shortcut is available.
+Download the [latest Windows installer](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe),
+close AVRcade, run `AVRcade-Setup.exe`, then open **AVRcade** from the Windows
+Start menu or desktop shortcut. Setup installs per user under
+`%LOCALAPPDATA%\Programs\AVRcade` without administrator access.
 
-For a portable installation, download **AVRcade-0.4.0-win-x64.zip**, extract
-the entire archive, and run `AVRcade.exe` (`vrclient-app.exe` in the existing v0.4.0 download) from the extracted folder.
-Keep its configuration, native helpers and documentation beside the executable.
+For portable use, download the [latest ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip),
+extract the entire archive into its own folder, and run `AVRcade.exe`.
+Keep `avrcade-cli.exe`, configuration, native helpers and documentation beside it.
+These links follow the latest published release; version-specific downloads
+remain on each release page. [SHA-256 checksums](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt)
+cover both permanent and versioned binary names.
 
 Windows 10 (1809 or later) or Windows 11, 64-bit, is required. AVRcade includes
 its .NET runtime. End users do not need Git, Visual Studio or a separate .NET

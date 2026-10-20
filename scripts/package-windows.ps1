@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$')]
-    [string]$Version = '0.4.0',
+    [string]$Version = '0.5.0',
     [string]$NativeBuildDir = 'build/package-native',
     [string]$FnvNativeBuildDir = 'build/fnv-x86',
     [string]$GtaSaBridgePath = '',
@@ -148,7 +148,7 @@ $publishCommon = @(
     '-p:PublishSingleFile=true',
     '-p:IncludeNativeLibrariesForSelfExtract=true',
     '-p:EnableCompressionInSingleFile=true',
-    '-p:DebugType=None', '-p:DebugSymbols=false',
+    '-p:DebugType=None', '-p:DebugSymbols=false', '-p:UseSharedCompilation=false',
     "-p:Version=$Version", '--nologo'
 )
 Invoke-Checked $DotNet (@('publish', (Join-Path $RepoRoot 'client\VrClient.App\VrClient.App.csproj')) + $publishCommon + @('-o', $AppPublish)) 'app publish'
@@ -219,6 +219,7 @@ Copy-Item -LiteralPath (Join-Path $RepoRoot 'THIRD-PARTY-NOTICES.md'), (Join-Pat
 $docsDest = New-Item -ItemType Directory -Force -Path (Join-Path $PayloadRoot 'docs')
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\app\README.md') -Destination $docsDest.FullName
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\app\STREAMING.md') -Destination $docsDest.FullName
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\app\MOD-UPDATES.md'), (Join-Path $RepoRoot 'docs\app\AVRCADE-FILENAMES.md') -Destination $docsDest.FullName
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\onboarding') -Destination $docsDest.FullName -Recurse
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\troubleshooting') -Destination $docsDest.FullName -Recurse
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\safety\unified-safety.md') -Destination $docsDest.FullName
@@ -273,6 +274,23 @@ finally {
     else { $env:VRCLIENT_REPO_ROOT = $savedRepoRoot }
 }
 
+# Keep these asset names identical across releases so direct install links stay current.
+function Write-LatestDownloadAssets([switch]$IncludeInstaller) {
+    $pairs = @(@{ Source = "AVRcade-$Version-win-x64.zip"; Alias = 'AVRcade-win-x64.zip' })
+    if ($IncludeInstaller) { $pairs += @{ Source = "AVRcade-Setup-$Version.exe"; Alias = 'AVRcade-Setup.exe' } }
+    $lines = @()
+    foreach ($pair in $pairs) {
+        $source = Join-Path $DistRoot $pair.Source
+        $alias = Join-Path $DistRoot $pair.Alias
+        Copy-Item -LiteralPath $source -Destination $alias -Force
+        $hash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ((Get-FileHash -LiteralPath $alias -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { throw 'Latest download alias copy changed.' }
+        $lines += "$hash  $($pair.Source)"
+        $lines += "$hash  $($pair.Alias)"
+    }
+    $lines | Set-Content -LiteralPath (Join-Path $DistRoot 'SHA256SUMS.txt') -Encoding ASCII
+}
+
 $portableArchive = Join-Path $DistRoot "AVRcade-$Version-win-x64.zip"
 if (Test-Path -LiteralPath $portableArchive) {
     Remove-Item -LiteralPath $portableArchive -Force
@@ -282,6 +300,7 @@ $portableHash = (Get-FileHash -LiteralPath $portableArchive -Algorithm SHA256).H
 "$portableHash  AVRcade-$Version-win-x64.zip" | Set-Content -LiteralPath (Join-Path $DistRoot "AVRcade-$Version-win-x64.sha256") -Encoding ASCII
 
 if ($SkipInstaller) {
+    Write-LatestDownloadAssets
     Write-Host "RESULT: package ok version=$Version portable=$portableArchive sha256=$portableHash installer=skipped"
     return
 }
@@ -294,4 +313,5 @@ if (-not (Test-Path -LiteralPath $installer)) { throw "installer output missing:
 $installerHash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
 "$installerHash  AVRcade-Setup-$Version.exe" | Set-Content -LiteralPath (Join-Path $DistRoot "AVRcade-Setup-$Version.sha256") -Encoding ASCII
 
+Write-LatestDownloadAssets -IncludeInstaller
 Write-Host "RESULT: package ok version=$Version portable=$portableArchive portable_sha256=$portableHash installer=$installer installer_sha256=$installerHash"
