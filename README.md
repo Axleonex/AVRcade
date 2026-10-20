@@ -22,7 +22,7 @@ The installer is unsigned. If Windows SmartScreen shows **Windows protected your
 
 **Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe`.
 
-> **v0.4.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
+> **v0.5.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 
@@ -73,7 +73,7 @@ A mode that is not ready says why and offers its one next step, such as *Install
 
 ## Cyberpunk 2077 VR setup
 
-For a source build containing this update, open Cyberpunk 2077 and choose **Install VR** at the top. AVRcade downloads CyberpunkVR Port 0.1.7 and opens the required More Occluders Scripted v0.3 download on Nexus. Sign in and confirm the download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
+In the current release, open Cyberpunk 2077 and choose **Install VR** at the top. AVRcade downloads CyberpunkVR Port 0.1.7 and opens the required More Occluders Scripted v0.3 download on Nexus. Sign in and confirm the download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
 
 If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
 
@@ -91,7 +91,7 @@ It uses SteamVR even through Virtual Desktop. **VR only** launches through Steam
 without a mod manager. **VR + mods** opens your chosen manager so you can select
 a profile containing UUVR and the AVRcade bridge. An extra game mod is optional.
 For **Mods, no VR**, select a profile without those VR plugins. **Vanilla** disables
-the game-folder mod loader for that launch. The v0.4.0 installer includes the launcher integration, but does not bundle or automatically download the YAPYAP VR package.
+the game-folder mod loader for that launch. The current installer includes the launcher integration, but does not bundle or automatically download the YAPYAP VR package.
 
 ![The Mods tab](docs/images/game-page-mods.png)
 
@@ -120,7 +120,7 @@ dotnet run --project client/VrClient.App -c Release
 
 The app, the `vrclient` command-line tool and their tests live in `client/`. The native C++ parts (the San Andreas bridge and the experimental native adapters) are optional and need Visual Studio Build Tools 2022; see [tools/toolchain.md](tools/toolchain.md).
 
-To build the installer, see [docs/release/WINDOWS-V0.4.md](docs/release/WINDOWS-V0.4.md).
+To build the installer, see [docs/release/WINDOWS-V0.5.md](docs/release/WINDOWS-V0.5.md).
 
 ### Repository layout
 
