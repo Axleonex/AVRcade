@@ -15,9 +15,7 @@ public sealed class GtaSanAndreasVanillaSettings(string? path = null)
 
     private static readonly string[] KnownModDirectories = ["modloader", "cleo", "scripts"];
 
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "gta-san-andreas-vanilla.json");
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("gta-san-andreas-vanilla.json");
 
     public string? Load()
     {

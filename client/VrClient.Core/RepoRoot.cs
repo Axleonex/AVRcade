@@ -1,14 +1,15 @@
 namespace VrClient.Core;
 
-/// Resolves the VRClient repo root (the dir holding config/modpacks/repo.modpack.json).
-/// Order: VRCLIENT_REPO_ROOT env var, walk up from the app base dir (dev builds run
+/// Resolves the AVRcade configuration root (the dir holding config/modpacks/repo.modpack.json).
+/// Order: AVRCADE_REPO_ROOT (legacy VRCLIENT_REPO_ROOT supported), walk up from the app base dir (dev builds run
 /// from bin/ under the repo), walk up from the current dir (published exe run from
 /// inside the repo). A published exe outside the repo needs the env var.
 public static class RepoRoot
 {
     public static string? Find()
     {
-        var fromEnv = Environment.GetEnvironmentVariable("VRCLIENT_REPO_ROOT");
+        var fromEnv = Environment.GetEnvironmentVariable("AVRCADE_REPO_ROOT")
+            ?? Environment.GetEnvironmentVariable("VRCLIENT_REPO_ROOT");
         if (!string.IsNullOrEmpty(fromEnv) && IsRoot(fromEnv))
             return Path.TrimEndingDirectorySeparator(fromEnv);
 

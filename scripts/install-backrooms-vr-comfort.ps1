@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$ProfileDirectory = (Join-Path $env:APPDATA 'UnrealVRMod\Backrooms-Win64-Shipping'),
-    [string]$InstalledCatalogue = (Join-Path $env:LOCALAPPDATA 'Programs\VRClient\config\unreal\escape-the-backrooms.uevr.json'),
+    [string]$InstalledCatalogue = (Join-Path $env:LOCALAPPDATA 'Programs\AVRcade\config\unreal\escape-the-backrooms.uevr.json'),
     [switch]$SkipInstalledCatalogue,
     # Retained for compatibility; the reviewed title-camera helper installs by default.
     [switch]$EnableExperimentalMenuAnchor

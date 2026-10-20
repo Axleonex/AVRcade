@@ -18,7 +18,7 @@ The app includes its .NET runtime. You do not need Git, Visual Studio, or a sepa
 
 The installer is unsigned. If Windows SmartScreen shows **Windows protected your PC**, check that you downloaded the file from this repository's release page. If you trust it, choose **More info → Run anyway**.
 
-**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `vrclient-app.exe`.
+**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe` (`vrclient-app.exe` in the existing v0.4.0 download).
 
 > **v0.4.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 

@@ -9,9 +9,7 @@ namespace VrClient.Core.ModManagers;
 public sealed class ManagedModProfileStore(string? root = null)
 {
     private const string MetadataFile = "profile.json";
-    private readonly string _root = Path.GetFullPath(root ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "managed-mod-profiles"));
+    private readonly string _root = Path.GetFullPath(root ?? VrClient.Core.AppDataPaths.Local("managed-mod-profiles"));
 
     public string Root => _root;
 

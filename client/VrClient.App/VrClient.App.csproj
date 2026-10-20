@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>vrclient-app</AssemblyName>
+    <AssemblyName>AVRcade</AssemblyName>
     <Product>AVRcade</Product>
     <Title>AVRcade</Title>
     <Description>AVRcade desktop app</Description>

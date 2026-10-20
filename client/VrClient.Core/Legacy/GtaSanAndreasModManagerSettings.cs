@@ -10,9 +10,7 @@ public sealed record GtaSanAndreasModManagerSelection(
 /// <summary>Remembers a user-selected tool; it does not install mods or control the tool's profiles.</summary>
 public sealed class GtaSanAndreasModManagerSettings(string? path = null)
 {
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "gta-san-andreas-mod-manager.json");
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("gta-san-andreas-mod-manager.json");
 
     public string? Load() => LoadSelection()?.Executable;
 

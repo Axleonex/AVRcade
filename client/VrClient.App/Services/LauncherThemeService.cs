@@ -48,8 +48,7 @@ public sealed class LauncherThemeService
 
     private LauncherThemeService()
     {
-        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRClient");
-        _settingsPath = Path.Combine(directory, "launcher-theme.json");
+        _settingsPath = VrClient.Core.AppDataPaths.Roaming("launcher-theme.json");
         Load();
     }
 

@@ -69,7 +69,7 @@ try {
     if ($install.ExitCode -ne 0) { throw "installer exited $($install.ExitCode)" }
 
     $required = @(
-        'vrclient-app.exe', 'vrclient.exe',
+        'AVRcade.exe', 'avrcade-cli.exe',
         'config\modpacks\repo.modpack.json',
         'config\modpacks\lethal-company.modpack.json',
         'config\modpacks\fallout-new-vegas.dependencies.json',
@@ -123,10 +123,12 @@ try {
         $cyberpunkBackend = 'included'
     }
 
+    $savedAvrcadeRepoRoot = $env:AVRCADE_REPO_ROOT
     $savedRepoRoot = $env:VRCLIENT_REPO_ROOT
     try {
+        Remove-Item Env:AVRCADE_REPO_ROOT -ErrorAction SilentlyContinue
         Remove-Item Env:VRCLIENT_REPO_ROOT -ErrorAction SilentlyContinue
-        $cli = Join-Path $SmokeRoot 'vrclient.exe'
+        $cli = Join-Path $SmokeRoot 'avrcade-cli.exe'
         $gamesOutput = Invoke-Cli $cli @('games') 'RESULT: games=\d+'
         $result.games_gate = $true
         if ($gamesOutput -match 'GAME: fallout-(3|new-vegas) ') {
@@ -136,7 +138,7 @@ try {
         [void](Invoke-Cli $cli @('safety', 'repo') 'crosscheck=available:permitted=true')
         $result.safety_gate = $true
 
-        $appProcess = Start-Process -FilePath (Join-Path $SmokeRoot 'vrclient-app.exe') -WorkingDirectory $SmokeRoot -PassThru
+        $appProcess = Start-Process -FilePath (Join-Path $SmokeRoot 'AVRcade.exe') -WorkingDirectory $SmokeRoot -PassThru
         $deadline = [DateTime]::UtcNow.AddSeconds(20)
         do {
             Start-Sleep -Milliseconds 250
@@ -151,6 +153,8 @@ try {
         $appProcess = $null
     }
     finally {
+        if ($null -eq $savedAvrcadeRepoRoot) { Remove-Item Env:AVRCADE_REPO_ROOT -ErrorAction SilentlyContinue }
+        else { $env:AVRCADE_REPO_ROOT = $savedAvrcadeRepoRoot }
         if ($null -eq $savedRepoRoot) { Remove-Item Env:VRCLIENT_REPO_ROOT -ErrorAction SilentlyContinue }
         else { $env:VRCLIENT_REPO_ROOT = $savedRepoRoot }
     }

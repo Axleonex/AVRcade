@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\VrClient.Core\VrClient.Core.csproj" />
@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyName>vrclient</AssemblyName>
+    <AssemblyName>avrcade-cli</AssemblyName>
+    <Product>AVRcade</Product>
+    <Title>AVRcade CLI</Title>
   </PropertyGroup>
 
 </Project>

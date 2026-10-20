@@ -1140,7 +1140,7 @@ public sealed partial class AppController
             else if (withMods)
                 start.ArgumentList.Add("--with-mods");
             start.ArgumentList.Add("--activation-source");
-            start.ArgumentList.Add("vrclient-app");
+            start.ArgumentList.Add("avrcade-app");
         }, ct);
 
     /// Run one verb of the vrclient command-line tool and report its RESULT line.
@@ -1149,7 +1149,7 @@ public sealed partial class AppController
     {
         var cli = FindWrapperExe();
         if (cli is null)
-            return new ActionOutcome(false, "vrclient.exe was not found beside the app.");
+            return new ActionOutcome(false, "avrcade-cli.exe was not found beside AVRcade.");
 
         var process = new Process();
         process.StartInfo = new ProcessStartInfo
@@ -1269,22 +1269,25 @@ public sealed partial class AppController
                 ? "; steam launch option: " + SteamLaunchOptionInstaller.Install(
                     ModpackResolver.LoadSpec(ModpackPath(slug)).SteamAppId,
                     wrapperExe, remove: false, dryRun: false, log: _ => { }).Message
-                : "; steam launch option skipped (vrclient.exe not found)";
+                : "; steam launch option skipped (avrcade-cli.exe not found)";
         }
 
         return new ActionOutcome(true, $"converted {slug} ({install.InstalledFiles.Count} files){launchOptionNote}");
     }
 
     /// The wrap-capable CLI exe the Steam launch option must point at. Shipped
-    /// layout: vrclient.exe sits beside the app exe; dev layout: the CLI build
+    /// layout: avrcade-cli.exe sits beside the app exe; dev layout: the CLI build
     /// output under the repo root.
     private string? FindWrapperExe()
     {
-        var beside = Path.Combine(AppContext.BaseDirectory, "vrclient.exe");
-        if (File.Exists(beside))
-            return beside;
-        var dev = Path.Combine(_repoRoot, "client", "VrClient.Cli", "bin", "Release", "net8.0", "vrclient.exe");
-        return File.Exists(dev) ? dev : null;
+        foreach (var name in new[] { "avrcade-cli.exe", "vrclient.exe" })
+        {
+            var beside = Path.Combine(AppContext.BaseDirectory, name);
+            if (File.Exists(beside)) return beside;
+            var dev = Path.Combine(_repoRoot, "client", "VrClient.Cli", "bin", "Release", "net8.0", name);
+            if (File.Exists(dev)) return dev;
+        }
+        return null;
     }
 
     private static string? SteamManifestBeside(string gameRoot, string appId)
@@ -1367,7 +1370,7 @@ public sealed partial class AppController
                 note = $"; steam launch option: {lo.Message}";
             }
             else
-                note = "; steam launch option untouched (vrclient.exe not found)";
+                note = "; steam launch option untouched (avrcade-cli.exe not found)";
         }
         return new ActionOutcome(true, $"uninstalled{note}");
     }

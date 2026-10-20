@@ -8,9 +8,7 @@ namespace VrClient.Core.ModManagers;
 /// manager's profiles.
 public sealed class GameModManagerSettings(string? path = null)
 {
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "game-mod-managers.json");
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("game-mod-managers.json");
 
     public string? Load(string gameSlug) =>
         LoadAll().TryGetValue(gameSlug, out var executable) && File.Exists(executable) ? executable : null;

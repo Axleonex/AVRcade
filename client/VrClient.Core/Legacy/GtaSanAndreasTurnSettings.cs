@@ -23,9 +23,7 @@ public sealed class GtaSanAndreasTurnSettings(string? path = null)
 
     public static GtaTurnPreference Default { get; } = new(GtaTurnMode.Snap, 90);
 
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "gta-san-andreas-turn.json");
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("gta-san-andreas-turn.json");
 
     public GtaTurnPreference Load()
     {

@@ -154,8 +154,8 @@ $publishCommon = @(
 Invoke-Checked $DotNet (@('publish', (Join-Path $RepoRoot 'client\VrClient.App\VrClient.App.csproj')) + $publishCommon + @('-o', $AppPublish)) 'app publish'
 Invoke-Checked $DotNet (@('publish', (Join-Path $RepoRoot 'client\VrClient.Cli\VrClient.Cli.csproj')) + $publishCommon + @('-o', $CliPublish)) 'CLI publish'
 
-Copy-Item -LiteralPath (Join-Path $AppPublish 'vrclient-app.exe') -Destination $PayloadRoot
-Copy-Item -LiteralPath (Join-Path $CliPublish 'vrclient.exe') -Destination $PayloadRoot
+Copy-Item -LiteralPath (Join-Path $AppPublish 'AVRcade.exe') -Destination $PayloadRoot
+Copy-Item -LiteralPath (Join-Path $CliPublish 'avrcade-cli.exe') -Destination $PayloadRoot
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'config') -Destination $PayloadRoot -Recurse
 & (Join-Path $PSScriptRoot 'assert-gtasa-bridge-sync.ps1') `
     -ProfilePath (Join-Path $PayloadRoot 'config\legacy\gta-san-andreas.json') `
@@ -245,16 +245,18 @@ $releaseManifest = [ordered]@{
 }
 $releaseManifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $PayloadRoot 'release-manifest.json') -Encoding UTF8
 
+$savedAvrcadeRepoRoot = $env:AVRCADE_REPO_ROOT
 $savedRepoRoot = $env:VRCLIENT_REPO_ROOT
 try {
+    Remove-Item Env:AVRCADE_REPO_ROOT -ErrorAction SilentlyContinue
     Remove-Item Env:VRCLIENT_REPO_ROOT -ErrorAction SilentlyContinue
-    $gamesOutput = & (Join-Path $PayloadRoot 'vrclient.exe') games 2>&1
+    $gamesOutput = & (Join-Path $PayloadRoot 'avrcade-cli.exe') games 2>&1
     $gamesText = $gamesOutput -join "`n"
     if ($LASTEXITCODE -ne 0 -or $gamesText -notmatch 'RESULT: games=\d+' -or
         $gamesText -match 'GAME: fallout-(3|new-vegas) ') {
         throw "staged CLI exposed an unpublished Fallout game or failed to list games: $($gamesOutput -join ' ')"
     }
-    $safetyOutput = & (Join-Path $PayloadRoot 'vrclient.exe') safety repo 2>&1
+    $safetyOutput = & (Join-Path $PayloadRoot 'avrcade-cli.exe') safety repo 2>&1
     if ($LASTEXITCODE -ne 0 -or (($safetyOutput -join "`n") -notmatch 'crosscheck=available')) {
         throw "staged CLI did not locate packaged native safety helper: $($safetyOutput -join ' ')"
     }
@@ -265,6 +267,8 @@ try {
     }
 }
 finally {
+    if ($null -eq $savedAvrcadeRepoRoot) { Remove-Item Env:AVRCADE_REPO_ROOT -ErrorAction SilentlyContinue }
+    else { $env:AVRCADE_REPO_ROOT = $savedAvrcadeRepoRoot }
     if ($null -eq $savedRepoRoot) { Remove-Item Env:VRCLIENT_REPO_ROOT -ErrorAction SilentlyContinue }
     else { $env:VRCLIENT_REPO_ROOT = $savedRepoRoot }
 }
@@ -282,7 +286,7 @@ if ($SkipInstaller) {
     return
 }
 
-$iss = Join-Path $RepoRoot 'installer\VRClient.iss'
+$iss = Join-Path $RepoRoot 'installer\AVRcade.iss'
 Invoke-Checked $Iscc @("/DAppVersion=$Version", "/DSourceRoot=$PayloadRoot", "/DOutputDir=$DistRoot", $iss) 'installer compile'
 
 $installer = Join-Path $DistRoot "AVRcade-Setup-$Version.exe"

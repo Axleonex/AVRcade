@@ -8,7 +8,7 @@ then open **AVRcade** from the Windows Start menu. The installer runs per user
 without administrator access. An optional desktop shortcut is available.
 
 For a portable installation, download **AVRcade-0.4.0-win-x64.zip**, extract
-the entire archive, and run `vrclient-app.exe` from the extracted folder.
+the entire archive, and run `AVRcade.exe` (`vrclient-app.exe` in the existing v0.4.0 download) from the extracted folder.
 Keep its configuration, native helpers and documentation beside the executable.
 
 Windows 10 (1809 or later) or Windows 11, 64-bit, is required. AVRcade includes

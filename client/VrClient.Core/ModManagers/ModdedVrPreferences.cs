@@ -7,9 +7,9 @@ public sealed record SavedModdedProfile(string ProfileKey, string? R2LaunchArgum
 /// Only VRClient preferences are written. Manager state and profiles remain owned by the manager.
 public sealed class ModdedVrPreferences(string? path = null)
 {
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "modded-vr-preferences.json");
+    private readonly string _rootsPath = path is null
+        ? VrClient.Core.AppDataPaths.Local("modded-vr-preferences.json.roots.json") : path + ".roots.json";
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("modded-vr-preferences.json");
 
     public IReadOnlyDictionary<string, SavedModdedProfile> Load()
     {
@@ -36,7 +36,7 @@ public sealed class ModdedVrPreferences(string? path = null)
 
     public IReadOnlyDictionary<ModManagerKind, string> LoadDataRoots()
     {
-        var path = PathOnDisk + ".roots.json";
+        var path = _rootsPath;
         if (!File.Exists(path)) return new Dictionary<ModManagerKind, string>();
         var stored = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path)) ?? [];
         var roots = new Dictionary<ModManagerKind, string>();
@@ -53,7 +53,7 @@ public sealed class ModdedVrPreferences(string? path = null)
             throw new DirectoryNotFoundException("Choose the existing data folder shown in the mod manager's settings.");
         var roots = LoadDataRoots().ToDictionary(x => x.Key.ToString(), x => x.Value);
         roots[manager.ToString()] = Path.GetFullPath(directory);
-        AtomicFile.WriteAllText(PathOnDisk + ".roots.json", JsonSerializer.Serialize(roots,
+        AtomicFile.WriteAllText(_rootsPath, JsonSerializer.Serialize(roots,
             new JsonSerializerOptions { WriteIndented = true }));
     }
 

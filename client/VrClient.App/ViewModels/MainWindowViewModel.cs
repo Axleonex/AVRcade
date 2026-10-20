@@ -262,10 +262,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
         _controller = new AppController(root);
         _falloutNewVegasService = new FalloutNewVegasDesktopService(root);
-        var releaseDataRoot = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "VRClient",
-            "release-foundation");
+        var releaseDataRoot = VrClient.Core.AppDataPaths.Local("release-foundation");
         _releasePackageStore = new ReleasePackageStore(releaseDataRoot);
         _releaseProfileStore = new ReleaseProfileStore(releaseDataRoot);
         RefreshCatalogue(announce: true);
@@ -568,7 +565,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private static HttpClient NewHttp()
     {
         var http = new HttpClient();
-        http.DefaultRequestHeaders.UserAgent.ParseAdd("vrclient-app/0.3");
+        http.DefaultRequestHeaders.UserAgent.ParseAdd("AVRcade/0.4");
         return http;
     }
 

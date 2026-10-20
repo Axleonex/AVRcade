@@ -57,7 +57,7 @@ public sealed class DiagnosticBundleWriter
         ArgumentException.ThrowIfNullOrWhiteSpace(outputDirectory);
         ArgumentNullException.ThrowIfNull(entries);
         Directory.CreateDirectory(outputDirectory);
-        var bundlePath = Path.Combine(outputDirectory, $"vrclient-diagnostics-{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss}.json");
+        var bundlePath = Path.Combine(outputDirectory, $"avrcade-diagnostics-{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss}.json");
         var redacted = entries.Select(entry => entry with { Message = Redact(entry.Message, userProfileDirectory) }).ToArray();
         File.WriteAllText(bundlePath, JsonSerializer.Serialize(redacted, JsonOptions), Encoding.UTF8);
         return bundlePath;

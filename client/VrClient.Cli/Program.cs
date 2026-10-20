@@ -394,7 +394,7 @@ try
             var pid = new GameLauncher().Launch(
                 plan, acknowledgeWarn: true, dryRun, xrRuntime,
                 session.BuildEnvironment(launchMode), session.BuildLaunchArguments(withMods));
-            var activationSource = GetOption("--activation-source") ?? "vrclient-cli";
+            var activationSource = GetOption("--activation-source") ?? "avrcade-cli";
             var diagnostics = session.WriteDiagnostics(
                 Path.Combine(repoRoot, "artifacts"), launchMode, activationSource, xrRuntime, pid, withMods);
             Console.WriteLine(
@@ -972,7 +972,7 @@ try
                     Console.WriteLine($"GTA-SA-CONVERT: installed={loaderDestination}");
                     Console.WriteLine($"GTA-SA-CONVERT: installed={nativeConfigDestination}");
                     Console.WriteLine(updateBridge
-                        ? "GTA-SA-CONVERT: updated only the hash-guarded VRClient bridge/profile transaction; unrelated mod/config files and the game executable were not replaced."
+                        ? "GTA-SA-CONVERT: updated only the hash-guarded AVRcade bridge/profile transaction; unrelated mod/config files and the game executable were not replaced."
                         : "GTA-SA-CONVERT: existing ASI/config files were not replaced; launch uses explicit experimental stereo mode.");
                     installed = true;
                     preflight = new GtaSanAndreasPreflight().Evaluate(profilePath, gameDir, destination);
@@ -1077,7 +1077,7 @@ try
                 ? LockfileIo.Read(LockfilePath()).Packages
                 : [];
 
-            Console.WriteLine($"VRClient doctor - game '{spec.GameSlug}' (Steam app {spec.SteamAppId})");
+            Console.WriteLine($"AVRcade doctor - game '{spec.GameSlug}' (Steam app {spec.SteamAppId})");
             Console.WriteLine($"  game install:     {(gameDir is not null ? $"FOUND      {gameDir}" : offlineLibrary is not null ? $"DISCONNECTED LIBRARY  {offlineLibrary}" : "NOT FOUND  (install through Steam or reconnect its library)")}");
             Console.WriteLine($"  vr mod:           {(modInstalled ? "INSTALLED  (BepInEx loader + VR plugin present)" : "NOT INSTALLED  (run convert)")}");
             Console.WriteLine($"  mod lockfile:     {(lockPackages.Count > 0 ? $"{lockPackages.Count} packages pinned: " + string.Join(", ", lockPackages.Select(p => $"{p.Name} {p.Version}")) : "none  (run resolve)")}");
@@ -1225,7 +1225,7 @@ try
             {
                 var launchOptionResult = SteamLaunchOptionInstaller.Install(
                     ModpackResolver.LoadSpec(ModpackPath()).SteamAppId,
-                    Environment.ProcessPath ?? "vrclient",
+                    Environment.ProcessPath ?? "avrcade-cli",
                     remove: false, dryRun: false,
                     line => Console.WriteLine($"WRAP-INSTALL: {line}"));
                 Console.WriteLine($"WRAP-INSTALL: {(launchOptionResult.Ok ? "ok" : "warning")} {launchOptionResult.Message}");
@@ -1265,7 +1265,7 @@ try
                 launcher.WriteEvidence(Path.Combine(repoRoot, "artifacts"), new SessionEvidence(
                     "repo", lockSha, DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     UserConfirmedVrStereo: false, UserConfirmedHeadTracking: false,
-                    Notes: "launched via vrclient; VR stereo/head-tracking confirmation pending (see Milestone 1 headset protocol)"));
+                    Notes: "launched via AVRcade; VR stereo/head-tracking confirmation pending (see Milestone 1 headset protocol)"));
             }
             Console.WriteLine($"RESULT: launched pid={pid} xr={xrRuntime?.Name ?? "system-default"}");
             return 0;
@@ -1279,7 +1279,7 @@ try
             {
                 var launchOptionResult = SteamLaunchOptionInstaller.Install(
                     ModpackResolver.LoadSpec(ModpackPath()).SteamAppId,
-                    Environment.ProcessPath ?? "vrclient",
+                    Environment.ProcessPath ?? "avrcade-cli",
                     remove: true, dryRun: false,
                     line => Console.WriteLine($"WRAP-INSTALL: {line}"));
                 Console.WriteLine($"WRAP-INSTALL: {(launchOptionResult.Ok ? "ok" : "warning")} {launchOptionResult.Message}");
@@ -1660,7 +1660,7 @@ try
             var installResult = SteamLaunchOptionInstaller.Install(
                 appId,
                 Environment.ProcessPath
-                    ?? throw new InvalidOperationException("cannot determine the vrclient executable path"),
+                    ?? throw new InvalidOperationException("cannot determine the AVRcade CLI executable path"),
                 remove: HasFlag("--remove"),
                 dryRun: HasFlag("--dry-run"),
                 line => Console.WriteLine($"WRAP-INSTALL: {line}"),
@@ -1671,14 +1671,14 @@ try
         case "wrap":
         {
             // LI-1 Steam launch-option wrapper. Paste into Steam > Properties > Launch Options:
-            //   "<vrclient.exe>" wrap -- %command%
+            //   "<avrcade-cli.exe>" wrap -- %command%
             // FAIL-OPEN CONTRACT: any wrapper-internal error still launches the original
             // command unchanged; the wrapper must never block a flat launch. It waits on
             // the game process because Steam derives running-state/playtime from it.
             var sep = Array.IndexOf(args, "--");
             if (sep < 0 || sep == args.Length - 1)
             {
-                var self = Environment.ProcessPath ?? "vrclient";
+                var self = Environment.ProcessPath ?? "avrcade-cli";
                 Console.WriteLine("RESULT: error=wrap-usage (expected: wrap [--vr on|off|auto] [--dry-run] -- <game command>)");
                 Console.WriteLine($"Steam launch option: \"{self}\" wrap -- %command%");
                 return 1;
@@ -1869,7 +1869,7 @@ static string? FindRepoRoot() => VrClient.Core.RepoRoot.Find();
 static HttpClient NewHttpClient()
 {
     var http = new HttpClient();
-    http.DefaultRequestHeaders.UserAgent.ParseAdd("vrclient/0.1");
+    http.DefaultRequestHeaders.UserAgent.ParseAdd("AVRcade/0.4");
     return http;
 }
 

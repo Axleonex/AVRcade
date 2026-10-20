@@ -75,9 +75,7 @@ public sealed class GtaSanAndreasPreflight
     public const string SteamAppId = "12120";
     public const string ExecutableName = "gta_sa.exe";
 
-    private static string RememberedInstallPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "gta-san-andreas-folder.txt");
+    private static string RememberedInstallPath => VrClient.Core.AppDataPaths.Local("gta-san-andreas-folder.txt");
 
     /// In order: the VRCLIENT_GTASA_DIR override, the folder the player pointed
     /// AVRcade at, the known classic-PC layout on any drive, then the Steam library.

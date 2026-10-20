@@ -23,6 +23,7 @@ public static class SteamLaunchOptions
         existing = existing.Trim();
         if (existing.Contains(prefix, StringComparison.OrdinalIgnoreCase))
             return existing;
+        existing = StripCompatiblePrefix(existing, wrapperExePath);
         if (existing.Length == 0)
             return $"{prefix} %command%";
         return existing.Contains("%command%", StringComparison.OrdinalIgnoreCase)
@@ -33,12 +34,25 @@ public static class SteamLaunchOptions
     /// Remove our wrapper, restoring what it wrapped ("" when it wrapped a bare %command%).
     public static string Strip(string existing, string wrapperExePath)
     {
-        var prefix = WrapPrefix(wrapperExePath);
         var trimmed = existing.Trim();
-        if (!trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            return trimmed;
-        var inner = trimmed[prefix.Length..].Trim();
+        var inner = StripCompatiblePrefix(trimmed, wrapperExePath);
+        if (inner == trimmed) return trimmed;
         return inner.Equals("%command%", StringComparison.OrdinalIgnoreCase) ? "" : inner;
+    }
+
+    private static string StripCompatiblePrefix(string existing, string wrapperExePath)
+    {
+        var exact = WrapPrefix(wrapperExePath);
+        if (existing.StartsWith(exact, StringComparison.OrdinalIgnoreCase))
+            return existing[exact.Length..].Trim();
+        // Only branded CLI launches may replace a previous installation's wrapper.
+        // Other launchers and game arguments remain untouched.
+        var fileName = wrapperExePath.Replace('\\', '/').Split('/').Last();
+        if (!fileName.Equals("avrcade-cli.exe", StringComparison.OrdinalIgnoreCase)) return existing;
+        var match = System.Text.RegularExpressions.Regex.Match(existing,
+            """^"(?:[^"]*[\\/])?(?:vrclient|avrcade-cli)\.exe"[ \t]+wrap[ \t]+--(?:[ \t]+|$)""",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return match.Success ? existing[match.Length..].Trim() : existing;
     }
 
     // ---- localconfig.vdf editing ----

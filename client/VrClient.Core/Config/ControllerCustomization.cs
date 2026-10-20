@@ -7,8 +7,7 @@ namespace VrClient.Core.Config;
 // A permutation preserves every action and prevents duplicate/missing hotkeys.
 public sealed class ControllerCustomization(string? root = null)
 {
-    public string Root { get; } = root ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VRClient", "controllers");
+    public string Root { get; } = root ?? VrClient.Core.AppDataPaths.Local("controllers");
     public static readonly string[] Slots = ["left_primary", "left_secondary", "left_stick_click",
         "right_primary", "right_secondary", "right_stick_click", "left_trigger", "left_grip", "right_trigger", "right_grip"];
 

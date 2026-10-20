@@ -31,11 +31,11 @@ $LuaPath = Join-Path $ProfileRoot 'scripts\first_person_head.lua'
 $ArtifactRoot = Join-Path $RepoRoot "artifacts\unreal\$Slug"
 
 function Resolve-Cli {
-    $packaged = Join-Path $RepoRoot 'build\package\windows\payload\vrclient.exe'
+    $packaged = Join-Path $RepoRoot 'build\package\windows\payload\avrcade-cli.exe'
     if (Test-Path -LiteralPath $packaged) { return $packaged }
-    $dev = Join-Path $RepoRoot 'client\VrClient.Cli\bin\Release\net8.0\vrclient.exe'
+    $dev = Join-Path $RepoRoot 'client\VrClient.Cli\bin\Release\net8.0\avrcade-cli.exe'
     if (Test-Path -LiteralPath $dev) { return $dev }
-    throw 'vrclient.exe not found; build the Release CLI or the Windows package first'
+    throw 'avrcade-cli.exe not found; build the Release CLI or the Windows package first'
 }
 
 function Get-GpuFacts {

@@ -37,9 +37,9 @@ public sealed record ControllerDeviceReference(
     public ControllerBindingReference BothGrips => At("both_grips");
     public Uri DiagramAssetUri => Id.ToLowerInvariant() switch
     {
-        "quest-touch" => new Uri("avares://vrclient-app/Assets/Controllers/quest-touch.png"),
-        "valve-index" => new Uri("avares://vrclient-app/Assets/Controllers/valve-index.png"),
-        _ => new Uri("avares://vrclient-app/Assets/Controllers/quest-touch.png")
+        "quest-touch" => new Uri("avares://AVRcade/Assets/Controllers/quest-touch.png"),
+        "valve-index" => new Uri("avares://AVRcade/Assets/Controllers/valve-index.png"),
+        _ => new Uri("avares://AVRcade/Assets/Controllers/quest-touch.png")
     };
 
     private ControllerBindingReference At(string slot) =>

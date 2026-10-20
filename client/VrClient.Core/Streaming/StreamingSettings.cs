@@ -7,8 +7,7 @@ public sealed record StreamingPreferences(int Port = 4455, string? ObsExecutable
 
 public sealed class StreamingSettings(string? path = null)
 {
-    public string PathOnDisk { get; } = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VRClient", "streaming.json");
+    public string PathOnDisk { get; } = path ?? VrClient.Core.AppDataPaths.Local("streaming.json");
 
     public StreamingPreferences Load()
     {

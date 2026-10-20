@@ -212,9 +212,7 @@ public static class UevrTools
     /// Per-tag tool dir under the user's local app data — outside the game dir,
     /// outside the repo.
     public static string ToolsDir(string tag)
-        => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "vrclient", "tools", "uevr", tag);
+        => VrClient.Core.AppDataPaths.Local(Path.Combine("tools", "uevr", tag));
 
     public static string InjectorPath(UevrReleasePin pin, string? toolsDir = null)
         => Path.Combine(toolsDir ?? ToolsDir(pin.Tag), pin.InjectorExe);
@@ -223,9 +221,7 @@ public static class UevrTools
         => File.Exists(InjectorPath(pin, toolsDir));
 
     public static string DotNetToolsDir(DotNetDesktopPin pin)
-        => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "vrclient", "tools", "dotnet", pin.Version);
+        => VrClient.Core.AppDataPaths.Local(Path.Combine("tools", "dotnet", pin.Version));
 
     public static string DotNetHostPath(DotNetDesktopPin pin, string? toolsDir = null)
         => Path.Combine(toolsDir ?? DotNetToolsDir(pin), "dotnet.exe");

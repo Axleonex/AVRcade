@@ -13,9 +13,7 @@ public sealed class RvTrackedHands(string? settingsPath = null, string? profileD
 {
     public const string ScriptFileName = "vrclient_rv_tracked_hands.lua";
     private const string DataFileName = "vrclient-rv-hands.json";
-    private readonly string _settingsPath = settingsPath ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "VRClient", "rv-tracked-hands.json");
+    private readonly string _settingsPath = settingsPath ?? VrClient.Core.AppDataPaths.Local("rv-tracked-hands.json");
     private readonly string _profileDirectory = profileDirectory ?? Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "UnrealVRMod", "Ride-Win64-Shipping");
