@@ -1,7 +1,8 @@
 # Manual game mod updates
 
 Games with public VR conversions show **OBS Stream**, then **Update mods**, then
-the title and creator credits in the left column. The update action belongs to
+the title, game image and creator credits in the left column. Credits sit directly
+below the image and above the status/install-location card. The update action belongs to
 that game. Games using only AVRcade's own native conversion do not get a public
 mod update control. OBS live/recording state appears separately, so the button
 keeps its recognizable name while an output is active.
