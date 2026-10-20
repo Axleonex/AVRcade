@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$')]
-    [string]$Version = '0.5.0',
+    [string]$Version = '0.5.1',
     [string]$NativeBuildDir = 'build/package-native',
     [string]$FnvNativeBuildDir = 'build/fnv-x86',
     [string]$GtaSaBridgePath = '',

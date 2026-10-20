@@ -22,7 +22,7 @@ The installer is unsigned. If Windows SmartScreen shows **Windows protected your
 
 **Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe`.
 
-> **v0.5.0 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
+> **v0.5.1 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 

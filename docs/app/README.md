@@ -1,4 +1,4 @@
-# AVRcade desktop app — Windows v0.5.0
+# AVRcade desktop app — Windows v0.5.1
 
 ## Install
 
