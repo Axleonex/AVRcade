@@ -400,12 +400,7 @@ public sealed class CyberpunkBackendInstaller
 
     private static string Resolve(string root, string relative)
     {
-        var fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-        var combined = Path.GetFullPath(Path.Combine(
-            fullRoot, relative.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar)));
-        if (!combined.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException($"Path leaves the game folder: {relative}");
-        return combined;
+        return ModUpdateTransaction.Resolve(root, relative);
     }
 
     private static bool HashEquals(string left, string right) =>

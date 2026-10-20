@@ -141,7 +141,7 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public double CoverOpacity => IsInstalled ? 1 : 0.55;
     public string SteamStoreUrl => SteamLinks.StorePage(View.SteamAppId);
     /// The player can point AVRcade at a copy it did not find by itself.
-    public bool CanLocateGame => HasModded || IsGtaSanAndreas;
+    public bool CanLocateGame => HasModded || IsGtaSanAndreas || IsCyberpunk || IsUnreal || IsYapyap;
     /// Classic San Andreas is no longer sold on Steam, so there is no store page to open.
     public bool HasStorePage => !IsGtaSanAndreas;
     public string NotInstalledText => IsGtaSanAndreas

@@ -7,20 +7,23 @@ namespace VrClient.Core;
 /// environment variable is still set. Development builds retain the legacy fallback.
 public static class RepoRoot
 {
-    public static string? Find()
+    public static string? Find() => Find(AppContext.BaseDirectory, Environment.CurrentDirectory,
+        Environment.GetEnvironmentVariable("AVRCADE_REPO_ROOT"), Environment.GetEnvironmentVariable("VRCLIENT_REPO_ROOT"));
+
+    public static string? Find(string executableDirectory, string currentDirectory, string? overrideRoot, string? legacyRoot)
     {
-        var fromEnv = Environment.GetEnvironmentVariable("AVRCADE_REPO_ROOT");
+        var fromEnv = overrideRoot;
         if (!string.IsNullOrEmpty(fromEnv) && IsRoot(fromEnv))
             return Path.TrimEndingDirectorySeparator(fromEnv);
 
-        var besideExecutable = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
+        var besideExecutable = Path.TrimEndingDirectorySeparator(executableDirectory);
         if (IsRoot(besideExecutable)) return besideExecutable;
 
-        fromEnv = Environment.GetEnvironmentVariable("VRCLIENT_REPO_ROOT");
+        fromEnv = legacyRoot;
         if (!string.IsNullOrEmpty(fromEnv) && IsRoot(fromEnv))
             return Path.TrimEndingDirectorySeparator(fromEnv);
 
-        return WalkUp(AppContext.BaseDirectory) ?? WalkUp(Environment.CurrentDirectory);
+        return WalkUp(executableDirectory) ?? WalkUp(currentDirectory);
     }
 
     private static string? WalkUp(string start)

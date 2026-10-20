@@ -275,7 +275,7 @@
                           IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsInstallingCyberpunkRequirements}"
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CancelCyberpunkRequirementsCommand}" />
                   <Button Content="Recheck setup" Margin="0,0,0,8" IsVisible="{Binding !SetupBusy}"
-                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RefreshCommand}" />
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RecheckGameSetupCommand}" />
                 </WrapPanel>
               </StackPanel>
             </Border>

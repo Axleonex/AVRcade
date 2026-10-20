@@ -1,6 +1,8 @@
 namespace VrClient.Core.Unreal;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using VrClient.Core.Launch;
 
 /// Keeps every UEVR launch tied to a fresh game session. Steam hands a launch
 /// request to an already-running game instead of starting a new one, so a
@@ -9,6 +11,28 @@ using System.Runtime.InteropServices;
 public static class UevrSession
 {
     public const string InjectorProcessName = "UEVRInjector";
+    public sealed record InjectorOwner(int ProcessId, long StartedUtcTicks, string Executable, string GameProcess);
+    private static string OwnersDirectory => AppDataPaths.Local("sessions/uevr");
+
+    public static bool MatchesOwner(InjectorOwner owner, int processId, long startedUtcTicks, string? executable) =>
+        owner.ProcessId == processId && owner.StartedUtcTicks == startedUtcTicks && executable is not null &&
+        !string.IsNullOrWhiteSpace(owner.Executable) && !string.IsNullOrWhiteSpace(owner.GameProcess) &&
+        Path.GetFullPath(owner.Executable).Equals(Path.GetFullPath(executable), StringComparison.OrdinalIgnoreCase);
+
+    public static void RememberInjector(UevrGame game, Process injector)
+    {
+        try
+        {
+            var executable = GameLaunchBinding.ProcessExecutable(injector);
+            if (executable is null) return;
+            Config.ControllerCustomization.ValidateIdentity(game.Slug, "quest-touch");
+            var owner = new InjectorOwner(injector.Id, injector.StartTime.ToUniversalTime().Ticks,
+                executable, UevrTools.ShippingProcessName(game));
+            AtomicFile.WriteAllText(Path.Combine(OwnersDirectory, game.Slug + ".json"), JsonSerializer.Serialize(owner));
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or
+            InvalidOperationException or System.ComponentModel.Win32Exception) { /* Untracked injectors are never auto-closed. */ }
+    }
 
     public static IReadOnlyList<string> WatchedProcessNames(UevrGame game) =>
     [
@@ -43,12 +67,26 @@ public static class UevrSession
 
     private static void CloseLeftoverInjectors()
     {
+        var owners = new List<InjectorOwner>();
+        if (Directory.Exists(OwnersDirectory))
+            foreach (var file in Directory.EnumerateFiles(OwnersDirectory, "*.json"))
+                try
+                {
+                    if (JsonSerializer.Deserialize<InjectorOwner>(File.ReadAllText(file)) is { } owner) owners.Add(owner);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException) { }
         foreach (var injector in Process.GetProcessesByName(InjectorProcessName))
         {
             using (injector)
             {
                 try
                 {
+                    var owner = owners.FirstOrDefault(item => MatchesOwner(item, injector.Id,
+                        injector.StartTime.ToUniversalTime().Ticks, GameLaunchBinding.ProcessExecutable(injector)));
+                    if (owner is null) continue; // Another launcher or user owns this process.
+                    var gameProcesses = Process.GetProcessesByName(owner.GameProcess);
+                    try { if (gameProcesses.Length != 0) continue; }
+                    finally { foreach (var gameProcess in gameProcesses) gameProcess.Dispose(); }
                     if (!injector.CloseMainWindow() || !injector.WaitForExit(3000))
                         injector.Kill();
                     injector.WaitForExit(3000);

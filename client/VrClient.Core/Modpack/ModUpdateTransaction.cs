@@ -22,7 +22,7 @@ public static class ModUpdateTransaction
             dir.StartsWith(prefix, StringComparison.OrdinalIgnoreCase); dir = Path.GetDirectoryName(dir))
             if (Directory.Exists(dir) && (File.GetAttributes(dir) & FileAttributes.ReparsePoint) != 0)
                 throw new InvalidDataException("An update path passes through a directory link.");
-        if (File.Exists(full) && (File.GetAttributes(full) & FileAttributes.ReparsePoint) != 0)
+        if ((File.Exists(full) || Directory.Exists(full)) && (File.GetAttributes(full) & FileAttributes.ReparsePoint) != 0)
             throw new InvalidDataException("An update target is a file link.");
         return full;
     }

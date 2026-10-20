@@ -20,7 +20,7 @@ public sealed class CyberpunkUpstreamSession : IDisposable
 
     public static string Store(string gameRoot) => Resolve(gameRoot, StoreDirectory);
     public static string PayloadPath(string gameRoot, string relative) =>
-        Resolve(Path.Combine(Store(gameRoot), "payload"), relative);
+        Resolve(gameRoot, StoreDirectory + "/payload/" + relative);
     public static string StatePath(string gameRoot) => Path.Combine(Store(gameRoot), "install.json");
     private static string JournalPath(string gameRoot) => Path.Combine(Store(gameRoot), "active.json");
 
@@ -83,6 +83,17 @@ public sealed class CyberpunkUpstreamSession : IDisposable
 
     private void Park()
     {
+        // An interrupted launcher does not grant ownership of files a manager
+        // replaced afterwards. Only mutable preferences may differ from storage.
+        foreach (var relative in _active)
+        {
+            var target = Resolve(_gameRoot, relative);
+            var saved = PayloadPath(_gameRoot, relative);
+            if (File.Exists(target) && File.Exists(saved) &&
+                Path.GetExtension(relative).ToLowerInvariant() is not (".ini" or ".cfg" or ".json") &&
+                !Hashing.Sha256OfFile(target).Equals(Hashing.Sha256OfFile(saved), StringComparison.OrdinalIgnoreCase))
+                throw new IOException($"Another mod changed {relative} during the previous VR session. Its file and AVRcade's stored copy were preserved. Disable that deployment in your manager, then Recheck setup.");
+        }
         // The native plugin leaves first. Every DLL backup is outside RED4ext.
         foreach (var relative in _active.OrderByDescending(p => p.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)).ToArray())
         {
@@ -112,10 +123,6 @@ public sealed class CyberpunkUpstreamSession : IDisposable
 
     public static string Resolve(string root, string relative)
     {
-        var prefix = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-        var full = Path.GetFullPath(Path.Combine(prefix, relative.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar)));
-        if (!full.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException($"Cyberpunk VR package path leaves its root: {relative}");
-        return full;
+        return ModUpdateTransaction.Resolve(root, relative);
     }
 }

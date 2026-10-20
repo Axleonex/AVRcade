@@ -103,15 +103,27 @@ public sealed partial class AppController
 
     public ActionOutcome RememberFriendslopGameFolder(string slug, string folder)
     {
-        if (!CommunityVrRoutes.All.TryGetValue(slug, out var route))
-            return new(false, "Manual Steam-library selection is available for Friendslop games only.");
-        var (_, exeName) = ReadGameConfigBasics(slug);
+        string appId;
+        string? exeName;
+        if (CommunityVrRoutes.All.TryGetValue(slug, out var route))
+        { appId = route.AppId; (_, exeName) = ReadGameConfigBasics(slug); }
+        else if (slug == "cyberpunk-2077")
+        { appId = CyberpunkNativePreflight.SteamAppId; exeName = "bin/x64/Cyberpunk2077.exe"; }
+        else if (slug == "yapyap")
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(_repoRoot, "config", "catalogue", "yapyap.json")));
+            appId = document.RootElement.GetProperty("steam_app_id").GetString()!;
+            exeName = document.RootElement.GetProperty("executable_names")[0].GetString();
+        }
+        else if (File.Exists(UevrGamePath(slug)))
+        { var unreal = UevrTools.LoadGame(UevrGamePath(slug)); appId = unreal.SteamAppId; exeName = unreal.LauncherStub; }
+        else return new(false, "This game has no supported Steam installation selection.");
         if (string.IsNullOrWhiteSpace(exeName))
             return new(false, "AVRcade has no executable identity for this game.");
         try
         {
-            return new SteamLibraryScanner().RememberGameFolder(route.AppId, exeName, folder)
-                ? new(true, "Steam game folder confirmed. AVRcade will remember its library and refresh discovery.")
+            return new SteamLibraryScanner().RememberGameFolder(appId, exeName, folder)
+                ? new(true, "Game folder confirmed. AVRcade will remember this installation for this game and refresh discovery.")
                 : new(false, "Choose this game's folder under a Steam library's steamapps\\common. The matching Steam app manifest and game executable must be present.");
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
@@ -1001,11 +1013,13 @@ public sealed partial class AppController
             OpenXrRuntimeSelector.SelectLiveFor32BitProcess(), mods);
 
     public Task<ActionOutcome> LaunchUnrealAsync(
-        string slug, bool acknowledge, CancellationToken ct = default) =>
+        string slug, bool acknowledge, CancellationToken ct = default, string? gameRoot = null) =>
         RunCliAsync(start =>
         {
             start.ArgumentList.Add("uevr-launch");
             start.ArgumentList.Add(slug);
+            if (gameRoot is not null)
+                GameLaunchBinding.AddGame(start, gameRoot, UevrTools.LoadGame(UevrGamePath(slug)).SteamAppId);
             if (acknowledge) start.ArgumentList.Add("--acknowledge");
         }, ct);
 
@@ -1129,10 +1143,11 @@ public sealed partial class AppController
         CyberpunkLaunchMode mode,
         CancellationToken ct = default,
         bool withVortex = false,
-        bool withMods = false) =>
+        bool withMods = false, string? gameRoot = null) =>
         RunCliAsync(start =>
         {
             start.ArgumentList.Add("cyberpunk-launch");
+            if (gameRoot is not null) GameLaunchBinding.AddGame(start, gameRoot, CyberpunkNativePreflight.SteamAppId);
             start.ArgumentList.Add("--mode");
             start.ArgumentList.Add(mode is CyberpunkLaunchMode.Vr ? "vr" : "flat");
             if (withVortex)
@@ -1152,15 +1167,7 @@ public sealed partial class AppController
             return new ActionOutcome(false, "avrcade-cli.exe was not found beside AVRcade.");
 
         var process = new Process();
-        process.StartInfo = new ProcessStartInfo
-        {
-            FileName = cli,
-            WorkingDirectory = _repoRoot,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-        };
+        process.StartInfo = GameLaunchBinding.CreateCliStartInfo(_repoRoot, cli);
         addArguments(process.StartInfo);
         var supervisesCyberpunk = process.StartInfo.ArgumentList.Contains("cyberpunk-launch");
         var processToken = supervisesCyberpunk ? CancellationToken.None : ct;
@@ -1382,7 +1389,7 @@ public sealed partial class AppController
         using var doc = JsonDocument.Parse(File.ReadAllText(ComfortMapPath(slug)));
         return doc.RootElement.TryGetProperty("cfg_file", out var cfg) &&
                cfg.GetString() is { Length: > 0 } relative
-            ? Path.Combine(gameDir, relative)
+            ? ModUpdateTransaction.Resolve(gameDir, relative)
             : null;
     }
 
@@ -1396,11 +1403,11 @@ public sealed partial class AppController
         var mapper = new ComfortConfigMapper();
         var entries = mapper.BuildCfgEntries(ProfilePath(slug), mapping);
         using var doc = JsonDocument.Parse(File.ReadAllText(ComfortMapPath(slug)));
-        var cfgPath = Path.Combine(gameDir, doc.RootElement.GetProperty("cfg_file").GetString()!);
+        var cfgPath = ModUpdateTransaction.Resolve(gameDir, doc.RootElement.GetProperty("cfg_file").GetString()!);
         if (!File.Exists(cfgPath))
             return;
         var (newText, _) = mapper.ApplyToCfg(File.ReadAllText(cfgPath), entries);
-        File.WriteAllText(cfgPath, newText);
+        AtomicFile.WriteAllText(cfgPath, newText);
     }
 
     private bool UnityHeadsetVerified(string slug)

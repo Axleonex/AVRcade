@@ -18,15 +18,24 @@ public sealed class GameModUpdater(string repoRoot, HttpClient http)
     {
         public Task<byte[]> GetBytesAsync(string url, CancellationToken ct = default) => client.GetByteArrayAsync(url, ct);
     }
-    private readonly IReadOnlyDictionary<string, GameModUpdateRoute> _routes = GameModUpdateRoutes.Load(repoRoot);
     private delegate Task<ActionOutcome> Adapter(GameView game, AppController controller,
         IProgress<string>? progress, CancellationToken ct);
 
     public async Task<GameModUpdateResult> UpdateAsync(GameView game, AppController controller,
         IProgress<string>? progress = null, CancellationToken ct = default)
     {
-        if (!_routes.TryGetValue(game.Slug, out var route))
+        if (!GameModUpdateRoutes.Load(repoRoot, game.Slug).TryGetValue(game.Slug, out var route))
             return new(false, "No public-mod update adapter is configured for this game.", DateTime.UtcNow.ToString("O"), []);
+        var adapterMatches = route.Adapter switch
+        {
+            "thunderstore" => game.Engine is GameEngine.Unity && game.Slug != "yapyap",
+            "cyberpunk" => game.Engine is GameEngine.Redengine && game.Slug == "cyberpunk-2077",
+            "uevr" => game.Engine is GameEngine.Unreal,
+            "paired" => game.Slug == "yapyap",
+            _ => false
+        };
+        if (!adapterMatches)
+            return new(false, "The update adapter does not match this game. Repair AVRcade's configuration before updating.", DateTime.UtcNow.ToString("O"), []);
         if (game.InstallDir is not { } root || !Directory.Exists(root))
             return new(false, "Install or locate the game before updating its VR components.", DateTime.UtcNow.ToString("O"), []);
         if (game.Readiness is GameReadiness.Blocked)

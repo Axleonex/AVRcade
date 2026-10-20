@@ -30,7 +30,7 @@ public partial class ControllerEditorViewModel : ObservableObject
     {
         _game = game; Defaults = ControllerCustomization.ForEditing(game, defaults); _store = store ?? new();
         try { _map = _store.Load(game, defaults.Id); }
-        catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or System.Text.Json.JsonException or UnauthorizedAccessException)
         { _map = ControllerCustomization.Identity(); Status = "Saved settings could not be read: " + ex.Message + " Reset to restore defaults."; }
         _diagram = ControllerCustomization.Apply(Defaults, _map);
         Select("left_primary");
@@ -54,7 +54,7 @@ public partial class ControllerEditorViewModel : ObservableObject
             _map = map; Diagram = ControllerCustomization.Apply(Defaults, map);
             Status = "Saved for this game and controller. The previous assignment swapped places. Applies on the next VR launch.";
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         { Status = "Could not save assignments: " + ex.Message; Select(SelectedSlot); }
     }
     [RelayCommand]
@@ -66,7 +66,7 @@ public partial class ControllerEditorViewModel : ObservableObject
             Diagram = ControllerCustomization.Apply(Defaults, _map); Select(SelectedSlot);
             Status = "Selected defaults restored for this game and controller. Applies on the next VR launch.";
         }
-        catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or System.Text.Json.JsonException or UnauthorizedAccessException)
         { Status = "Could not restore defaults: " + ex.Message; }
     }
     [RelayCommand]
@@ -79,7 +79,7 @@ public partial class ControllerEditorViewModel : ObservableObject
             OnPropertyChanged(nameof(HasSelectedDefaults));
             Status = "Current assignments saved as your defaults for this game and controller.";
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         { Status = "Could not save defaults: " + ex.Message; }
     }
     [RelayCommand]
@@ -92,7 +92,7 @@ public partial class ControllerEditorViewModel : ObservableObject
             Diagram = ControllerCustomization.Apply(Defaults, _map); Select(SelectedSlot);
             Status = "Original bindings restored. Your saved defaults are kept. Applies on the next VR launch.";
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         { Status = "Could not restore original bindings: " + ex.Message; }
     }
 

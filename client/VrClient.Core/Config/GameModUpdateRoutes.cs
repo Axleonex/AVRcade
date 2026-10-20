@@ -18,15 +18,19 @@ public sealed record GameModUpdateRoute(
 /// Metadata selects an adapter; creators and UI do not contain installation code.
 public static class GameModUpdateRoutes
 {
-    public static IReadOnlyDictionary<string, GameModUpdateRoute> Load(string repoRoot)
+    public static IReadOnlyDictionary<string, GameModUpdateRoute> Load(string repoRoot, string? onlyGame = null)
     {
         var path = Path.Combine(repoRoot, "config", "mod-update-routes.json");
         if (!File.Exists(path)) return new Dictionary<string, GameModUpdateRoute>();
         using var doc = JsonDocument.Parse(File.ReadAllText(path));
         if (doc.RootElement.GetProperty("schema").GetString() != "mod-update-routes/1")
             throw new InvalidDataException("Unsupported mod update catalogue.");
-        var routes = doc.RootElement.GetProperty("games").Deserialize<Dictionary<string, GameModUpdateRoute>>()
-            ?? throw new InvalidDataException("Mod update catalogue is empty.");
+        // Deserialize only the requested route at runtime. A damaged or unsupported
+        // entry for another game must not prevent this game's recovery or update.
+        var routes = doc.RootElement.GetProperty("games").EnumerateObject()
+            .Where(item => onlyGame is null || item.Name == onlyGame)
+            .ToDictionary(item => item.Name, item => item.Value.Deserialize<GameModUpdateRoute>()
+                ?? throw new InvalidDataException($"Mod update route is empty: {item.Name}"));
         foreach (var (slug, route) in routes)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(slug, "^[a-z0-9]+(?:-[a-z0-9]+)*$") ||

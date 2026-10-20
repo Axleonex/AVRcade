@@ -84,7 +84,9 @@ public sealed class CommunityConversionReferenceTests
             Assert.NotNull(reference);
             foreach (var device in reference.Devices)
             {
-                Assert.Equal(assemblyName, device.DiagramAssetUri.Host);
+                // System.Uri normalizes host casing; assembly identifiers here
+                // are URI hosts, while the packaged resource path stays exact.
+                Assert.Equal(assemblyName, device.DiagramAssetUri.Host, ignoreCase: true);
                 Assert.True(File.Exists(Path.Combine(
                     root,
                     "client",

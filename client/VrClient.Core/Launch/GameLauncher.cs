@@ -61,6 +61,7 @@ public sealed class GameLauncher
         // select one explicitly. This keeps --xr-runtime system and the
         // no-override path deterministic for every game adapter.
         startInfo.Environment.Remove("XR_RUNTIME_JSON");
+        startInfo.Environment.Remove("VRCLIENT_VR_ACTIVE");
         if (xrRuntime is not null)
             startInfo.Environment["XR_RUNTIME_JSON"] = xrRuntime.JsonPath;
         if (childEnvironment is not null)

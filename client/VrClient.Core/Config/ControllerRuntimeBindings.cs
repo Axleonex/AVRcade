@@ -54,21 +54,9 @@ public sealed class ControllerRuntimeBindings(ControllerCustomization? settings 
             var mapping = BuildOpenXr(game.Slug);
             var adapter = _adapters.GetValueOrDefault(game.Slug, ControllerBindingAdapters.OpenXr);
             var routesFile = Path.Combine(runtime, "routes.txt");
-            var routes = File.Exists(routesFile) ? File.ReadAllLines(routesFile).ToList() : [];
-            // Settings migration copies routes verbatim. This game's legacy binding
-            // path is still its own route, not a conflict with another game.
-            var legacyFile = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VRClient", "controllers", "runtime", game.Slug + ".bindings");
-            routes.RemoveAll(line => line.EndsWith("|" + file, StringComparison.OrdinalIgnoreCase) ||
-                line.EndsWith("|" + legacyFile, StringComparison.OrdinalIgnoreCase));
-            if (adapter.UsesOpenXr && game.InstallDir != null)
-                foreach (var executable in Executables(repoRoot, game))
-                {
-                    if (routes.Any(line => line.StartsWith(executable + "|", StringComparison.OrdinalIgnoreCase)))
-                        throw new InvalidDataException("Another game already owns this executable's controller route.");
-                    routes.Add(executable + "|" + file);
-                }
+            Directory.CreateDirectory(runtime);
+            using var routeLease = new FileStream(routesFile + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            var routes = RoutesFor(repoRoot, game, file, routesFile, adapter.UsesOpenXr);
             var layer = Path.Combine(repoRoot, "native", "controller-remap", "package", "layer.json");
             if (adapter.UsesOpenXr && !string.IsNullOrWhiteSpace(mapping))
             {
@@ -91,8 +79,46 @@ public sealed class ControllerRuntimeBindings(ControllerCustomization? settings 
             AtomicFile.WriteAllText(routesFile, string.Join("\n", routes));
             return new(true, "Saved controller assignments prepared for the next VR launch.");
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
         { return new(false, "Could not prepare controller assignments: " + ex.Message); }
+    }
+
+    /// Repairs only this game's generated routes. Saved assignments/defaults and
+    /// other games' routes remain untouched; no native layer or game mod is installed.
+    public ActionOutcome RecheckRoutes(string repoRoot, GameView game)
+    {
+        try
+        {
+            _ = BuildOpenXr(game.Slug); // Validate saved mappings without resetting them.
+            var runtime = Path.Combine(_settings.Root, "runtime");
+            Directory.CreateDirectory(runtime);
+            var file = Path.Combine(runtime, game.Slug + ".bindings");
+            var routesFile = Path.Combine(runtime, "routes.txt");
+            using var lease = new FileStream(routesFile + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            var adapter = _adapters.GetValueOrDefault(game.Slug, ControllerBindingAdapters.OpenXr);
+            var routes = RoutesFor(repoRoot, game, file, routesFile, adapter.UsesOpenXr && File.Exists(file));
+            AtomicFile.WriteAllText(routesFile, string.Join("\n", routes));
+            return new(true, "Controller routes checked. Saved button assignments and selected defaults were kept.");
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
+        { return new(false, "Controller setup needs attention: " + ex.Message + " Use Controls to reset this game's controller to your selected defaults if needed."); }
+    }
+
+    private List<string> RoutesFor(string repoRoot, GameView game, string file, string routesFile, bool includeExecutables)
+    {
+        var routes = File.Exists(routesFile) ? File.ReadAllLines(routesFile).ToList() : [];
+        var legacyFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VRClient", "controllers", "runtime", game.Slug + ".bindings");
+        routes.RemoveAll(line => line.EndsWith("|" + file, StringComparison.OrdinalIgnoreCase) ||
+            line.EndsWith("|" + legacyFile, StringComparison.OrdinalIgnoreCase));
+        if (includeExecutables && game.InstallDir != null)
+            foreach (var executable in Executables(repoRoot, game))
+            {
+                if (routes.Any(line => line.StartsWith(executable + "|", StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidDataException("Another game already owns this executable's controller route. Recheck that game's selected installation.");
+                routes.Add(executable + "|" + file);
+            }
+        return routes;
     }
 
     public static IReadOnlyList<string> Executables(string repoRoot, GameView game)

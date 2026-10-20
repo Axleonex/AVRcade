@@ -342,6 +342,28 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void Refresh() => RefreshCatalogue(announce: true);
 
+    [RelayCommand]
+    private async Task RecheckGameSetupAsync()
+    {
+        if (_controller is null || Busy || IsInstallingCyberpunkRequirements) return;
+        RefreshCatalogue(announce: false);
+        if (SelectedGame is not { } game) return;
+        var root = game.View.InstallDir;
+        if (root is null) { StatusText = "Reconnect this game's disk or choose Locate installed game, then Recheck setup."; return; }
+        ClearFinishedModUpdate(game.Slug, root);
+        Busy = true;
+        ReportGameSetup(game.Slug, root, "Checking this game's installation and controller routes...", true);
+        if (game.IsCyberpunk) ReportCyberpunkSetup(root, "Checking this game's installation and controller routes...", true);
+        ActionOutcome outcome;
+        try { outcome = await Task.Run(() => new VrClient.Core.Launch.GameSetupRecovery().Recheck(_controller.RepoRoot, game.View)); }
+        catch (Exception ex) { outcome = new(false, "Setup check could not complete: " + ex.Message); }
+        finally { Busy = false; }
+        ReportGameSetup(game.Slug, root, outcome.Message, false, !outcome.Ok);
+        if (game.IsCyberpunk) ReportCyberpunkSetup(root, outcome.Message, false);
+        RefreshCatalogue(announce: false);
+        StatusText = outcome.Message;
+    }
+
     /// The page in view still asks the player for something: the headset software,
     /// a game to install, or a setup step on one of the four play modes.
     public bool HasPendingSetup => !RuntimeOnline ||
@@ -803,7 +825,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
             {
                 if (File.Exists(Path.Combine(dir, ".avrcade", "mod-updates", "pending.json")))
-                { finalStatus = "An interrupted mod update needs recovery. Close the game and choose Update mods before launching VR."; return; }
+                { finalStatus = "An interrupted mod update needs recovery. Close the game and choose Recheck setup before launching VR."; return; }
                 var modRoots = mode == PlayMode.VrWithMods && game.Modded?.SelectedProfile?.Directory is { } profileRoot
                     ? new[] { profileRoot } : null;
                 var controls = new VrClient.Core.Config.ControllerRuntimeBindings().Prepare(_controller.RepoRoot, game.View, modRoots);
@@ -818,7 +840,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     managerExecutable: mode == PlayMode.ModsNoVr ? GameModManagerExecutable(game) : null),
                 GameEngine.Unity => LaunchUnity(game, dir, mode, acknowledge),
                 GameEngine.Unreal => mode is PlayMode.VrOnly or PlayMode.VrWithMods
-                    ? await _controller.LaunchUnrealAsync(game.Slug, acknowledge)
+                    ? await _controller.LaunchUnrealAsync(game.Slug, acknowledge, gameRoot: dir)
                     : _controller.LaunchUnrealFlat(game.Slug),
                 GameEngine.Redengine => await LaunchCyberpunkAsync(game, mode),
                 GameEngine.LegacyD3D9 => LaunchGtaSanAndreas(dir, mode),
@@ -877,11 +899,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         var withMods = mode is PlayMode.VrWithMods or PlayMode.ModsNoVr;
         if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
-            return await _controller!.LaunchRedengineAsync(CyberpunkLaunchMode.Vr, withMods: withMods);
+            return await _controller!.LaunchRedengineAsync(CyberpunkLaunchMode.Vr, withMods: withMods, gameRoot: game.View.InstallDir);
         // With the VR backend installed AVRcade starts the game itself, VR switched
         // off; without it a normal Steam start is the only route.
         return game.View.ModInstalled && game.View.Readiness is not GameReadiness.Blocked
-            ? await _controller!.LaunchRedengineAsync(CyberpunkLaunchMode.Flat, withMods: withMods)
+            ? await _controller!.LaunchRedengineAsync(CyberpunkLaunchMode.Flat, withMods: withMods, gameRoot: game.View.InstallDir)
             : _controller!.LaunchCyberpunkFlatViaSteam(withMods);
     }
 

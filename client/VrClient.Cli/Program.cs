@@ -317,7 +317,8 @@ try
             var discovered = new VrClient.Core.Discovery.SteamLibraryScanner()
                 .FindGame(CyberpunkNativePreflight.SteamAppId, Path.Combine("bin", "x64", "Cyberpunk2077.exe"), steamRoot);
             var gameDir = GetOption("--game-dir") ?? discovered?.InstallDir;
-            var manifestPath = GetOption("--steam-manifest") ?? discovered?.ManifestPath;
+            var manifestPath = GetOption("--steam-manifest") ?? (GetOption("--game-dir") is { } selectedCyberpunk
+                ? GameLaunchBinding.ManifestFor(selectedCyberpunk, CyberpunkNativePreflight.SteamAppId) : discovered?.ManifestPath);
             if (manifestPath is null && gameDir is not null)
             {
                 var steamApps = Directory.GetParent(gameDir)?.Parent?.FullName;
@@ -1338,6 +1339,10 @@ try
                 return 1;
             }
             var uevrGame = UevrTools.LoadGame(uevrGamePath);
+            var selectedUevrRoot = GetOption("--game-dir") ?? new VrClient.Core.Discovery.SteamLibraryScanner()
+                .FindGame(uevrGame.SteamAppId, uevrGame.LauncherStub, GetOption("--steam-root"))?.InstallDir;
+            if (selectedUevrRoot is null || !File.Exists(Path.Combine(selectedUevrRoot, uevrGame.LauncherStub)))
+                throw new InvalidOperationException("The selected game installation is unavailable. Reconnect its disk or choose Locate installed game.");
             var uevrVerdict = new SafetyGate().Evaluate(uevrGamePath,
                 Path.Combine(repoRoot, "config", "safety", "default-rules.json"));
             if (RefuseUnlessSafe(uevrVerdict) is int uevrRefusal)
@@ -1352,7 +1357,7 @@ try
             var attachDelay = int.TryParse(GetOption("--attach-delay"), out var ad) ? ad : 10;
 
             // Steam reuses a running game, ignoring the new VR/DX11 launch state.
-            if (uevrGame.Slug == BackroomsTrackedHands.GameSlug && !HasFlag("--dry-run") &&
+            if (!HasFlag("--dry-run") &&
                 UevrSession.PrepareForNewLaunch(uevrGame) is { } conflict)
             {
                 Console.WriteLine($"RESULT: error=uevr_session_already_running - {conflict}");
@@ -1452,12 +1457,19 @@ try
             for (var waited = 0; waited < attachTimeout; waited++)
             {
                 var found = System.Diagnostics.Process.GetProcessesByName(attachProcess);
-                if (found.Length > 0) { gameProc = found[0]; break; }
+                foreach (var candidate in found)
+                {
+                    if (gameProc is null && GameLaunchBinding.MatchesExecutable(
+                            GameLaunchBinding.ProcessExecutable(candidate), selectedUevrRoot, uevrGame.ShippingBinaryRelative))
+                        gameProc = candidate;
+                    else candidate.Dispose();
+                }
+                if (gameProc is not null) break;
                 Thread.Sleep(1000);
             }
             if (gameProc is null)
             {
-                Console.WriteLine($"RESULT: error=uevr_game_process_not_found - '{attachProcess}' did not appear within {attachTimeout}s");
+                Console.WriteLine($"RESULT: error=uevr_game_process_not_found - '{attachProcess}' from the selected installation did not appear within {attachTimeout}s. Close other copies, then use Locate installed game and Recheck setup.");
                 return 1;
             }
             // The game process blocks module enumeration from a non-elevated caller
@@ -1511,6 +1523,7 @@ try
             injectorPsi.Environment["DOTNET_ROOT_X64"] = UevrTools.DotNetToolsDir(dotNetPin);
             injectorPsi.Environment["DOTNET_ROLL_FORWARD"] = "Major";
             var injectorProc = System.Diagnostics.Process.Start(injectorPsi);
+            if (injectorProc is not null) UevrSession.RememberInjector(uevrGame, injectorProc);
 
             // Verify the hook landed: config.txt grows past its seeded size OR gains the
             // frontend runtime key. (Frontend writes these right after a successful
