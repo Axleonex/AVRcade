@@ -13,7 +13,7 @@ from the public catalogue. No runtime package dependency was added.
 |---|---|---|
 | Configuration | A legacy development-root variable could override installed configuration. | Bundled configuration wins over the legacy variable; explicit AVRcade overrides remain supported. |
 | Child launcher | A helper could inherit another configuration root or rediscover another copy. | Bind both configuration variables and pass the selected game folder and its matching Steam manifest. |
-| Remembered disks | Locating one title reordered discovery for every title. | Store the selected installation by Steam app ID, retaining old library hints for discovery. |
+| Remembered disks | Locating one title reordered discovery for every title. | Pin first discovery and explicit Locate selections by Steam app ID, retaining old library hints for discovery. |
 | Missing media | An unavailable selected disk could silently fall back to another copy. | Keep the selection and offer reconnect/Locate; unreadable selections also fail closed. |
 | Steam metadata | An unreadable manifest blocked healthy libraries; identities and folder boundaries were insufficiently checked. | Skip unavailable libraries, verify app IDs and reject paths outside the selected game's installation. |
 | Update adapters | A malformed unrelated route blocked another game's updater. | Deserialize and validate only the requested route; reject adapters that do not match the selected game. |
@@ -51,7 +51,7 @@ refuses to inject when the executable does not belong to the selected installati
   shares, directory junctions, ownership conflicts, controller defaults, repeatable
   recovery, interrupted updates and concurrent leases.
 - Added a separate app test project to the solution for controller recovery commands.
-- Final managed solution result: **539 passed, 0 failed, 0 skipped** (537 core, 2 app).
+- Final managed solution result: **540 passed, 0 failed, 0 skipped** (538 core, 2 app).
 - App and CLI are built from the audited source; local deployment records contain
   executable checksums and rollback locations.
 

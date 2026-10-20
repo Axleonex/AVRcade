@@ -24,6 +24,19 @@ public sealed class GameIsolationTests : IDisposable
     }
 
     [Fact]
+    public void FirstDiscoveryPinsTheGameBeforeAnotherTitleChangesLibraryPriority()
+    {
+        var a = Library("disk-a", "101"); var b = Library("disk-b", "101", "202");
+        var preference = Path.Combine(_root, "libraries.txt");
+        File.WriteAllLines(preference, [a, b]);
+        var scanner = new SteamLibraryScanner(preference);
+        var first = scanner.FindGame("101", "Game.exe");
+        Assert.NotNull(first);
+        Assert.True(scanner.RememberGameFolder("202", "Game.exe", Path.Combine(b, "steamapps", "common", "Game202")));
+        Assert.Equal(first.InstallDir, scanner.FindGame("101", "Game.exe")?.InstallDir);
+    }
+
+    [Fact]
     public void UnreadableSelectionDoesNotSilentlyPickAnotherDisk()
     {
         var a = Library("disk-a", "101"); var b = Library("disk-b", "101", "202");

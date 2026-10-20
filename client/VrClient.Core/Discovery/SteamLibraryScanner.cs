@@ -80,7 +80,18 @@ public sealed class SteamLibraryScanner
 
             foreach (var library in libraries.Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                if (FindInLibrary(appId, exeName, library) is { } found) return found;
+                if (FindInLibrary(appId, exeName, library) is { } found)
+                {
+                    if (steamRoot is null)
+                    {
+                        RememberFirstDiscovery(appId, found.InstallDir);
+                        var selectedNow = SelectedFolder(appId);
+                        if (selectedNow is not null && !SameFolder(selectedNow, found.InstallDir))
+                            return FindGame(appId, exeName);
+                        if (selectedNow is null && File.Exists(SelectionPath(appId))) return null;
+                    }
+                    return found;
+                }
             }
         }
         return null;
@@ -112,6 +123,20 @@ public sealed class SteamLibraryScanner
     }
 
     private string SelectionPath(string appId) => Path.Combine(_savedLibraryRootsPath + ".games", appId + ".txt");
+    private void RememberFirstDiscovery(string appId, string folder)
+    {
+        try
+        {
+            var path = SelectionPath(appId);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            // First discovery pins only this title; a second app cannot replace
+            // another instance's selection. Locate explicitly changes it later.
+            using var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+            using var writer = new StreamWriter(stream);
+            writer.Write(folder);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+    }
     private string? SelectedFolder(string appId)
     {
         var path = ReadAvailable(SelectionPath(appId))?.Trim();
