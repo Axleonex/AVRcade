@@ -392,20 +392,30 @@ try
             using var upstreamSession = !dryRun && CyberpunkUpstreamSession.ReadState(gameDir!) is not null
                 ? new CyberpunkUpstreamSession(gameDir!, launchMode is CyberpunkLaunchMode.Vr)
                 : null;
+            if (upstreamSession is not null)
+                session.PrepareManagedLauncher(gameDir!, launchMode, dryRun);
             var pid = new GameLauncher().Launch(
                 plan, acknowledgeWarn: true, dryRun, xrRuntime,
                 session.BuildEnvironment(launchMode), session.BuildLaunchArguments(withMods));
             var activationSource = GetOption("--activation-source") ?? "avrcade-cli";
             var diagnostics = session.WriteDiagnostics(
-                Path.Combine(repoRoot, "artifacts"), launchMode, activationSource, xrRuntime, pid, withMods);
+                Path.Combine(repoRoot, "artifacts"), launchMode, activationSource, xrRuntime, pid,
+                withVortex: withVortex, withMods: withMods);
+            using var gameProcess = pid > 0 ? System.Diagnostics.Process.GetProcessById(pid) : null;
+            if (gameProcess is not null)
+            {
+                var startup = await GameStartupMonitor.ObserveAsync(gameProcess, plan.GameExePath);
+                session.WriteStartupResult(diagnostics, startup);
+                if (!startup.Running)
+                    throw new InvalidOperationException($"{startup.Message} Diagnostics: {diagnostics}");
+            }
             Console.WriteLine(
-                $"RESULT: cyberpunk-launch mode={launchMode.ToString().ToLowerInvariant()} pid={pid} started=true " +
+                $"RESULT: cyberpunk-launch mode={launchMode.ToString().ToLowerInvariant()} pid={pid} started={(!dryRun).ToString().ToLowerInvariant()} " +
                 $"xr={xrRuntime?.Name ?? "none"} mods={withMods} vortex={withVortex} backend=CyberpunkVR_Stereo diagnostics={diagnostics}");
             if (upstreamSession is not null && pid > 0)
             {
                 // Keep the package lease alive independently of the desktop app.
-                using var gameProcess = System.Diagnostics.Process.GetProcessById(pid);
-                await gameProcess.WaitForExitAsync();
+                await gameProcess!.WaitForExitAsync();
             }
             return 0;
         }
@@ -822,6 +832,11 @@ try
                 dryRun: dryRun,
                 xrRuntime: gtaXrRuntime,
                 childEnvironment: childEnvironment);
+            if (!dryRun)
+            {
+                var startup = await GameStartupMonitor.ObserveAsync(pid, plan.GameExePath);
+                if (!startup.Running) throw new InvalidOperationException(startup.Message);
+            }
             Console.WriteLine(dryRun
                 ? "RESULT: gta-sa-launch status=dry_run"
                 : $"RESULT: gta-sa-launch status=launched pid={pid}");
@@ -1262,6 +1277,8 @@ try
             var pid = launcher.Launch(plan, HasFlag("--acknowledge"), dryRun, xrRuntime);
             if (!dryRun)
             {
+                var startup = await GameStartupMonitor.ObserveAsync(pid, plan.GameExePath);
+                if (!startup.Running) throw new InvalidOperationException(startup.Message);
                 var lockSha = File.Exists(LockfilePath()) ? Hashing.Sha256OfFile(LockfilePath()) : "";
                 launcher.WriteEvidence(Path.Combine(repoRoot, "artifacts"), new SessionEvidence(
                     "repo", lockSha, DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),

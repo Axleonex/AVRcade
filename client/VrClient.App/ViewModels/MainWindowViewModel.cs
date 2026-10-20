@@ -846,7 +846,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 GameEngine.LegacyD3D9 => LaunchGtaSanAndreas(dir, mode),
                 _ => new ActionOutcome(false, "This game has no launch route in AVRcade yet.")
             };
-            finalStatus = outcome.Message;
+            if (outcome.Ok && outcome.LaunchedProcessId is > 0 && outcome.LaunchedExecutable is { } launchedExecutable)
+            {
+                StatusText = $"Checking {game.DisplayName} startup…";
+                var startup = await VrClient.Core.Launch.GameStartupMonitor.ObserveAsync(
+                    outcome.LaunchedProcessId.Value, launchedExecutable);
+                finalStatus = $"{game.DisplayName}: {startup.Message}";
+            }
+            else finalStatus = outcome.Message;
         }
         catch (Exception ex)
         {

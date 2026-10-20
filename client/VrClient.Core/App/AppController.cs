@@ -40,7 +40,11 @@ public sealed record GameView(
 public sealed record RuntimeStatusView(
     bool SteamVrRunning, bool VirtualDesktopRunning, string SelectedRuntime);
 
-public sealed record ActionOutcome(bool Ok, string Message);
+public sealed record ActionOutcome(bool Ok, string Message)
+{
+    public int? LaunchedProcessId { get; init; }
+    public string? LaunchedExecutable { get; init; }
+}
 
 /// Locate a Steam game's install dir by app id + executable name; null if not found.
 public delegate string? SteamInstallLocator(string appId, string exeName);
@@ -910,7 +914,8 @@ public sealed partial class AppController
                 dryRun
                     ? "GTA San Andreas stereo launch plan ok (dry run)"
                     : $"launched GTA San Andreas experimental stereo bridge pid={pid} " +
-                      $"(ModLoader mode: {mods}; GGMM and root-level mods are shared)");
+                      $"(ModLoader mode: {mods}; GGMM and root-level mods are shared)")
+            { LaunchedProcessId = dryRun ? null : pid, LaunchedExecutable = plan.GameExePath };
         }
         catch (Exception ex)
         {
@@ -937,7 +942,8 @@ public sealed partial class AppController
                 xrRuntime: null, childEnvironment: GtaSanAndreasDesktopEnvironment());
             return new ActionOutcome(true, dryRun
                 ? "GTA San Andreas desktop launch plan ok (VR disabled)"
-                : $"launched GTA San Andreas without VR pid={pid}; installed game mods remain active");
+                : $"launched GTA San Andreas without VR pid={pid}; installed game mods remain active")
+            { LaunchedProcessId = dryRun ? null : pid, LaunchedExecutable = plan.GameExePath };
         }
         catch (Exception ex)
         {
@@ -1181,7 +1187,7 @@ public sealed partial class AppController
                 output.AppendLine(line);
                 if (line.StartsWith("RESULT: cyberpunk-launch ", StringComparison.Ordinal) &&
                     line.Contains("started=true", StringComparison.Ordinal))
-                    started.TrySetResult(new ActionOutcome(true, line));
+                    started.TrySetResult(new ActionOutcome(true, GameStartupMonitor.FormatCliResult(line, true)));
             }
             return output.ToString();
         }
@@ -1196,7 +1202,8 @@ public sealed partial class AppController
                 var result = output.Split('\n', StringSplitOptions.RemoveEmptyEntries)
                     .LastOrDefault(line => line.StartsWith("RESULT:", StringComparison.Ordinal))
                     ?.Trim() ?? output.ReplaceLineEndings(" ").Trim();
-                return new ActionOutcome(process.ExitCode == 0, result);
+                return new ActionOutcome(process.ExitCode == 0,
+                    GameStartupMonitor.FormatCliResult(result, process.ExitCode == 0));
             }
             catch (OperationCanceledException)
             {
@@ -1321,7 +1328,8 @@ public sealed partial class AppController
             if (!dryRun && plan.ModPresent && ModCfgPath(slug, gameDir) is { } modCfg)
                 ModRuntimePin.Apply(modCfg, xr?.JsonPath);
             var pid = launcher.Launch(plan, acknowledge, dryRun, xr);
-            return new ActionOutcome(true, dryRun ? "launch plan ok (dry run)" : $"launched pid={pid}");
+            return new ActionOutcome(true, dryRun ? "launch plan ok (dry run)" : $"launched pid={pid}")
+            { LaunchedProcessId = dryRun ? null : pid, LaunchedExecutable = plan.GameExePath };
         }
         catch (Exception ex)
         {

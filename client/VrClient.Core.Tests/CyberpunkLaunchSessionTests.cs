@@ -6,6 +6,114 @@ namespace VrClient.Core.Tests;
 
 public sealed class CyberpunkLaunchSessionTests
 {
+    [Theory]
+    [InlineData("bin")]
+    [InlineData(".avrcade/cyberpunk-2077/launcher-config-backups")]
+    public void AutomaticLauncherCannotWriteThroughAnotherInstallationLink(string linked)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-launcher-link-" + Guid.NewGuid().ToString("N"));
+        var game = Path.Combine(root, "game");
+        var outside = Path.Combine(root, "other-game");
+        var link = Path.Combine(game, linked.Replace('/', Path.DirectorySeparatorChar));
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(game, "bin", "x64"));
+            File.WriteAllText(Path.Combine(game, "bin", "x64", "vrport-launcher.ini"), "show_launcher=1\n");
+            Directory.CreateDirectory(outside);
+            if (linked == "bin") Directory.Delete(Path.Combine(game, "bin"), true);
+            Directory.CreateDirectory(Path.GetDirectoryName(link)!);
+            if (OperatingSystem.IsWindows())
+            {
+                var start = new System.Diagnostics.ProcessStartInfo("powershell.exe") { UseShellExecute = false, CreateNoWindow = true };
+                start.ArgumentList.Add("-NoProfile"); start.ArgumentList.Add("-Command");
+                start.ArgumentList.Add("New-Item -ItemType Junction -Path '" + link.Replace("'", "''") + "' -Target '" + outside.Replace("'", "''") + "' | Out-Null");
+                using var process = System.Diagnostics.Process.Start(start)!;
+                process.WaitForExit(); Assert.Equal(0, process.ExitCode);
+            }
+            else Directory.CreateSymbolicLink(link, outside);
+            Assert.Throws<InvalidDataException>(() => new CyberpunkLaunchSession().PrepareManagedLauncher(game, CyberpunkLaunchMode.Vr));
+            Assert.Empty(Directory.EnumerateFileSystemEntries(outside));
+        }
+        finally
+        {
+            if (Directory.Exists(link) && (File.GetAttributes(link) & FileAttributes.ReparsePoint) != 0) Directory.Delete(link);
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
+    public void AutomaticLauncherPreservesSettingsAndOriginalBackupAndIsIdempotent()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-launcher-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var path = Path.Combine(root, "bin", "x64", "vrport-launcher.ini");
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            const string original = "width=2864\r\nheight=3184\r\nhmd_type=2\r\ndebug=0\r\nshow_launcher=1\r\nlauncher_delay_ms=1500\r\ncustom=value\r\n";
+            File.WriteAllText(path, original);
+            var session = new CyberpunkLaunchSession();
+            var backup = session.PrepareManagedLauncher(root, CyberpunkLaunchMode.Vr);
+            Assert.NotNull(backup);
+            Assert.Equal(original, File.ReadAllText(backup));
+            Assert.Equal(original.Replace("show_launcher=1", "show_launcher=0"), File.ReadAllText(path));
+            var changedAt = File.GetLastWriteTimeUtc(path);
+            Assert.Null(session.PrepareManagedLauncher(root, CyberpunkLaunchMode.Vr));
+            Assert.Equal(changedAt, File.GetLastWriteTimeUtc(path));
+            Assert.Single(Directory.GetFiles(Path.GetDirectoryName(backup)!));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
+    [Fact]
+    public void AutomaticLauncherCreatesOnlySupportedDefaultsWhenConfigIsAbsent()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-launcher-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(root);
+            Assert.Null(new CyberpunkLaunchSession().PrepareManagedLauncher(root, CyberpunkLaunchMode.Vr));
+            var text = File.ReadAllText(Path.Combine(root, "bin", "x64", "vrport-launcher.ini"));
+            Assert.Contains("show_launcher=0", text);
+            Assert.Contains("launcher_delay_ms=1000", text);
+            Assert.DoesNotContain("width=", text);
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
+    [Theory]
+    [InlineData(CyberpunkLaunchMode.Flat, false)]
+    [InlineData(CyberpunkLaunchMode.Vr, true)]
+    public void FlatAndDryRunDoNotChangeLauncherFiles(CyberpunkLaunchMode mode, bool dryRun)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-launcher-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(root);
+            Assert.Null(new CyberpunkLaunchSession().PrepareManagedLauncher(root, mode, dryRun));
+            Assert.Empty(Directory.EnumerateFileSystemEntries(root));
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Fact]
+    public void DiagnosticsSeparateRedmodFromVortexAndRecordStartupFailure()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-startup-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var session = new CyberpunkLaunchSession();
+            var path = session.WriteDiagnostics(root, CyberpunkLaunchMode.Vr, "test", null, 42,
+                withVortex: false, withMods: true);
+            session.WriteStartupResult(path, new GameStartupResult(false, unchecked((int)0xC0000409), "Game closed during startup."));
+            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            Assert.False(document.RootElement.GetProperty("vortex_launch").GetBoolean());
+            Assert.True(document.RootElement.GetProperty("redmod_enabled").GetBoolean());
+            Assert.Equal("startup_failed", document.RootElement.GetProperty("startup_status").GetString());
+            Assert.Equal(unchecked((int)0xC0000409), document.RootElement.GetProperty("startup_exit_code").GetInt32());
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
     [Fact]
     public void Vortex_launch_enables_redmod_without_changing_normal_vr_arguments()
     {
