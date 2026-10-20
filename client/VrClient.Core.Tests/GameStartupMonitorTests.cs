@@ -88,4 +88,39 @@ public sealed class GameStartupMonitorTests
         Assert.Equal("Game closed during startup (exit code 0xC0000409).", GameStartupMonitor.FormatCliResult(
             "RESULT: error=Game closed during startup (exit code 0xC0000409).", false));
     }
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(120001)]
+    public async Task PidOverloadPreservesInvalidObservationErrors(int milliseconds)
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => GameStartupMonitor.ObserveAsync(
+            Environment.ProcessId, Environment.ProcessPath!, TimeSpan.FromMilliseconds(milliseconds)));
+    }
+
+    [Fact]
+    public async Task PidOverloadVerifiesTheSelectedRunningExecutable()
+    {
+        var result = await GameStartupMonitor.ObserveAsync(
+            Environment.ProcessId, Environment.ProcessPath!, TimeSpan.Zero);
+        Assert.True(result.Running);
+        Assert.Contains("display readiness has not been verified", result.Message);
+    }
+
+    [Fact]
+    public async Task MissingPidDoesNotBecomeAReportedSuccessfulLaunch()
+    {
+        var result = await GameStartupMonitor.ObserveAsync(int.MaxValue, "missing.exe", TimeSpan.Zero);
+        Assert.False(result.Running);
+        Assert.Contains("closed before startup", result.Message);
+    }
+
+    [Fact]
+    public async Task CancellationDuringObservationLeavesTheSelectedProcessRunning()
+    {
+        using var process = Process.GetCurrentProcess();
+        using var cancelled = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => GameStartupMonitor.ObserveAsync(
+            process, Environment.ProcessPath!, TimeSpan.FromSeconds(5), cancelled.Token));
+        Assert.False(process.HasExited);
+    }
 }

@@ -224,7 +224,10 @@ public sealed class FriendslopGameMatrixTests : TempTree
         Assert.True(view.ModInstalled);
         Assert.Equal("Warn", view.SafetyVerdict);
         Assert.True(ManagedModIsolation.IsVrOnly(game));
-        Assert.True(controller.LaunchUnityVr(slug, game, acknowledge: true, dryRun: true).Ok);
+        var outcome = controller.LaunchUnityVr(slug, game, acknowledge: true, dryRun: true);
+        Assert.True(outcome.Ok, outcome.Message);
+        Assert.Null(outcome.LaunchedProcessId);
+        Assert.Equal(Path.Combine(game, exe), outcome.LaunchedExecutable);
         Assert.Contains("warn_not_acknowledged",
             controller.LaunchUnityVr(slug, game, acknowledge: false, dryRun: true).Message);
         var plan = new GameLauncher().Plan(game, controller.EvaluateSafety(slug), modInstalled: true, exe);

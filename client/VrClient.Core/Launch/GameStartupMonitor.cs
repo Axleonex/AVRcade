@@ -15,15 +15,17 @@ public static class GameStartupMonitor
     {
         ct.ThrowIfCancellationRequested();
         if (processId == -1) return new(true, null, "Launch plan checked (dry run); no game was started.");
+        Process process;
         try
         {
-            using var process = Process.GetProcessById(processId);
-            return await ObserveAsync(process, executable, observation, ct);
+            process = Process.GetProcessById(processId);
         }
         catch (ArgumentException)
         {
             return new(false, null, "The game closed before startup could be checked. Use Recheck setup, then try again.");
         }
+        using (process)
+            return await ObserveAsync(process, executable, observation, ct);
     }
 
     public static async Task<GameStartupResult> ObserveAsync(Process process, string executable,
