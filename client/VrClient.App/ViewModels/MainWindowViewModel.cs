@@ -453,7 +453,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     "Close this game, check that its drive is available, and run diagnostics again.")]));
             if (IsSelectedInstallation(captured)) StatusText = $"{captured.DisplayName}: diagnostics could not finish. See Troubleshooting below.";
         }
-        finally { Busy = false; }
+        finally
+        {
+            Busy = false;
+            if (!IsSelectedInstallation(captured))
+                StatusText = $"{captured.DisplayName}: check finished. Open that game's Troubleshooting tab for results.";
+        }
     }
     [RelayCommand(CanExecute = nameof(CanRunGameDiagnostics))]
     private async Task TroubleshootingActionAsync(TroubleshootingFinding? finding)
@@ -486,7 +491,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             RecordTroubleshootingAction(game.View, "Steam verification could not start: " + ex.Message, false);
             if (IsSelectedInstallation(game.View)) StatusText = "Steam verification could not start: " + ex.Message;
         }
-        finally { Busy = false; }
+        finally
+        {
+            Busy = false;
+            if (!IsSelectedInstallation(game.View))
+                StatusText = $"{game.DisplayName}: see that game's Troubleshooting tab for the Steam verification request result.";
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanRepairSelectedGame))]
@@ -520,6 +530,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             StatusText = outcome.Message;
             if (!outcome.Ok) DetailTabIndex = 4;
         }
+        else StatusText = $"{game.DisplayName}: setup recheck finished. Open that game's Troubleshooting tab for results.";
     }
 
     /// The page in view still asks the player for something: the headset software,
