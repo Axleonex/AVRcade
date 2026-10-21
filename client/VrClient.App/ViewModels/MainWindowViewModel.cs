@@ -141,18 +141,31 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     partial void OnSelectedGameChanged(GameItemViewModel? value)
     {
         OnPropertyChanged(nameof(CanUpdateSelectedMods));
+        RefreshRepairAvailability();
         Streaming.SetGameContext(ShowGameDetail ? value?.Slug : null);
         UpdateSelectedGameFacts();
     }
 
     public bool CanUpdateSelectedMods => !Busy && !IsInstallingCyberpunkRequirements && SelectedGame?.CanUpdateMods == true;
+    public bool CanRepairSelectedGame => !Busy && !IsInstallingCyberpunkRequirements && SelectedGame?.View.InstallDir is not null;
+    private void RefreshRepairAvailability()
+    {
+        OnPropertyChanged(nameof(CanRepairSelectedGame));
+        VerifyGameFilesCommand.NotifyCanExecuteChanged();
+        RecheckGameSetupCommand.NotifyCanExecuteChanged();
+    }
     partial void OnBusyChanged(bool value)
     {
         if (value) StatusSuccess = false;
         OnPropertyChanged(nameof(CanUpdateSelectedMods));
+        RefreshRepairAvailability();
     }
     partial void OnStatusTextChanged(string value) => StatusSuccess = false;
-    partial void OnIsInstallingCyberpunkRequirementsChanged(bool value) => OnPropertyChanged(nameof(CanUpdateSelectedMods));
+    partial void OnIsInstallingCyberpunkRequirementsChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanUpdateSelectedMods));
+        RefreshRepairAvailability();
+    }
 
     private void UpdateSelectedGameFacts()
     {
@@ -355,7 +368,22 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void Refresh() => RefreshCatalogue(announce: true);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRepairSelectedGame))]
+    private async Task VerifyGameFilesAsync()
+    {
+        if (_controller is null || !CanRepairSelectedGame || SelectedGame is not { } game) return;
+        Busy = true;
+        StatusText = $"Preparing Steam verification for {game.DisplayName}...";
+        try
+        {
+            var outcome = await Task.Run(() => new VrClient.Core.Launch.GameSetupRecovery().VerifyGameFiles(_controller.RepoRoot, game.View));
+            StatusText = outcome.Message;
+        }
+        catch (Exception ex) { StatusText = "Steam verification could not start: " + ex.Message; }
+        finally { Busy = false; }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRepairSelectedGame))]
     private async Task RecheckGameSetupAsync()
     {
         if (_controller is null || Busy || IsInstallingCyberpunkRequirements) return;
@@ -889,6 +917,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         StatusText = $"Starting {game.DisplayName}…";
         try
         {
+            var native = new VrClient.Core.Launch.NativeDependencyHealth().Check(dir,
+                VrClient.Core.Config.ControllerRuntimeBindings.Executables(_controller.RepoRoot, game.View));
+            if (!native.Healthy) { finalStatus = native.Message; return; }
             if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
             {
                 if (File.Exists(Path.Combine(dir, ".avrcade", "mod-updates", "pending.json")))

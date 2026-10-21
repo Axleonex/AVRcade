@@ -20,13 +20,13 @@ public sealed class GameSetupRecoveryTests : IDisposable
     {
         var root = Path.Combine(_root, disk, slug);
         Directory.CreateDirectory(root);
-        File.WriteAllText(Path.Combine(root, "Game.exe"), "fixture");
+        File.WriteAllBytes(Path.Combine(root, "Game.exe"), NativePeFixture.Create());
         if (slug == "cyberpunk-2077")
         {
             Directory.CreateDirectory(Path.Combine(root, "bin", "x64"));
-            File.WriteAllText(Path.Combine(root, "bin", "x64", "Cyberpunk2077.exe"), "fixture");
+            File.WriteAllBytes(Path.Combine(root, "bin", "x64", "Cyberpunk2077.exe"), NativePeFixture.Create());
         }
-        if (slug == "gta-san-andreas") File.WriteAllText(Path.Combine(root, "gta_sa.exe"), "fixture");
+        if (slug == "gta-san-andreas") File.WriteAllBytes(Path.Combine(root, "gta_sa.exe"), NativePeFixture.Create(x64: false));
         return new(slug, slug, "101", root, true, "Allow", "fixture", GameEngine.Unity, GameReadiness.Ready, "Ready");
     }
     private string Routes => Path.Combine(_controllers.Root, "runtime", "routes.txt");
@@ -103,7 +103,7 @@ public sealed class GameSetupRecoveryTests : IDisposable
             foreach (var name in names)
             {
                 var file = ModUpdateTransaction.Resolve(folder, name.Replace('\\', '/'));
-                Directory.CreateDirectory(Path.GetDirectoryName(file)!); File.WriteAllText(file, "fixture");
+                Directory.CreateDirectory(Path.GetDirectoryName(file)!); File.WriteAllBytes(file, NativePeFixture.Create());
             }
             Directory.CreateDirectory(Path.GetDirectoryName(Binding(entry.Slug))!);
             File.WriteAllText(Binding(entry.Slug), "");
@@ -193,5 +193,101 @@ public sealed class GameSetupRecoveryTests : IDisposable
         using var held = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         Assert.False(new GameSetupRecovery(_controllers, _ => false).Recheck(_root, game).Ok);
         Assert.False(File.Exists(Routes));
+    }
+
+    private GameView SteamGame(string slug = "repo")
+    {
+        var game = Game(slug, "library/steamapps/common");
+        var manifest = GameLaunchBinding.ManifestFor(game.InstallDir!, game.SteamAppId);
+        File.WriteAllText(manifest, $"\"AppState\" {{ \"appid\" \"{game.SteamAppId}\" \"installdir\" \"{slug}\" }}");
+        return game;
+    }
+
+    [Fact]
+    public void SteamVerificationTargetsOnlyTheSelectedInstallationAndDoesNotClaimCompletion()
+    {
+        var game = SteamGame();
+        System.Diagnostics.ProcessStartInfo? opened = null;
+        var result = new GameSetupRecovery(_controllers, _ => false).VerifyGameFiles(_root, game, start => opened = start);
+        Assert.True(result.Ok, result.Message);
+        Assert.Equal("steam://validate/101", opened!.FileName);
+        Assert.True(opened.UseShellExecute);
+        Assert.Contains("requested", result.Message);
+        Assert.Contains("Wait for Steam", result.Message);
+    }
+
+    [Fact]
+    public void VerificationCanRepairAMissingGameExecutable()
+    {
+        var game = SteamGame();
+        File.Delete(Path.Combine(game.InstallDir!, "Game.exe"));
+        var requested = false;
+        Assert.True(new GameSetupRecovery(_controllers, _ => false)
+            .VerifyGameFiles(_root, game, _ => requested = true).Ok);
+        Assert.True(requested);
+    }
+
+    [Fact]
+    public void RunningGamePreventsSteamVerificationAndRecoveryWrites()
+    {
+        var game = SteamGame();
+        var requested = false;
+        var result = new GameSetupRecovery(_controllers, _ => true).VerifyGameFiles(_root, game, _ => requested = true);
+        Assert.False(result.Ok); Assert.False(requested);
+        Assert.False(Directory.Exists(Path.Combine(game.InstallDir!, ".avrcade")));
+    }
+
+    [Theory]
+    [InlineData("appid", "999")]
+    [InlineData("installdir", "other-game")]
+    public void MismatchedSteamIdentityCannotRepairAnotherGame(string field, string value)
+    {
+        var game = SteamGame();
+        var manifest = GameLaunchBinding.ManifestFor(game.InstallDir!, game.SteamAppId);
+        var text = File.ReadAllText(manifest);
+        File.WriteAllText(manifest, text.Replace(field == "appid" ? "\"101\"" : "\"repo\"", $"\"{value}\""));
+        var requested = false;
+        Assert.False(new GameSetupRecovery(_controllers, _ => false).VerifyGameFiles(_root, game, _ => requested = true).Ok);
+        Assert.False(requested);
+    }
+
+    [Fact]
+    public void UnregisteredCopyAndInvalidSteamIdDoNotOpenExternalActions()
+    {
+        var game = Game("repo");
+        Assert.False(new GameSetupRecovery(_controllers, _ => false).VerifyGameFiles(_root, game, _ => Assert.Fail("Opened an unregistered game")).Ok);
+        game = SteamGame() with { SteamAppId = "101/launch" };
+        Assert.False(new GameSetupRecovery(_controllers, _ => false).VerifyGameFiles(_root, game, _ => Assert.Fail("Invalid URI was opened")).Ok);
+    }
+
+    [Fact]
+    public void EveryCatalogueGameUsesItsOwnSteamVerificationIdentity()
+    {
+        var source = TestRepoRoot.Find();
+        var games = new AppController(source, (_, _) => null, gtaSanAndreasLocator: () => null).ListGames();
+        foreach (var game in games)
+        {
+            var folder = Path.Combine(_root, "all-games", "steamapps", "common", game.Slug);
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(GameLaunchBinding.ManifestFor(folder, game.SteamAppId),
+                $"\"AppState\" {{ \"appid\" \"{game.SteamAppId}\" \"installdir\" \"{game.Slug}\" }}");
+            string? uri = null;
+            var result = new GameSetupRecovery(_controllers, _ => false).VerifyGameFiles(source,
+                game with { InstallDir = folder }, start => uri = start.FileName);
+            Assert.True(result.Ok, game.Slug + ": " + result.Message);
+            Assert.Equal("steam://validate/" + game.SteamAppId, uri);
+        }
+    }
+
+    [Fact]
+    public void RecheckIdentifiesMissingEntryPointAndPointsToBottomAboutTab()
+    {
+        var game = Game("repo");
+        File.WriteAllBytes(Path.Combine(game.InstallDir!, "Game.exe"), NativePeFixture.Create(library: "icuin.dll", import: "ExpectedFunction"));
+        File.WriteAllBytes(Path.Combine(game.InstallDir!, "icuin.dll"), NativePeFixture.Create(export: "OtherFunction"));
+        var result = new GameSetupRecovery(_controllers, _ => false).Recheck(_root, game);
+        Assert.False(result.Ok);
+        Assert.Contains("missing entry point", result.Message);
+        Assert.Contains("About at the bottom", result.Message);
     }
 }

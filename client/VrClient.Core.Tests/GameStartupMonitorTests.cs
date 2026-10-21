@@ -5,6 +5,30 @@ namespace VrClient.Core.Tests;
 
 public sealed class GameStartupMonitorTests
 {
+    [Theory]
+    [InlineData(unchecked((int)0xC0000139), "entry point")]
+    [InlineData(unchecked((int)0xC0000135), "DLL is missing")]
+    [InlineData(unchecked((int)0xC000007B), "architecture")]
+    [InlineData(unchecked((int)0xC0000142), "initialize")]
+    public void LoaderFailuresGiveSpecificDiagnosisAndRepairLocation(int code, string cause)
+    {
+        var message = GameStartupMonitor.DescribeExitCode(code);
+        Assert.Contains(cause, message);
+        Assert.Contains("About tab at the bottom", message);
+        Assert.Contains("Recheck setup", message);
+    }
+
+    [Theory]
+    [InlineData("Cyberpunk2077.exe - Entry Point Not Found")]
+    [InlineData("Game.exe - Bad Image")]
+    [InlineData("Game.exe - System Error")]
+    [InlineData("Game.exe - Application Error")]
+    public void WaitingLoaderErrorDialogIsNotReportedAsSuccessfulStartup(string title)
+    {
+        Assert.Contains("has not completed startup", GameStartupMonitor.DescribeLoaderWindow(title));
+        Assert.Null(GameStartupMonitor.DescribeLoaderWindow("Cyberpunk 2077"));
+    }
+
     [Fact]
     public async Task EarlyExitDuringObservationIsReportedWithoutClaimingSuccess()
     {

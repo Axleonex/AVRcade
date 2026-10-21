@@ -44,11 +44,13 @@ public static class GameStartupMonitor
                 if (process.HasExited)
                 {
                     var code = process.ExitCode;
-                    return new(false, code, $"The game closed during startup (exit code 0x{unchecked((uint)code):X8}). Use Recheck setup, then try again.");
+                    return new(false, code, DescribeExitCode(code));
                 }
                 var actual = GameLaunchBinding.ProcessExecutable(process);
                 if (actual is null || !Path.GetFullPath(actual).Equals(Path.GetFullPath(executable), StringComparison.OrdinalIgnoreCase))
                     return new(false, null, "Could not verify that the process belongs to the selected installation. No process was stopped. Use Locate installed game and Recheck setup.");
+                if (DescribeLoaderWindow(process.MainWindowTitle) is { } loaderFailure)
+                    return new(false, null, loaderFailure);
                 var remaining = duration - elapsed.Elapsed;
                 if (remaining <= TimeSpan.Zero)
                     return new(true, null, "The game process is running. Check the game window or headset; display readiness has not been verified.");
@@ -59,6 +61,27 @@ public static class GameStartupMonitor
         {
             return new(false, null, "The game stopped or its startup could not be inspected. Use Recheck setup, then try again.");
         }
+    }
+
+    public static string DescribeExitCode(int code)
+    {
+        var cause = unchecked((uint)code) switch
+        {
+            0xC0000139 => " A required DLL entry point is missing; a game file or native mod may be incompatible.",
+            0xC0000135 => " A required DLL is missing.",
+            0xC000007B => " A native library has the wrong architecture or an invalid binary format.",
+            0xC0000142 => " A native library failed to initialize.",
+            _ => ""
+        };
+        return $"The game closed during startup (exit code 0x{unchecked((uint)code):X8}).{cause} Use Recheck setup" +
+            (cause.Length == 0 ? ", then try again." : "; the About tab at the bottom of this page has Verify game files in Steam for original game files. Check incompatible mods in their manager.");
+    }
+
+    public static string? DescribeLoaderWindow(string title)
+    {
+        var failure = new[] { "Entry Point Not Found", "Bad Image", "System Error", "Application Error" }
+            .FirstOrDefault(kind => title.EndsWith(" - " + kind, StringComparison.OrdinalIgnoreCase));
+        return failure is null ? null : $"Windows reported {failure} during game startup. Close the error dialog, then use Recheck setup. Verify game files in Steam is in the About tab at the bottom of this page. The game has not completed startup.";
     }
 
     public static string FormatCliResult(string result, bool ok)

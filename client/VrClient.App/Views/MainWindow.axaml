@@ -824,6 +824,19 @@
                       <TextBlock Grid.Row="6" Grid.Column="2" Text="{Binding InstallText}" TextWrapping="Wrap" />
                     </Grid>
 
+                    <Border Classes="inset">
+                      <StackPanel Spacing="10">
+                        <TextBlock Classes="heading" Text="Game file repair" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Steam can check this game's original files and download missing or damaged files. When Steam finishes, return to Recheck setup at the top of this page." />
+                        <Button x:Name="VerifyGameFilesButton" Content="Verify game files in Steam"
+                                HorizontalAlignment="Left"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VerifyGameFilesCommand}" />
+                        <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding NotInstalled}"
+                                   Text="Install or locate this game first to verify its files." />
+                      </StackPanel>
+                    </Border>
+
                   </StackPanel>
                 </TabItem>
               </TabControl>
