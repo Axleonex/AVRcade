@@ -352,12 +352,25 @@ public sealed partial class AppController
 
     /// headsetConnected lets a caller that already sampled the VR processes pass
     /// its answer in, so one refresh works from a single sample.
-    public IReadOnlyList<GameView> ListGames(bool? headsetConnected = null)
+    public IReadOnlyList<GameView> ListGames(bool? headsetConnected = null) =>
+        DiscoverGames(headsetConnected, gameSlug: null);
+
+    /// Recheck one game without opening another game's configuration or installation.
+    public GameView? GetGame(string slug, bool? headsetConnected = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(slug);
+        if (!slug.All(c => char.IsAsciiLetterOrDigit(c) || c == '-'))
+            throw new ArgumentException("Invalid catalogue game identity.", nameof(slug));
+        return DiscoverGames(headsetConnected, slug.ToLowerInvariant()).SingleOrDefault();
+    }
+
+    private IReadOnlyList<GameView> DiscoverGames(bool? headsetConnected, string? gameSlug)
+    {
+        bool Includes(string slug) => gameSlug is null || slug.Equals(gameSlug, StringComparison.OrdinalIgnoreCase);
         var views = new List<GameView>();
-        AddYapyapCatalogueEntry(views);
+        if (Includes("yapyap")) AddYapyapCatalogueEntry(views);
         var headset = headsetConnected ?? _headsetConnected();
-        foreach (var g in new GameCatalog().Discover(ModpacksDir, GamesDir, ProfilesDir))
+        foreach (var g in new GameCatalog().Discover(ModpacksDir, GamesDir, ProfilesDir, gameSlug))
         {
             if ((!RedDeadCatalogEnabled && DeferredCatalogSlugs.Contains(g.Slug)) ||
                 (!FalloutCatalogEnabled && DeferredFalloutCatalogSlugs.Contains(g.Slug)))
@@ -389,7 +402,7 @@ public sealed partial class AppController
 
         // Fallout: New Vegas uses a dedicated desktop setup flow when its catalog entry is enabled.
         var fnvAdapterPath = Path.Combine(_repoRoot, "adapters", "fallout_new_vegas", "adapter.json");
-        if (FalloutCatalogEnabled && File.Exists(fnvAdapterPath))
+        if (FalloutCatalogEnabled && Includes("fallout-new-vegas") && File.Exists(fnvAdapterPath))
         {
             var discovery = _falloutNewVegasDiscovery();
             var install = discovery.Installs.FirstOrDefault(candidate =>
@@ -408,7 +421,7 @@ public sealed partial class AppController
         }
 
         var fallout3AdapterPath = Path.Combine(_repoRoot, "adapters", "fallout_3", "adapter.json");
-        if (FalloutCatalogEnabled && File.Exists(fallout3AdapterPath))
+        if (FalloutCatalogEnabled && Includes("fallout-3") && File.Exists(fallout3AdapterPath))
         {
             var install = _fallout3Discovery().Installs.FirstOrDefault(candidate =>
                 candidate.Support == Fallout3InstallSupport.Supported);
@@ -430,11 +443,13 @@ public sealed partial class AppController
 
         var releasePath = Path.Combine(UnrealDir, "uevr-release.json");
         var dotNetPath = Path.Combine(UnrealDir, "dotnet-desktop-runtime.json");
-        if (Directory.Exists(UnrealDir) && File.Exists(releasePath) && File.Exists(dotNetPath))
+        if ((gameSlug is null || File.Exists(UevrGamePath(gameSlug))) &&
+            Directory.Exists(UnrealDir) && File.Exists(releasePath) && File.Exists(dotNetPath))
         {
             var dotNetPin = UevrTools.LoadDotNetDesktopPin(dotNetPath);
             foreach (var path in Directory.EnumerateFiles(UnrealDir, "*.uevr.json"))
             {
+                if (gameSlug is not null && !Path.GetFileName(path).Equals(gameSlug + ".uevr.json", StringComparison.OrdinalIgnoreCase)) continue;
                 var game = UevrTools.LoadGame(path);
                 var installDir = _locator(game.SteamAppId, game.LauncherStub);
                 var offlineLibrary = installDir is null
@@ -463,7 +478,7 @@ public sealed partial class AppController
         }
 
         var cyberpunkProfile = Path.Combine(RedengineDir, "cyberpunk-2077.json");
-        if (File.Exists(cyberpunkProfile))
+        if (Includes("cyberpunk-2077") && File.Exists(cyberpunkProfile))
         {
             using var document = JsonDocument.Parse(File.ReadAllText(cyberpunkProfile));
             var game = document.RootElement.GetProperty("game");
@@ -503,7 +518,7 @@ public sealed partial class AppController
         }
 
         var rdr2Profile = Path.Combine(RageDir, "rdr2.json");
-        if (RedDeadCatalogEnabled && File.Exists(rdr2Profile))
+        if (RedDeadCatalogEnabled && Includes("rdr2") && File.Exists(rdr2Profile))
         {
             using var document = JsonDocument.Parse(File.ReadAllText(rdr2Profile));
             var game = document.RootElement.GetProperty("game");
@@ -534,7 +549,7 @@ public sealed partial class AppController
                         : "RDR2 uses the native RAGE adapter contract; build identity, bridge services, and one smoke run are still required."));
         }
 
-        if (File.Exists(GtaSanAndreasProfilePath))
+        if (Includes("gta-san-andreas") && File.Exists(GtaSanAndreasProfilePath))
         {
             try
             {

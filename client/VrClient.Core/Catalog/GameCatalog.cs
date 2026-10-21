@@ -10,7 +10,7 @@ public sealed class GameCatalog
     /// Discover every game with a config/modpacks/<slug>.modpack.json under modpacksDir,
     /// and report which of its four convention files exist. gameConfigDir/profileDir are
     /// the roots for config/games and config/profiles.
-    public IReadOnlyList<OnboardedGame> Discover(string modpacksDir, string gameConfigDir, string profileDir)
+    public IReadOnlyList<OnboardedGame> Discover(string modpacksDir, string gameConfigDir, string profileDir, string? gameSlug = null)
     {
         var games = new List<OnboardedGame>();
         if (!Directory.Exists(modpacksDir))
@@ -21,6 +21,8 @@ public sealed class GameCatalog
             var fileName = Path.GetFileName(modpackPath);
             var slug = fileName[..^".modpack.json".Length];
 
+            // Filter before parsing: another game's broken config cannot block a scoped refresh.
+            if (gameSlug is not null && !slug.Equals(gameSlug, StringComparison.OrdinalIgnoreCase)) continue;
             var spec = ModpackResolver.LoadSpec(modpackPath);
             games.Add(new OnboardedGame(
                 Slug: slug,

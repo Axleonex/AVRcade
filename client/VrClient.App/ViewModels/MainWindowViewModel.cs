@@ -249,18 +249,19 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     /// coverLocator maps a Steam app id to a local cover image; tooling that must
     /// not show publisher artwork passes one that finds nothing.
-    public MainWindowViewModel(Func<string, string?>? coverLocator = null, StreamingViewModel? streaming = null)
+    public MainWindowViewModel(Func<string, string?>? coverLocator = null, StreamingViewModel? streaming = null,
+        AppController? controller = null)
     {
         Streaming = streaming ?? new();
         _coverLocator = coverLocator ?? (appId => SteamLibraryArtworkLocator.FindPortrait(appId));
         IsDarkTheme = LauncherThemeService.Current.IsDark;
-        var root = RepoRoot.Find();
+        var root = controller?.RepoRoot ?? RepoRoot.Find();
         if (root is null)
         {
             StatusText = "Could not find the AVRcade configuration folder.";
             return;
         }
-        _controller = new AppController(root);
+        _controller = controller ?? new AppController(root);
         _falloutNewVegasService = new FalloutNewVegasDesktopService(root);
         var releaseDataRoot = VrClient.Core.AppDataPaths.Local("release-foundation");
         _releasePackageStore = new ReleasePackageStore(releaseDataRoot);
@@ -292,7 +293,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             Busy = false;
             ReportGameSetup(slug, gameRoot, message, false, failed);
-            RefreshCatalogue(announce: false);
+            RefreshGame(slug);
             StatusText = message;
         }
     }
@@ -323,6 +324,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (game is null)
             return;
         SelectedGame = game;
+        if (!Busy && !IsInstallingCyberpunkRequirements)
+        {
+            RefreshGame(game.Slug);
+            if (SelectedGame is not { } refreshed) return;
+            game = refreshed;
+        }
         DetailTabIndex = 0;
         ShowGameDetail = true;
         if (game.Modded is not null)
@@ -346,8 +353,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private async Task RecheckGameSetupAsync()
     {
         if (_controller is null || Busy || IsInstallingCyberpunkRequirements) return;
-        RefreshCatalogue(announce: false);
-        if (SelectedGame is not { } game) return;
+        if (SelectedGame is not { } selected) return;
+        RefreshGame(selected.Slug);
+        var game = Games.FirstOrDefault(item => item.Slug == selected.Slug);
+        if (game is null) return;
         var root = game.View.InstallDir;
         if (root is null) { StatusText = "Reconnect this game's disk or choose Locate installed game, then Recheck setup."; return; }
         ClearFinishedModUpdate(game.Slug, root);
@@ -360,7 +369,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         finally { Busy = false; }
         ReportGameSetup(game.Slug, root, outcome.Message, false, !outcome.Ok);
         if (game.IsCyberpunk) ReportCyberpunkSetup(root, outcome.Message, false);
-        RefreshCatalogue(announce: false);
+        RefreshGame(game.Slug);
         StatusText = outcome.Message;
     }
 
@@ -375,17 +384,19 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// player just finished outside AVRcade stops being asked for.
     public void RedetectQuietly()
     {
-        if (!Busy) RefreshCatalogue(announce: false);
+        if (Busy || IsInstallingCyberpunkRequirements || _controller is null) return;
+        if (ShowGameDetail && SelectedGame is { } game) RefreshGame(game.Slug);
+        else UpdateRuntimeStatus(_controller.GetRuntimeStatus());
     }
 
     /// Remember where a game the scan missed is installed (Unity games and San Andreas).
     public void RememberGameFolder(string folder)
     {
-        if (_controller is null || SelectedGame is not { CanLocateGame: true }) return;
-        var result = SelectedGame.IsGtaSanAndreas
+        if (_controller is null || SelectedGame is not { CanLocateGame: true } game) return;
+        var result = game.IsGtaSanAndreas
             ? _controller.RememberGtaSanAndreasFolder(folder)
-            : _controller.RememberFriendslopGameFolder(SelectedGame.Slug, folder);
-        if (result.Ok) RefreshCatalogue(announce: false);
+            : _controller.RememberFriendslopGameFolder(game.Slug, folder);
+        if (result.Ok) RefreshGame(game.Slug);
         StatusText = result.Message;
     }
 
@@ -410,52 +421,70 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         // Sampled once per refresh and shared by every game below.
         var runtime = _controller.GetRuntimeStatus();
         var runtimeDetected = runtime.SteamVrRunning || runtime.VirtualDesktopRunning;
-        var gtaTurnPreference = _controller.GetGtaSanAndreasTurnPreference();
         var dataRoots = _moddedPreferences.LoadDataRoots();
         var setupGuides = GameSetupGuides.Load(_controller.RepoRoot);
         _installedManagers = _modManagerDiscovery.FindInstalled(dataRoots);
-
         foreach (var game in _controller.ListGames(runtimeDetected)
                      .OrderByDescending(game => game.InstallDir is not null)
                      .ThenBy(game => game.DisplayName, StringComparer.OrdinalIgnoreCase))
-        {
-            var item = new GameItemViewModel(
-                game,
-                _controller.GetControllerReference(game.Slug),
-                _controller.GetHudMode(game),
-                gtaTurnPreference,
-                _controller.GetCyberpunkTurnPreference(game),
-                CoverFor(game.SteamAppId), _controller.GetModCredits(game.Slug));
-            if (CommunityVrRoutes.All.TryGetValue(game.Slug, out var route))
-            {
-                var modded = new ModdedGameViewModel(_controller.RepoRoot, route, game.InstallDir,
-                    game.InstallDir is not null, game.Readiness is not GameReadiness.Blocked,
-                    game.OfflineSteamLibrary is not null,
-                    runtimeDetected, runtime.SteamVrRunning, game.ModInstalled,
-                    _modManagerDiscovery, _installedManagers, dataRoots, _moddedPreferences,
-                    item.RefreshPlayModes);
-                item.SetModded(modded);
-                if (game.Slug == selectedSlug && selectedManagerKind is { } kind &&
-                    _installedManagers.FirstOrDefault(manager => manager.Kind == kind) is { } manager)
-                    modded.SelectedManager = manager;
-            }
-            item.SetPlayModeSource(
-                source => BuildPlayModes(source, runtimeDetected), runtimeDetected, _controller.GetUnrealMods(game), runtime.SteamVrRunning);
-            if (item.IsCyberpunk && game.InstallDir is { } cpRoot && _cyberpunkSetupProgress.TryGetValue(cpRoot, out var cpProgress))
-                item.SetCyberpunkSetupProgress(cpProgress.Message, cpProgress.Busy);
-            item.SetSetupGuide(setupGuides.GetValueOrDefault(game.Slug));
-            if (game.InstallDir is { } setupRoot && _gameSetupProgress.TryGetValue(SetupKey(game.Slug, setupRoot), out var setupProgress))
-                item.SetSetupProgress(setupProgress.Message, setupProgress.Busy, setupProgress.Failed);
-            if (game.InstallDir is { } updateRoot && _modUpdateProgress.TryGetValue(SetupKey(game.Slug, updateRoot), out var updateProgress))
-                item.SetModUpdateProgress(updateProgress.Message, updateProgress.Busy, updateProgress.Failed);
-            Games.Add(item);
-        }
+            Games.Add(CreateGameItem(game, runtime, dataRoots, setupGuides,
+                game.Slug == selectedSlug ? selectedManagerKind : null));
         Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
         ApplyFilter();
         OnPropertyChanged(nameof(FilterAllText));
         OnPropertyChanged(nameof(FilterInstalledText));
         OnPropertyChanged(nameof(FilterReadyText));
 
+        UpdateRuntimeStatus(runtime);
+        UpdateReleaseTooling(runtimeDetected);
+        if (announce)
+            StatusText = CatalogueSummaryText;
+        SelectedGame = Games.FirstOrDefault(game => game.Slug == selectedSlug)
+            ?? (Games.Count > 0 ? Games[0] : null);
+    }
+
+    private GameItemViewModel CreateGameItem(GameView game, RuntimeStatusView runtime,
+        IReadOnlyDictionary<ModManagerKind, string> dataRoots,
+        IReadOnlyDictionary<string, GameSetupGuide> setupGuides, ModManagerKind? selectedManagerKind)
+    {
+        var controller = _controller ?? throw new InvalidOperationException("Catalogue configuration is unavailable.");
+        var runtimeDetected = runtime.SteamVrRunning || runtime.VirtualDesktopRunning;
+        var item = new GameItemViewModel(
+            game,
+            controller.GetControllerReference(game.Slug),
+            controller.GetHudMode(game),
+            game.Engine is GameEngine.LegacyD3D9
+                ? controller.GetGtaSanAndreasTurnPreference() : GtaSanAndreasTurnSettings.Default,
+            controller.GetCyberpunkTurnPreference(game),
+            CoverFor(game.SteamAppId), controller.GetModCredits(game.Slug));
+        if (CommunityVrRoutes.All.TryGetValue(game.Slug, out var route))
+        {
+            var modded = new ModdedGameViewModel(controller.RepoRoot, route, game.InstallDir,
+                game.InstallDir is not null, game.Readiness is not GameReadiness.Blocked,
+                game.OfflineSteamLibrary is not null,
+                runtimeDetected, runtime.SteamVrRunning, game.ModInstalled,
+                _modManagerDiscovery, _installedManagers, dataRoots, _moddedPreferences,
+                item.RefreshPlayModes);
+            item.SetModded(modded);
+            if (selectedManagerKind is { } kind &&
+                _installedManagers.FirstOrDefault(manager => manager.Kind == kind) is { } manager)
+                modded.SelectedManager = manager;
+        }
+        item.SetPlayModeSource(
+            source => BuildPlayModes(source, runtimeDetected), runtimeDetected, controller.GetUnrealMods(game), runtime.SteamVrRunning);
+        if (item.IsCyberpunk && game.InstallDir is { } cpRoot && _cyberpunkSetupProgress.TryGetValue(cpRoot, out var cpProgress))
+            item.SetCyberpunkSetupProgress(cpProgress.Message, cpProgress.Busy);
+        item.SetSetupGuide(setupGuides.GetValueOrDefault(game.Slug));
+        if (game.InstallDir is { } setupRoot && _gameSetupProgress.TryGetValue(SetupKey(game.Slug, setupRoot), out var setupProgress))
+            item.SetSetupProgress(setupProgress.Message, setupProgress.Busy, setupProgress.Failed);
+        if (game.InstallDir is { } updateRoot && _modUpdateProgress.TryGetValue(SetupKey(game.Slug, updateRoot), out var updateProgress))
+            item.SetModUpdateProgress(updateProgress.Message, updateProgress.Busy, updateProgress.Failed);
+        return item;
+    }
+
+    private void UpdateRuntimeStatus(RuntimeStatusView runtime)
+    {
+        var runtimeDetected = runtime.SteamVrRunning || runtime.VirtualDesktopRunning;
         RuntimeText = $"SteamVR: {(runtime.SteamVrRunning ? "running" : "off")}   " +
                       $"Virtual Desktop: {(runtime.VirtualDesktopRunning ? "running" : "off")}   " +
                       $"Launch uses: {runtime.SelectedRuntime}";
@@ -464,11 +493,42 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             ? $"VR ready · {runtime.SelectedRuntime}"
             : "Headset not connected";
         OnPropertyChanged(nameof(ShowHeadsetHint));
-        UpdateReleaseTooling(runtimeDetected);
-        if (announce)
-            StatusText = CatalogueSummaryText;
-        SelectedGame = Games.FirstOrDefault(game => game.Slug == selectedSlug)
-            ?? (Games.Count > 0 ? Games[0] : null);
+    }
+
+    /// Update the action's game, preserving unrelated pages and the current selection.
+    public void RefreshGame(string slug)
+    {
+        if (_controller is null) return;
+        var old = Games.FirstOrDefault(item => item.Slug == slug);
+        if (old is null) return;
+        var runtime = _controller.GetRuntimeStatus();
+        var view = _controller.GetGame(slug, runtime.SteamVrRunning || runtime.VirtualDesktopRunning);
+        var selected = ReferenceEquals(SelectedGame, old);
+        if (view is null)
+        {
+            Games.Remove(old);
+            if (selected) SelectedGame = null;
+        }
+        else
+        {
+            var roots = _moddedPreferences.LoadDataRoots();
+            _installedManagers = _modManagerDiscovery.FindInstalled(roots);
+            var item = CreateGameItem(view, runtime, roots, GameSetupGuides.Load(_controller.RepoRoot),
+                old.Modded?.SelectedManager?.Kind);
+            Games[Games.IndexOf(old)] = item;
+            if (selected) SelectedGame = item;
+            var ordered = Games.OrderByDescending(game => game.IsInstalled)
+                .ThenBy(game => game.DisplayName, StringComparer.OrdinalIgnoreCase).ToList();
+            var position = ordered.IndexOf(item);
+            if (Games.IndexOf(item) != position) Games.Move(Games.IndexOf(item), position);
+        }
+        old.Dispose();
+        Streaming.SetCatalogue(Games.Select(game => new KeyValuePair<string, string>(game.Slug, game.DisplayName)));
+        ApplyFilter();
+        OnPropertyChanged(nameof(FilterAllText));
+        OnPropertyChanged(nameof(FilterInstalledText));
+        OnPropertyChanged(nameof(FilterReadyText));
+        UpdateRuntimeStatus(runtime);
     }
 
     /// Steam's cached cover for a game, decoded once. A missing or unreadable file
@@ -628,7 +688,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             _modUpdateCancellation = null;
             Busy = false;
             ReportModUpdate(slug, root, message, false, failed);
-            RefreshCatalogue(announce: false);
+            RefreshGame(slug);
             StatusText = message;
         }
     }
@@ -710,7 +770,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             Busy = false;
             if (game.IsCyberpunk) ReportCyberpunkSetup(dir, finalStatus, false);
             ReportGameSetup(slug, dir, finalStatus, false, setupFailed);
-            RefreshCatalogue(announce: false);
+            RefreshGame(slug);
             StatusText = finalStatus;
         }
     }
@@ -766,7 +826,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         try { message = (await InstallCyberpunkRequirementsCoreAsync(gameRoot)).Message; }
         catch (OperationCanceledException) { message = "Cyberpunk requirements download detection cancelled. Use Install requirements to resume."; }
         catch (Exception ex) { message = $"Cyberpunk requirements setup: {ex.Message}"; }
-        RefreshCatalogue(announce: false);
+        RefreshGame("cyberpunk-2077");
         StatusText = message;
     }
 
@@ -793,7 +853,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             Busy = false;
             ReportCyberpunkSetup(gameRoot, message, false);
-            RefreshCatalogue(announce: false);
+            RefreshGame("cyberpunk-2077");
             StatusText = message;
         }
     }
@@ -862,7 +922,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         finally
         {
             Busy = false;
-            RefreshCatalogue(announce: false);
+            RefreshGame(game.Slug);
             StatusText = finalStatus;
         }
     }
@@ -1246,10 +1306,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void SaveMovedProfileRoot()
     {
-        if (SelectedGame?.Modded is not { } modded) return;
+        if (SelectedGame is not { Modded: { } modded } game) return;
         var message = modded.SaveMovedProfileRoot();
         if (message.StartsWith("Saved", StringComparison.Ordinal))
-            RefreshCatalogue(announce: false);
+            RefreshGame(game.Slug);
         StatusText = message;
     }
 
@@ -1294,7 +1354,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         finally
         {
             Busy = false;
-            RefreshCatalogue(announce: false);
+            RefreshGame(game.Slug);
             StatusText = finalStatus;
         }
     }
