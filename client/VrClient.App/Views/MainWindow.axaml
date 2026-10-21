@@ -5,6 +5,7 @@
         xmlns:views="using:VrClient.App.Views"
         xmlns:config="using:VrClient.Core.Config"
         xmlns:mod="using:VrClient.Core.ModManagers"
+        xmlns:launch="using:VrClient.Core.Launch"
         x:Class="VrClient.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Width="1240" Height="820" MinWidth="960" MinHeight="640"
@@ -824,11 +825,48 @@
                       <TextBlock Grid.Row="6" Grid.Column="2" Text="{Binding InstallText}" TextWrapping="Wrap" />
                     </Grid>
 
+                  </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Troubleshooting">
+                  <StackPanel Spacing="16" Margin="6,14,6,8">
+                    <TextBlock Classes="heading" Text="Troubleshoot this game" />
+                    <TextBlock Classes="secondary" TextWrapping="Wrap"
+                               Text="Checks run only when requested, for this game's selected installation. Results stay in memory; no troubleshooting reports or history are saved." />
+                    <TextBlock x:Name="TroubleshootingSummary" TextWrapping="Wrap"
+                               Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingSummary}" />
+                    <WrapPanel>
+                      <Button Content="Run diagnostics" Margin="0,0,10,8" Classes="primary"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RunGameDiagnosticsCommand}" />
+                      <Button Content="Repair this game's setup" Margin="0,0,10,8"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RecheckGameSetupCommand}" />
+                    </WrapPanel>
+                    <TextBlock Classes="secondary" TextWrapping="Wrap"
+                               Text="Repair setup recovers interrupted managed updates and prepares this game's saved controller routes. It preserves your preferences. Close the game before repairing." />
+                    <TextBlock TextWrapping="Wrap"
+                               Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingActionStatus}" />
+                    <ItemsControl ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingFindings}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="launch:TroubleshootingFinding">
+                          <Border Classes="inset" Margin="0,0,0,10">
+                            <StackPanel Spacing="8">
+                              <TextBlock Classes="eyebrow" Text="{Binding Status}" />
+                              <TextBlock Classes="heading" Text="{Binding Title}" />
+                              <TextBlock TextWrapping="Wrap" Text="{Binding Detail}" />
+                              <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Instructions}" />
+                              <Button Content="{Binding ActionLabel}" IsVisible="{Binding HasAction}" HorizontalAlignment="Left"
+                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingActionCommand}"
+                                      CommandParameter="{Binding}" />
+                            </StackPanel>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <Border Classes="inset">
                       <StackPanel Spacing="10">
                         <TextBlock Classes="heading" Text="Game file repair" />
                         <TextBlock Classes="secondary" TextWrapping="Wrap"
-                                   Text="Steam can check this game's original files and download missing or damaged files. When Steam finishes, return to Recheck setup at the top of this page." />
+                                   Text="Steam can check this game's original files and download missing or damaged files. Steam handles the verification; wait for it to finish, then run diagnostics again. Mod compatibility needs its own checks." />
                         <Button x:Name="VerifyGameFilesButton" Content="Verify game files in Steam"
                                 HorizontalAlignment="Left"
                                 Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VerifyGameFilesCommand}" />

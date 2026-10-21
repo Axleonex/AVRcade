@@ -9,6 +9,7 @@ using VrClient.Core.App;
 using VrClient.Core.Config;
 using VrClient.Core.Discovery;
 using VrClient.Core.Legacy;
+using VrClient.Core.Launch;
 using VrClient.Core.Model;
 using VrClient.Core.Modpack;
 using VrClient.Core.ModManagers;
@@ -95,7 +96,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _showGameDetail;
     [ObservableProperty] private bool _showSettings;
     [ObservableProperty] private string _libraryFilter = "all";
-    /// 0 = VR setup, 1 = Mods, 2 = Controls, 3 = About.
+    /// 0 = VR setup, 1 = Mods, 2 = Controls, 3 = About, 4 = Troubleshooting.
     [ObservableProperty] private int _detailTabIndex;
     // Facts about the selected game's mod tools, read from disk once per selection.
     [ObservableProperty] private string _gtaVanillaFolderText = string.Empty;
@@ -142,6 +143,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(CanUpdateSelectedMods));
         RefreshRepairAvailability();
+        ShowSelectedTroubleshooting();
         Streaming.SetGameContext(ShowGameDetail ? value?.Slug : null);
         UpdateSelectedGameFacts();
     }
@@ -153,6 +155,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(CanRepairSelectedGame));
         VerifyGameFilesCommand.NotifyCanExecuteChanged();
         RecheckGameSetupCommand.NotifyCanExecuteChanged();
+        RunGameDiagnosticsCommand.NotifyCanExecuteChanged();
+        TroubleshootingActionCommand.NotifyCanExecuteChanged();
     }
     partial void OnBusyChanged(bool value)
     {
@@ -368,6 +372,103 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void Refresh() => RefreshCatalogue(announce: true);
 
+    // Session-only, one small result per installation. Nothing is written to disk.
+    private readonly Dictionary<string, (GameTroubleshootingReport Report, string Action)> _troubleshooting = new(StringComparer.OrdinalIgnoreCase);
+    [ObservableProperty] private IReadOnlyList<TroubleshootingFinding> _troubleshootingFindings = [];
+    [ObservableProperty] private string _troubleshootingSummary = "Run diagnostics to check this game's installation.";
+    [ObservableProperty] private string _troubleshootingActionStatus = string.Empty;
+    public bool CanRunGameDiagnostics => _controller is not null && SelectedGame is not null && !Busy && !IsInstallingCyberpunkRequirements;
+    private static string TroubleshootingKey(GameView game) => game.Slug + "|" +
+        (game.InstallDir is { } root ? Path.TrimEndingDirectorySeparator(Path.GetFullPath(root)) : "not-installed");
+    private bool IsSelectedInstallation(GameView game) => SelectedGame is { } selected &&
+        TroubleshootingKey(selected.View).Equals(TroubleshootingKey(game), StringComparison.OrdinalIgnoreCase);
+    private void ShowSelectedTroubleshooting()
+    {
+        var selected = SelectedGame;
+        if (selected is not null && _troubleshooting.TryGetValue(TroubleshootingKey(selected.View), out var state))
+        {
+            TroubleshootingFindings = state.Report.Findings;
+            TroubleshootingSummary = state.Action.Length > 0
+                ? $"{selected.DisplayName} · action at {state.Report.CheckedAt.LocalDateTime:t}. Review the result, then run diagnostics when finished."
+                : $"{selected.DisplayName} · checked {state.Report.CheckedAt.LocalDateTime:t}. " +
+                    (state.Report.NeedsAttention ? "Review the findings below." : "No problem found in the checks performed. Manual VR checks may still be needed.");
+            TroubleshootingActionStatus = state.Action;
+        }
+        else
+        {
+            TroubleshootingFindings = [];
+            TroubleshootingSummary = selected is null ? "Choose a game to troubleshoot."
+                : $"Run diagnostics to check {selected.DisplayName}. Results stay in memory until AVRcade closes.";
+            TroubleshootingActionStatus = string.Empty;
+        }
+    }
+    private void StoreTroubleshooting(GameView game, GameTroubleshootingReport report, string action = "")
+    {
+        var key = TroubleshootingKey(game);
+        foreach (var old in _troubleshooting.Where(item =>
+            !Games.Any(candidate => candidate.Slug == item.Value.Report.Slug) ||
+            item.Value.Report.Slug == game.Slug && !item.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+            .Select(item => item.Key).ToArray()) _troubleshooting.Remove(old);
+        if (!_troubleshooting.ContainsKey(key) && _troubleshooting.Count >= 32)
+            _troubleshooting.Remove(_troubleshooting.Keys.First());
+        _troubleshooting[key] = (report, action.Length <= 2000 ? action : action[..2000]);
+        if (IsSelectedInstallation(game)) ShowSelectedTroubleshooting();
+    }
+    private void RecordTroubleshootingAction(GameView game, string message, bool ok)
+    {
+        // Repairs/Steam requests invalidate previous findings; rerun explicitly when finished.
+        StoreTroubleshooting(game, new(game.Slug, game.InstallDir, DateTimeOffset.Now,
+            [new("Action result", ok ? "Instructions" : "Attention", ShortTroubleshootingText(message),
+                "When the action finishes, run diagnostics again for this installation.")]), message);
+    }
+    private static string ShortTroubleshootingText(string text) => text.Length <= 1800 ? text : text[..1800] + "…";
+    private GameTroubleshootingReport CheckCapturedGame(GameView captured)
+    {
+        var runtime = _controller!.GetRuntimeStatus();
+        var current = _controller.GetGame(captured.Slug, runtime.SteamVrRunning || runtime.VirtualDesktopRunning);
+        if (current is null || !TroubleshootingKey(current).Equals(TroubleshootingKey(captured), StringComparison.OrdinalIgnoreCase))
+            return new(captured.Slug, captured.InstallDir, DateTimeOffset.Now,
+                [new("Installation changed", "Attention", "This game's selected installation changed while checking.",
+                    "Refresh this game, confirm its installed folder, then run diagnostics again.")]);
+        return new GameTroubleshooting().Check(_controller.RepoRoot, current, runtime);
+    }
+    [RelayCommand(CanExecute = nameof(CanRunGameDiagnostics))]
+    private async Task RunGameDiagnosticsAsync()
+    {
+        if (!CanRunGameDiagnostics || SelectedGame is not { } selected) return;
+        var captured = selected.View;
+        Busy = true;
+        StatusText = $"Checking {captured.DisplayName}...";
+        try
+        {
+            var report = await Task.Run(() => CheckCapturedGame(captured));
+            StoreTroubleshooting(captured, report);
+            if (IsSelectedInstallation(captured))
+            { DetailTabIndex = 4; StatusText = $"{captured.DisplayName}: diagnostics finished. See Troubleshooting at the bottom of this page."; }
+        }
+        catch (Exception ex)
+        {
+            StoreTroubleshooting(captured, new(captured.Slug, captured.InstallDir, DateTimeOffset.Now,
+                [new("Check could not finish", "Attention", ex.Message.Length > 1800 ? ex.Message[..1800] : ex.Message,
+                    "Close this game, check that its drive is available, and run diagnostics again.")]));
+            if (IsSelectedInstallation(captured)) StatusText = $"{captured.DisplayName}: diagnostics could not finish. See Troubleshooting below.";
+        }
+        finally { Busy = false; }
+    }
+    [RelayCommand(CanExecute = nameof(CanRunGameDiagnostics))]
+    private async Task TroubleshootingActionAsync(TroubleshootingFinding? finding)
+    {
+        if (!CanRunGameDiagnostics || finding is null || !TroubleshootingFindings.Any(current => ReferenceEquals(current, finding))) return;
+        switch (finding.Action)
+        {
+            case TroubleshootingAction.RepairSetup: await RecheckGameSetupAsync(); break;
+            case TroubleshootingAction.VerifyFiles: await VerifyGameFilesAsync(); break;
+            case TroubleshootingAction.VrSetup: DetailTabIndex = 0; break;
+            case TroubleshootingAction.Mods: DetailTabIndex = 1; break;
+            case TroubleshootingAction.Controls: DetailTabIndex = 2; break;
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanRepairSelectedGame))]
     private async Task VerifyGameFilesAsync()
     {
@@ -377,9 +478,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         try
         {
             var outcome = await Task.Run(() => new VrClient.Core.Launch.GameSetupRecovery().VerifyGameFiles(_controller.RepoRoot, game.View));
-            StatusText = outcome.Message;
+            RecordTroubleshootingAction(game.View, outcome.Message, outcome.Ok);
+            if (IsSelectedInstallation(game.View)) StatusText = outcome.Message;
         }
-        catch (Exception ex) { StatusText = "Steam verification could not start: " + ex.Message; }
+        catch (Exception ex)
+        {
+            RecordTroubleshootingAction(game.View, "Steam verification could not start: " + ex.Message, false);
+            if (IsSelectedInstallation(game.View)) StatusText = "Steam verification could not start: " + ex.Message;
+        }
         finally { Busy = false; }
     }
 
@@ -391,6 +497,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         RefreshGame(selected.Slug);
         var game = Games.FirstOrDefault(item => item.Slug == selected.Slug);
         if (game is null) return;
+        if (!TroubleshootingKey(game.View).Equals(TroubleshootingKey(selected.View), StringComparison.OrdinalIgnoreCase))
+        { StatusText = "This game's installation changed. Confirm its folder, then recheck again."; return; }
         var root = game.View.InstallDir;
         if (root is null) { StatusText = "Reconnect this game's disk or choose Locate installed game, then Recheck setup."; return; }
         ClearFinishedModUpdate(game.Slug, root);
@@ -404,7 +512,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         ReportGameSetup(game.Slug, root, outcome.Message, false, !outcome.Ok);
         if (game.IsCyberpunk) ReportCyberpunkSetup(root, outcome.Message, false);
         RefreshGame(game.Slug);
-        StatusText = outcome.Message;
+        StoreTroubleshooting(game.View, new(game.Slug, root, DateTimeOffset.Now,
+            [new("Setup recheck", outcome.Ok ? "Check" : "Attention", ShortTroubleshootingText(outcome.Message),
+                "Run diagnostics for this installation to review native files, VR requirements and runtime observations.")]), outcome.Message);
+        if (IsSelectedInstallation(game.View))
+        {
+            StatusText = outcome.Message;
+            if (!outcome.Ok) DetailTabIndex = 4;
+        }
     }
 
     /// The page in view still asks the player for something: the headset software,

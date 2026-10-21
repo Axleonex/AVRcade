@@ -12,7 +12,7 @@ public sealed record NativeDependencyReport(IReadOnlyList<NativeDependencyIssue>
     public string Message => Healthy ? $"Native dependency check passed ({FilesChecked} files)." :
         "Native startup problem: " + string.Join("; ", Issues.Take(3).Select(issue =>
             $"{issue.Consumer}: {issue.Kind} {issue.Library}" + (issue.Symbol is null ? "" : $" ({issue.Symbol})"))) +
-        ". For original game files, open About at the bottom of this page and choose Verify game files in Steam. Update incompatible mods through their creator or mod manager.";
+        ". For original game files, open Troubleshooting at the bottom of this page and choose Verify game files in Steam. Update incompatible mods through their creator or mod manager.";
 }
 
 public sealed class NativeDependencyHealth

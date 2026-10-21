@@ -280,7 +280,7 @@ public sealed class GameSetupRecoveryTests : IDisposable
     }
 
     [Fact]
-    public void RecheckIdentifiesMissingEntryPointAndPointsToBottomAboutTab()
+    public void RecheckIdentifiesMissingEntryPointAndPointsToBottomTroubleshootingTab()
     {
         var game = Game("repo");
         File.WriteAllBytes(Path.Combine(game.InstallDir!, "Game.exe"), NativePeFixture.Create(library: "icuin.dll", import: "ExpectedFunction"));
@@ -288,6 +288,6 @@ public sealed class GameSetupRecoveryTests : IDisposable
         var result = new GameSetupRecovery(_controllers, _ => false).Recheck(_root, game);
         Assert.False(result.Ok);
         Assert.Contains("missing entry point", result.Message);
-        Assert.Contains("About at the bottom", result.Message);
+        Assert.Contains("Troubleshooting at the bottom", result.Message);
     }
 }

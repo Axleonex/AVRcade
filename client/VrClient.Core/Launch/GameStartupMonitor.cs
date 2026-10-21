@@ -74,14 +74,14 @@ public static class GameStartupMonitor
             _ => ""
         };
         return $"The game closed during startup (exit code 0x{unchecked((uint)code):X8}).{cause} Use Recheck setup" +
-            (cause.Length == 0 ? ", then try again." : "; the About tab at the bottom of this page has Verify game files in Steam for original game files. Check incompatible mods in their manager.");
+            (cause.Length == 0 ? ", then try again." : "; the Troubleshooting tab at the bottom of this page has Verify game files in Steam for original game files. Check incompatible mods in their manager.");
     }
 
     public static string? DescribeLoaderWindow(string title)
     {
         var failure = new[] { "Entry Point Not Found", "Bad Image", "System Error", "Application Error" }
             .FirstOrDefault(kind => title.EndsWith(" - " + kind, StringComparison.OrdinalIgnoreCase));
-        return failure is null ? null : $"Windows reported {failure} during game startup. Close the error dialog, then use Recheck setup. Verify game files in Steam is in the About tab at the bottom of this page. The game has not completed startup.";
+        return failure is null ? null : $"Windows reported {failure} during game startup. Close the error dialog, then use Recheck setup. Verify game files in Steam is in the Troubleshooting tab at the bottom of this page. The game has not completed startup.";
     }
 
     public static string FormatCliResult(string result, bool ok)

@@ -20,7 +20,7 @@ public sealed class GameSetupRecovery(ControllerCustomization? controllers = nul
                 return new(false, "Reconnect this game's disk or choose Locate installed game, then Recheck setup.");
             var executables = ControllerRuntimeBindings.Executables(repoRoot, game);
             if (executables.Count == 0)
-                return new(false, "This game's executable is missing from the selected folder. Choose Locate installed game or Verify game files in Steam.");
+                return new(false, "This game's executable is missing from the selected folder. Choose Locate installed game, or open Troubleshooting at the bottom of this page for Verify game files in Steam.");
             var route = GameModUpdateRoutes.Load(repoRoot, game.Slug).GetValueOrDefault(game.Slug);
             var processes = (route?.ProcessNames ?? []).Concat(executables.Select(Path.GetFileNameWithoutExtension));
             void EnsureClosed()

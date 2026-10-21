@@ -14,7 +14,7 @@ public sealed class GameStartupMonitorTests
     {
         var message = GameStartupMonitor.DescribeExitCode(code);
         Assert.Contains(cause, message);
-        Assert.Contains("About tab at the bottom", message);
+        Assert.Contains("Troubleshooting tab at the bottom", message);
         Assert.Contains("Recheck setup", message);
     }
 
