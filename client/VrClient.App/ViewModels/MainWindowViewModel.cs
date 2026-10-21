@@ -83,6 +83,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private GameItemViewModel? _selectedGame;
     [ObservableProperty] private string _statusText = "Ready.";
+    [ObservableProperty] private bool _statusSuccess;
     [ObservableProperty] private string _runtimeText = "Runtime: unknown";
     [ObservableProperty] private string _runtimeIndicatorText = "Checking for a headset";
     [ObservableProperty] private bool _runtimeOnline;
@@ -145,7 +146,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     }
 
     public bool CanUpdateSelectedMods => !Busy && !IsInstallingCyberpunkRequirements && SelectedGame?.CanUpdateMods == true;
-    partial void OnBusyChanged(bool value) => OnPropertyChanged(nameof(CanUpdateSelectedMods));
+    partial void OnBusyChanged(bool value)
+    {
+        if (value) StatusSuccess = false;
+        OnPropertyChanged(nameof(CanUpdateSelectedMods));
+    }
+    partial void OnStatusTextChanged(string value) => StatusSuccess = false;
     partial void OnIsInstallingCyberpunkRequirementsChanged(bool value) => OnPropertyChanged(nameof(CanUpdateSelectedMods));
 
     private void UpdateSelectedGameFacts()
@@ -879,6 +885,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         Busy = true;
         var finalStatus = $"Finished launching {game.DisplayName}.";
+        var launchSucceeded = false;
         StatusText = $"Starting {game.DisplayName}…";
         try
         {
@@ -906,25 +913,71 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 GameEngine.LegacyD3D9 => LaunchGtaSanAndreas(dir, mode),
                 _ => new ActionOutcome(false, "This game has no launch route in AVRcade yet.")
             };
+            var feedbackOutcome = outcome;
             if (outcome.Ok && outcome.LaunchedProcessId is > 0 && outcome.LaunchedExecutable is { } launchedExecutable)
             {
                 StatusText = $"Checking {game.DisplayName} startup…";
                 var startup = await VrClient.Core.Launch.GameStartupMonitor.ObserveAsync(
                     outcome.LaunchedProcessId.Value, launchedExecutable);
-                finalStatus = $"{game.DisplayName}: {startup.Message}";
+                feedbackOutcome = outcome with
+                {
+                    Ok = startup.Running,
+                    Message = $"{game.DisplayName}: {startup.Message}"
+                };
             }
-            else finalStatus = outcome.Message;
+            (finalStatus, launchSucceeded) = DescribeLaunchFeedback(game.DisplayName, mode, feedbackOutcome);
         }
         catch (Exception ex)
         {
             finalStatus = $"Launch failed: {ex.Message}";
+            launchSucceeded = false;
         }
         finally
         {
             Busy = false;
             RefreshGame(game.Slug);
             StatusText = finalStatus;
+            StatusSuccess = launchSucceeded;
         }
+    }
+
+    private static (string Text, bool Success) DescribeLaunchFeedback(
+        string gameName, PlayMode mode, ActionOutcome outcome)
+    {
+        if (!outcome.Ok || mode is not (PlayMode.VrOnly or PlayMode.VrWithMods))
+            return (outcome.Message, false);
+
+        // ActionOutcome.Ok also covers opening a manager or a test launcher.
+        // Those handoffs, and an unconfirmed UEVR attachment, are not VR success.
+        var message = outcome.Message;
+        if (message.Contains("AVRcade has not launched the game", StringComparison.OrdinalIgnoreCase) ||
+            message.StartsWith("Mod manager opened.", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("test opened", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("has not confirmed it attached", StringComparison.OrdinalIgnoreCase))
+            return (message, false);
+
+        if (message.StartsWith("RESULT: cyberpunk-launch ", StringComparison.Ordinal) &&
+            message.Contains("started=true", StringComparison.Ordinal))
+            return ($"VR launch succeeded: {gameName}. Put on your headset to check the image and tracking.", true);
+        if (message.StartsWith("launched pid=", StringComparison.Ordinal))
+            return ($"VR launch succeeded: {gameName}. Put on your headset to check the image and tracking.", true);
+        if (message.StartsWith("Cyberpunk 2077 process is running in VR mode.", StringComparison.Ordinal) ||
+            message.Contains("The game process is running.", StringComparison.Ordinal))
+            return ($"VR launch succeeded: {gameName}. {message}", true);
+        if (message.StartsWith("UEVR attached to the game.", StringComparison.Ordinal))
+            return ($"VR connected: {gameName}. {message}", true);
+        if (message.StartsWith("Started ", StringComparison.Ordinal))
+            return ($"VR launch succeeded: {gameName}. {message}", true);
+
+        // Steam and MO2 can accept a request before the game or headset is ready.
+        return ($"VR launch request sent: {gameName}. {message}", true);
+    }
+
+    private void ReportLaunchOutcome(string gameName, PlayMode mode, ActionOutcome outcome)
+    {
+        var feedback = DescribeLaunchFeedback(gameName, mode, outcome);
+        StatusText = feedback.Text;
+        StatusSuccess = feedback.Success;
     }
 
     private ActionOutcome LaunchUnity(GameItemViewModel game, string dir, PlayMode mode, bool acknowledge)
@@ -1016,7 +1069,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Busy = true;
         try
         {
-            StatusText = _controller.LaunchFallout3Native(installDir, requireVortex).Message;
+            ReportLaunchOutcome("Fallout 3", requireVortex ? PlayMode.VrWithMods : PlayMode.VrOnly,
+                _controller.LaunchFallout3Native(installDir, requireVortex));
         }
         catch (Exception ex)
         {
@@ -1070,7 +1124,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (_falloutNewVegasService is null || SelectedGame?.CanLaunchFalloutNewVegas != true)
             return;
         Busy = true;
-        try { StatusText = (await LaunchFalloutNewVegasVortexCoreAsync()).Message; }
+        try
+        {
+            ReportLaunchOutcome("Fallout: New Vegas", PlayMode.VrWithMods,
+                await LaunchFalloutNewVegasVortexCoreAsync());
+        }
         catch (Exception ex) { StatusText = $"New Vegas VR with Vortex could not start: {ex.Message}"; }
         finally { Busy = false; }
     }

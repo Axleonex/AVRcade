@@ -886,7 +886,15 @@
     <!-- Status line -->
     <Border Grid.Row="2" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="28,10">
       <Grid ColumnDefinitions="*,16,Auto">
-        <TextBlock Classes="secondary" Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center" />
+        <TextBlock x:Name="LaunchStatusText" Classes="secondary" Classes.launchSuccess="{Binding StatusSuccess}"
+                   Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center">
+          <TextBlock.Styles>
+            <Style Selector="TextBlock.launchSuccess">
+              <Setter Property="Foreground" Value="{DynamicResource GoodBrush}" />
+              <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+          </TextBlock.Styles>
+        </TextBlock>
         <ProgressBar Grid.Column="2" Width="120" Height="4" IsIndeterminate="True" IsVisible="{Binding Busy}" />
       </Grid>
     </Border>
