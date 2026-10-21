@@ -4,25 +4,27 @@ Play the PC games you already own in VR from one library.
 
 AVRcade finds your Steam games, sets up each game's VR conversion for you, and gives every game the same four launch buttons.
 
-## Install on Windows
+## Clean install of the latest Windows release
 
-**[Download AVRcade for Windows (.exe)](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe)**
+**[Download the latest AVRcade Windows installer (.exe)](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe)**
 
 [Portable ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip) · [SHA-256 checksums](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt) · [Latest release notes](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
 
-These download links always select the latest published release.
+These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
 
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
-2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. No administrator access is needed.
+2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. It installs to `%LOCALAPPDATA%\Programs\AVRcade`; no administrator access is needed.
 3. **Open AVRcade** from the Windows Start menu.
 
 The app includes its .NET runtime. You do not need Git, Visual Studio, or a separate .NET installation.
 
 The installer is unsigned. If Windows SmartScreen shows **Windows protected your PC**, check that you downloaded the file from this repository's release page. If you trust it, choose **More info → Run anyway**.
 
-**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All**, then open the extracted folder and run `AVRcade.exe`.
+**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All** into a new, empty folder, then run `AVRcade.exe` there. Keep the complete extracted folder together.
 
-> **v0.5.1 includes OBS streaming controls and the current ten-game catalog.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
+**Updating an existing installation?** Close AVRcade and run the latest installer. Your saved game selections and preferences are preserved. A clean application install does not require deleting your games, mod-manager profiles or saves.
+
+> **v0.5.2 adds a Troubleshooting tab for each of the ten catalogue games, Steam game-file verification, native startup checks and clearer VR launch feedback.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 
@@ -76,6 +78,16 @@ A mode that is not ready says why and offers its one next step, such as *Install
 In the current release, open Cyberpunk 2077 and choose **Install VR** at the top. AVRcade downloads CyberpunkVR Port 0.1.7 and opens the required More Occluders Scripted v0.3 download on Nexus. Sign in and confirm the download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
 
 If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
+
+## Troubleshoot one game
+
+Open a game's page and select **Troubleshooting** in the tabs at the bottom.
+
+- **Run diagnostics** checks that installation's executable, native dependencies, VR requirements and runtime observations. Findings explain the problem and give a supported action or instructions.
+- **Repair this game's setup** recovers interrupted managed updates and prepares its saved controller routes. Close the affected game first.
+- **Verify game files in Steam** asks Steam to check and repair that game's original files. Wait for Steam to finish, then run diagnostics again. Mod compatibility needs its own checks.
+
+**Recheck setup** stays at the top of the game page and points to Troubleshooting when needed. Results are isolated by game and installation. Diagnostics runs on demand and keeps only the latest small result in memory; it creates no troubleshooting logs or saved history. Checks passing do not confirm headset image, tracking or gameplay.
 
 ## Stream or record with OBS
 
