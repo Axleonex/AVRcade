@@ -1,6 +1,11 @@
 {
   "schema": "redengine-native/1",
   "profile_id": "cyberpunk-2077-redengine4-native-steam-20383525",
+  "game_compatibility": {
+    "supported_versions": ["2.31"],
+    "package_version": "0.1.7",
+    "source_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#requirements"
+  },
   "game": {
     "slug": "cyberpunk-2077",
     "display_name": "Cyberpunk 2077",

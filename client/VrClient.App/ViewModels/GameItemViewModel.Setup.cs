@@ -28,7 +28,8 @@ public sealed partial class GameItemViewModel
     public IBrush SetupBrush => ModUpdateFailed || _setupFailed ? LauncherThemeService.Brush("WarningBrush") : IsCyberpunk ? CyberpunkSetupBrush
         : LauncherThemeService.Brush(SetupBlocked || _setupFailed ? "WarningBrush"
             : SetupPackagesInstalled && !SetupBusy ? "GoodBrush" : "AccentBrush");
-    public string SetupStatus => HasModUpdateMessage ? ModUpdateMessage : IsCyberpunk ? CyberpunkSetupStatus
+    public string SetupStatus => SetupBlocked && !SetupBusy ? View.ReadinessDetail
+        : HasModUpdateMessage ? ModUpdateMessage : IsCyberpunk ? CyberpunkSetupStatus
         : _setupMessage ?? (!IsInstalled ? NotInstalledText
         : SetupBlocked ? View.ReadinessDetail
         : SetupPackagesInstalled ? "The required packages are present. Headset connection and each launch mode are checked separately below."

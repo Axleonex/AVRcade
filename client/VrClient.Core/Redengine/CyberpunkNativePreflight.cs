@@ -3,6 +3,7 @@ namespace VrClient.Core.Redengine;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using VrClient.Core.Config;
 
 public enum CyberpunkNativePreflightStatus
 {
@@ -28,14 +29,22 @@ public sealed record CyberpunkNativePreflightResult(
     string? ActualSha256,
     string? ExpectedSha256,
     IReadOnlyList<string> MissingDependencies,
-    IReadOnlyList<string> Conflicts)
+    IReadOnlyList<string> Conflicts,
+    GameVersionCompatibility? VersionCompatibility = null)
 {
     public bool Ready => Status == CyberpunkNativePreflightStatus.ReadyForHeadsetValidation;
+    public bool CanLaunch(CyberpunkLaunchMode mode) => mode is CyberpunkLaunchMode.Vr ? Ready
+        : ExecutablePath is not null && File.Exists(ExecutablePath);
+    public string CompatibilityDetail => VersionCompatibility?.Detail ??
+        $"Installed Steam build: {ActualBuildId ?? "unknown"}; required build: {ExpectedBuildId ?? "unpinned"}. " +
+        (Differs(ActualSha256, ExpectedSha256, StringComparison.OrdinalIgnoreCase)
+            ? "The executable also differs from this exact-build native integration. " : "") +
+        "Use Update mods to check for a compatible VR package. Steam verification is not a game-version downgrade.";
 
     /// The game on disk is a different build than the one the VR backend is pinned
     /// to. Status reports missing files first, so this is checked separately before
     /// offering to install them.
-    public bool IdentityMismatch =>
+    public bool IdentityMismatch => VersionCompatibility is { } compatibility ? !compatibility.Supported :
         Differs(ActualSha256, ExpectedSha256, StringComparison.OrdinalIgnoreCase) ||
         Differs(ActualBuildId, ExpectedBuildId, StringComparison.Ordinal);
 
@@ -45,7 +54,7 @@ public sealed record CyberpunkNativePreflightResult(
 }
 
 /// Read-only, fail-closed validation for VRClient's Cyberpunk REDengine backend.
-public sealed class CyberpunkNativePreflight
+public sealed class CyberpunkNativePreflight(Func<string, string?>? readProductVersion = null)
 {
     public const string SteamAppId = "1091500";
 
@@ -81,15 +90,22 @@ public sealed class CyberpunkNativePreflight
             ? Path.GetFullPath(steamManifestPath)
             : null;
         var actualBuild = ReadBuildId(manifest);
+        var compatibility = GameVersionCompatibility.Read(root,
+            readProductVersion is not null ? readProductVersion(executable)
+                : System.Diagnostics.FileVersionInfo.GetVersionInfo(executable).ProductVersion);
 
         CyberpunkNativePreflightResult Complete(CyberpunkNativePreflightStatus status, int exitCode) =>
             new(status, exitCode, gameRoot, executable, manifest, actualBuild, expectedBuild,
-                actualHash, expectedHash, missing, conflicts);
+                actualHash, expectedHash, missing, conflicts, compatibility);
 
         if (conflicts.Length > 0)
             return Complete(CyberpunkNativePreflightStatus.ConflictingHooks, 4);
         if (missing.Length > 0)
             return Complete(CyberpunkNativePreflightStatus.DependenciesRequired, 5);
+        if (compatibility is not null)
+            return compatibility.Supported
+                ? Complete(CyberpunkNativePreflightStatus.ReadyForHeadsetValidation, 0)
+                : Complete(CyberpunkNativePreflightStatus.BuildMismatch, 8);
         if (string.IsNullOrWhiteSpace(expectedBuild) || string.IsNullOrWhiteSpace(expectedHash))
             return Complete(CyberpunkNativePreflightStatus.FingerprintUnpinned, 6);
         if (actualBuild is null)

@@ -337,15 +337,6 @@ try
                 Console.WriteLine($"CYBERPUNK-PREFLIGHT: missing={string.Join(',', preflight.MissingDependencies)}");
             if (preflight.Conflicts.Count > 0)
                 Console.WriteLine($"CYBERPUNK-PREFLIGHT: conflicts={string.Join(',', preflight.Conflicts)}");
-            if (verb == "cyberpunk-preflight" || !preflight.Ready)
-            {
-                Console.WriteLine($"RESULT: cyberpunk-preflight status={preflight.Status}");
-                return preflight.ExitCode;
-            }
-
-            if (System.Diagnostics.Process.GetProcessesByName("Cyberpunk2077").Length > 0)
-                throw new InvalidOperationException("cyberpunk_launch_refused - Cyberpunk2077 is already running");
-
             var launchMode = (GetOption("--mode") ?? "vr").ToLowerInvariant() switch
             {
                 "vr" => CyberpunkLaunchMode.Vr,
@@ -353,6 +344,16 @@ try
                 var invalid => throw new InvalidOperationException(
                     $"cyberpunk_launch_refused - invalid launch mode '{invalid}' (expected vr or flat)")
             };
+            if (verb == "cyberpunk-preflight" || !preflight.CanLaunch(launchMode))
+            {
+                Console.WriteLine($"RESULT: cyberpunk-preflight status={preflight.Status}" +
+                    (preflight.IdentityMismatch ? " " + preflight.CompatibilityDetail : ""));
+                return preflight.ExitCode;
+            }
+
+            if (System.Diagnostics.Process.GetProcessesByName("Cyberpunk2077").Length > 0)
+                throw new InvalidOperationException("cyberpunk_launch_refused - Cyberpunk2077 is already running");
+
             var withVortex = HasFlag("--with-vortex");
             // --with-mods is the manager-agnostic route: it passes REDmod's -modded
             // for whatever the player deployed, without requiring Vortex.
@@ -379,13 +380,22 @@ try
             var plan = new LaunchPlan(
                 preflight.ExecutablePath!,
                 ModPresent: true,
-                new SafetyVerdict(Verdict.Allow, "cyberpunk_preflight_ready", "", "Pinned REDengine backend is ready"));
+                new SafetyVerdict(Verdict.Allow, launchMode is CyberpunkLaunchMode.Vr ? "cyberpunk_preflight_ready" : "cyberpunk_flat_launch", "",
+                    launchMode is CyberpunkLaunchMode.Vr ? "Supported REDengine backend is ready" : "Monitor launch with the managed VR package disabled"));
             var dryRun = HasFlag("--dry-run");
             var session = new CyberpunkLaunchSession();
             var backendPackagePath = Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json");
-            if (File.Exists(backendPackagePath) && CyberpunkBackendInstaller.LoadPackage(backendPackagePath).UpstreamRelease is not null &&
-                CyberpunkUpstreamSession.ReadState(gameDir!) is null)
-                throw new InvalidOperationException("Install CyberpunkVR Port through AVRcade first so monitor and VR modes can be isolated safely.");
+            if (File.Exists(backendPackagePath))
+            {
+                var package = CyberpunkBackendInstaller.LoadPackage(backendPackagePath);
+                var installedState = CyberpunkUpstreamSession.ReadState(gameDir!);
+                if (package.UpstreamRelease is not null && installedState is null)
+                    throw new InvalidOperationException("Install CyberpunkVR Port through AVRcade first so monitor and VR modes can be isolated safely.");
+                if (launchMode is CyberpunkLaunchMode.Vr && installedState is not null && installedState.Version != package.Version)
+                    throw new InvalidOperationException("Update mods before launching VR: the installed Cyberpunk VR package does not match this version's compatibility requirements.");
+                if (launchMode is CyberpunkLaunchMode.Vr && preflight.VersionCompatibility is { } policy && policy.PackageVersion != package.Version)
+                    throw new InvalidOperationException("The Cyberpunk VR package and its compatibility metadata do not match. Update AVRcade before launching VR.");
+            }
             if (launchMode is CyberpunkLaunchMode.Vr && CyberpunkUpstreamSession.ReadState(gameDir!) is not null &&
                 !CyberpunkNexusRequirements.Installed(gameDir!))
                 throw new InvalidOperationException("Finish Nexus download authorization in AVRcade's Cyberpunk setup for More Occluders Scripted v0.3 first.");

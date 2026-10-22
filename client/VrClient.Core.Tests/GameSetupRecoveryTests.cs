@@ -290,4 +290,22 @@ public sealed class GameSetupRecoveryTests : IDisposable
         Assert.Contains("missing entry point", result.Message);
         Assert.Contains("Troubleshooting at the bottom", result.Message);
     }
+
+    [Fact]
+    public void EveryCatalogueGamesCompatibilityBlockSurvivesSuccessfulFileAndControllerChecks()
+    {
+        var catalogue = new AppController(TestRepoRoot.Find(), (_, _) => null, gtaSanAndreasLocator: () => null).ListGames();
+        Assert.Equal(10, catalogue.Count);
+        foreach (var entry in catalogue)
+        {
+            var game = Game(entry.Slug) with { Readiness = GameReadiness.Blocked,
+                ReadinessDetail = "Installed game version is not supported by this VR package." };
+            var result = new GameSetupRecovery(_controllers, _ => false).Recheck(_root, game);
+            Assert.False(result.Ok, entry.Slug);
+            Assert.Contains(game.ReadinessDetail, result.Message);
+            var report = new GameTroubleshooting().Check(_root, game, new(true, false, "SteamVR"));
+            Assert.Equal(game.Slug, report.Slug); Assert.Equal(game.InstallDir, report.InstallDir);
+            Assert.Contains(report.Findings, finding => finding.NeedsAttention && finding.Detail == game.ReadinessDetail);
+        }
+    }
 }

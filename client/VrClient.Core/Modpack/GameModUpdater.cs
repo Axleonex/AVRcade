@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using VrClient.Core.App;
 using VrClient.Core.Config;
+using VrClient.Core.Launch;
 using VrClient.Core.Redengine;
 using VrClient.Core.Unreal;
 
@@ -38,21 +39,31 @@ public sealed class GameModUpdater(string repoRoot, HttpClient http)
             return new(false, "The update adapter does not match this game. Repair AVRcade's configuration before updating.", DateTime.UtcNow.ToString("O"), []);
         if (game.InstallDir is not { } root || !Directory.Exists(root))
             return new(false, "Install or locate the game before updating its VR components.", DateTime.UtcNow.ToString("O"), []);
-        if (game.Readiness is GameReadiness.Blocked)
-            return new(false, game.ReadinessDetail, DateTime.UtcNow.ToString("O"), []);
-
         void EnsureClosed() => EnsureProcessesClosed(route.ProcessNames);
-        EnsureClosed();
-        var lockPath = ModUpdateTransaction.Resolve(root, ".avrcade/mod-updates/update.lock");
-        Directory.CreateDirectory(Path.GetDirectoryName(lockPath)!);
-        using var lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-        ModUpdateTransaction.Recover(root);
         var releases = new List<ModReleaseCheck>();
         foreach (var source in route.Sources)
         {
             progress?.Report($"Checking {source.Name} upstream releases...");
             releases.Add(await CheckSourceAsync(source, SupportedReference(game, route, source), ct));
         }
+        // Compatibility blocks prevent installation, not read-only update discovery.
+        // Do this before creating leases, journals or recovering any game files.
+        if (game.Readiness is GameReadiness.Blocked)
+        {
+            var details = releases.Select(release => release.Upstream is null ? release.Detail
+                : $"{release.Name}: upstream {release.Upstream}; AVRcade package {ShortReference(release.Supported)}. " +
+                    (release.NewerAvailable ? "A newer author release exists, but its compatibility with this game version is not established by this AVRcade package."
+                        : "No newer author release was found."));
+            return new(false, string.Join("\n", new[] { game.ReadinessDetail }.Concat(details)
+                .Append("No game files were changed. " + (game.VersionCompatibility is not null
+                    ? GameVersionCompatibility.RecoveryInstructions
+                    : "Review this game's reported block in Troubleshooting and VR setup before installing updates."))), DateTime.UtcNow.ToString("O"), releases);
+        }
+        EnsureClosed();
+        var lockPath = ModUpdateTransaction.Resolve(root, ".avrcade/mod-updates/update.lock");
+        Directory.CreateDirectory(Path.GetDirectoryName(lockPath)!);
+        using var lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        ModUpdateTransaction.Recover(root);
         var adapters = new Dictionary<string, Adapter>
         {
             ["thunderstore"] = async (item, app, status, token) =>
@@ -83,6 +94,12 @@ public sealed class GameModUpdater(string repoRoot, HttpClient http)
 
     private async Task<ActionOutcome> UpdateCyberpunkAsync(GameView game, AppController controller, IProgress<string>? progress, CancellationToken ct)
     {
+        // Recheck after the network await: Steam can change the executable while
+        // the game page and upstream release request are still open.
+        var preflight = new CyberpunkNativePreflight().Evaluate(
+            Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077.json"),
+            game.InstallDir, GameLaunchBinding.ManifestFor(game.InstallDir!, game.SteamAppId));
+        if (preflight.IdentityMismatch) return new(false, preflight.CompatibilityDetail);
         var state = CyberpunkUpstreamSession.ReadState(game.InstallDir!);
         var package = CyberpunkBackendInstaller.LoadPackage(Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json"));
         if (state?.Version == package.Version && game.ModInstalled)

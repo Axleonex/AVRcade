@@ -41,4 +41,41 @@ public sealed class GameUpdateIsolationTests : IDisposable
         Assert.Contains("adapter", outcome.Message, StringComparison.OrdinalIgnoreCase);
         Assert.False(Directory.Exists(Path.Combine(gameDir, ".avrcade")));
     }
+
+    [Fact]
+    public async Task BlockedGameStillChecksUpstreamWithoutWritingOrRecoveringAnyGameFiles()
+    {
+        Routes(new Dictionary<string, object> { ["repo"] = new {
+            adapter = "thunderstore", process_names = new[] { "fixture-not-running" },
+            sources = new[] { new { name = "VR mod", repository = "author/vr", kind = "release", reviewed_reference = "1.0" } } },
+            ["other-game"] = "unrelated broken route" });
+        var root = Path.Combine(_root, "selected"); Directory.CreateDirectory(root);
+        var other = Path.Combine(_root, "other"); Directory.CreateDirectory(other);
+        File.WriteAllText(Path.Combine(root, "keep.txt"), "selected original");
+        File.WriteAllText(Path.Combine(other, "keep.txt"), "other original");
+        var handler = new ReleaseHandler(); using var http = new HttpClient(handler);
+        var game = new GameView("repo", "REPO", "3241660", root, true, "Block", "BuildMismatch",
+            GameEngine.Unity, GameReadiness.Blocked, "This VR package does not support the installed game version.");
+        var result = await new GameModUpdater(_root, http).UpdateAsync(game, new AppController(_root, (_, _) => null));
+        Assert.False(result.Ok); Assert.Equal(1, handler.Calls);
+        Assert.True(Assert.Single(result.Releases).NewerAvailable);
+        Assert.Contains("2.0", result.Message); Assert.Contains("No game files were changed", result.Message);
+        Assert.False(Directory.Exists(Path.Combine(root, ".avrcade")));
+        Assert.Equal("selected original", File.ReadAllText(Path.Combine(root, "keep.txt")));
+        Assert.Equal("other original", File.ReadAllText(Path.Combine(other, "keep.txt")));
+    }
+
+    private sealed class ReleaseHandler : HttpMessageHandler
+    {
+        public int Calls { get; private set; }
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+        {
+            Calls++;
+            Assert.Equal("https://api.github.com/repos/author/vr/releases?per_page=30", request.RequestUri!.AbsoluteUri);
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("""
+                [{"draft":false,"tag_name":"2.0","published_at":"2026-10-22T00:00:00Z","html_url":"https://github.com/author/vr/releases/tag/2.0"},
+                 {"draft":false,"tag_name":"1.0","published_at":"2026-10-01T00:00:00Z","html_url":"https://github.com/author/vr/releases/tag/1.0"}]
+                """) });
+        }
+    }
 }

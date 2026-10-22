@@ -442,6 +442,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         try
         {
             var report = await Task.Run(() => CheckCapturedGame(captured));
+            RefreshGame(captured.Slug); // Reflect repaired/updated files in this game's play buttons.
             StoreTroubleshooting(captured, report);
             if (IsSelectedInstallation(captured))
             { DetailTabIndex = 4; StatusText = $"{captured.DisplayName}: diagnostics finished. See Troubleshooting at the bottom of this page."; }
@@ -471,6 +472,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             case TroubleshootingAction.VrSetup: DetailTabIndex = 0; break;
             case TroubleshootingAction.Mods: DetailTabIndex = 1; break;
             case TroubleshootingAction.Controls: DetailTabIndex = 2; break;
+            case TroubleshootingAction.UpdateMods: await UpdateGameModsAsync(); break;
         }
     }
 
@@ -735,10 +737,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             case GameEngine.Redengine:
                 return PlayModePlanner.Cyberpunk(new CyberpunkPlayFacts(
                     installed,
-                    allowed ? null
-                        : view.SafetyReason == nameof(CyberpunkNativePreflightStatus.ConflictingHooks)
-                            ? "Another VR or graphics hook (dxgi.dll or d3d12.dll) is in the game folder. Remove it first"
-                            : "This game build does not match the supported VR backend",
+                    allowed ? null : view.ReadinessDetail,
                     view.ModInstalled, runtimeDetected,
                     _controller?.CyberpunkBackendInstallable == true,
                     view.InstallDir is { } cyberpunkDir && CyberpunkNexusRequirements.Installed(cyberpunkDir)));
@@ -814,7 +813,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task UpdateGameModsAsync()
     {
-        if (_controller is null || SelectedGame is not { CanUpdateMods: true } game ||
+        if (_controller is null || SelectedGame is not { } previous || Busy || IsInstallingCyberpunkRequirements) return;
+        RefreshGame(previous.Slug); // Steam may have updated the game since this page opened.
+        if (SelectedGame is not { CanUpdateMods: true } game || !IsSelectedInstallation(previous.View) ||
             game.View.InstallDir is not { } root || Busy || IsInstallingCyberpunkRequirements) return;
         var slug = game.Slug;
         Busy = true;

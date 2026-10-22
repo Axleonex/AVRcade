@@ -35,7 +35,8 @@ public sealed record GameView(
     string SafetyVerdict, string SafetyReason,
     GameEngine Engine, GameReadiness Readiness, string ReadinessDetail,
     string? ProfileSourceUrl = null, bool ProfileImportRequired = false,
-    bool ProfileImported = false, string? OfflineSteamLibrary = null);
+    bool ProfileImported = false, string? OfflineSteamLibrary = null,
+    GameVersionCompatibility? VersionCompatibility = null);
 
 public sealed record RuntimeStatusView(
     bool SteamVrRunning, bool VirtualDesktopRunning, string SelectedRuntime);
@@ -480,41 +481,59 @@ public sealed partial class AppController
         var cyberpunkProfile = Path.Combine(RedengineDir, "cyberpunk-2077.json");
         if (Includes("cyberpunk-2077") && File.Exists(cyberpunkProfile))
         {
-            using var document = JsonDocument.Parse(File.ReadAllText(cyberpunkProfile));
-            var game = document.RootElement.GetProperty("game");
-            var slug = game.GetProperty("slug").GetString()!;
-            var displayName = game.GetProperty("display_name").GetString()!;
-            var appId = game.GetProperty("steam_app_id").GetString()!;
-            var shippingBinary = game.GetProperty("shipping_binary").GetString()!;
-            var installDir = _locator(appId, shippingBinary);
-            var manifest = installDir is null ? null : SteamManifestBeside(installDir, appId);
-            var preflight = new CyberpunkNativePreflight().Evaluate(
-                cyberpunkProfile, installDir, manifest);
-            var managedPackage = CyberpunkBackend;
-            var conflicts = installDir is not null && managedPackage is not null
-                ? CyberpunkInstallConflicts(preflight, managedPackage, installDir) : preflight.Conflicts;
-            var needsManagedInstall = installDir is not null && managedPackage?.Package.UpstreamRelease is not null &&
-                CyberpunkUpstreamSession.ReadState(installDir) is null;
-            var installed = installDir is not null &&
-                preflight.MissingDependencies.Count == 0 && !needsManagedInstall;
-            var blocked = conflicts.Count > 0 || preflight.IdentityMismatch;
-            var requirementsMissing = installed && managedPackage?.Package.UpstreamRelease is not null &&
-                !CyberpunkNexusRequirements.Installed(installDir!);
-            var readiness = installDir is null ? GameReadiness.NeedsGame
-                : blocked ? GameReadiness.Blocked
-                : !installed ? GameReadiness.NeedsVrMod
-                : requirementsMissing ? GameReadiness.NeedsVrMod
-                : !headset ? GameReadiness.NeedsHeadset
-                : GameReadiness.ProfileUnverified;
-            views.Add(new GameView(
-                slug, displayName, appId, installDir, installed,
-                blocked ? "Block" : "Allow",
-                conflicts.Count > 0 ? nameof(CyberpunkNativePreflightStatus.ConflictingHooks)
-                    : preflight.IdentityMismatch ? nameof(CyberpunkNativePreflightStatus.BuildMismatch)
-                    : "cyberpunk_preflight_ready",
-                GameEngine.Redengine, readiness,
-                requirementsMissing ? "Authorize the More Occluders Scripted v0.3 download to finish Cyberpunk VR setup."
-                    : ReadinessDetail(readiness, GameEngine.Redengine)));
+            string? selectedInstall = null;
+            try
+            {
+                using var document = JsonDocument.Parse(File.ReadAllText(cyberpunkProfile));
+                var game = document.RootElement.GetProperty("game");
+                var slug = game.GetProperty("slug").GetString()!;
+                var displayName = game.GetProperty("display_name").GetString()!;
+                var appId = game.GetProperty("steam_app_id").GetString()!;
+                var shippingBinary = game.GetProperty("shipping_binary").GetString()!;
+                var installDir = selectedInstall = _locator(appId, shippingBinary);
+                var manifest = installDir is null ? null : SteamManifestBeside(installDir, appId);
+                var preflight = new CyberpunkNativePreflight().Evaluate(
+                    cyberpunkProfile, installDir, manifest);
+                var managedPackage = CyberpunkBackend;
+                var compatibilityMetadataMismatch = preflight.VersionCompatibility is { } policy &&
+                    (managedPackage is null || policy.PackageVersion != managedPackage.Package.Version);
+                var conflicts = installDir is not null && managedPackage is not null
+                    ? CyberpunkInstallConflicts(preflight, managedPackage, installDir) : preflight.Conflicts;
+                var needsManagedInstall = installDir is not null && managedPackage?.Package.UpstreamRelease is not null &&
+                    CyberpunkUpstreamSession.ReadState(installDir)?.Version != managedPackage.Package.Version;
+                var installed = installDir is not null &&
+                    preflight.MissingDependencies.Count == 0 && !needsManagedInstall;
+                var blocked = conflicts.Count > 0 || preflight.IdentityMismatch || compatibilityMetadataMismatch;
+                var requirementsMissing = installed && managedPackage?.Package.UpstreamRelease is not null &&
+                    !CyberpunkNexusRequirements.Installed(installDir!);
+                var readiness = installDir is null ? GameReadiness.NeedsGame
+                    : blocked ? GameReadiness.Blocked
+                    : !installed ? GameReadiness.NeedsVrMod
+                    : requirementsMissing ? GameReadiness.NeedsVrMod
+                    : !headset ? GameReadiness.NeedsHeadset
+                    : GameReadiness.ProfileUnverified;
+                views.Add(new GameView(
+                    slug, displayName, appId, installDir, installed,
+                    blocked ? "Block" : "Allow",
+                    conflicts.Count > 0 ? nameof(CyberpunkNativePreflightStatus.ConflictingHooks)
+                        : compatibilityMetadataMismatch ? "CompatibilityMetadataMismatch"
+                        : preflight.IdentityMismatch ? nameof(CyberpunkNativePreflightStatus.BuildMismatch)
+                        : "cyberpunk_preflight_ready",
+                    GameEngine.Redengine, readiness,
+                    conflicts.Count > 0 ? "Another VR or graphics hook conflicts with this VR backend: " + string.Join(", ", conflicts)
+                        : compatibilityMetadataMismatch ? "This AVRcade copy's VR package and compatibility metadata do not match. Update AVRcade before using this VR conversion."
+                        : preflight.IdentityMismatch ? preflight.CompatibilityDetail
+                        : requirementsMissing ? "Authorize the More Occluders Scripted v0.3 download to finish Cyberpunk VR setup."
+                        : ReadinessDetail(readiness, GameEngine.Redengine),
+                    VersionCompatibility: preflight.VersionCompatibility));
+            }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or
+                InvalidOperationException or KeyNotFoundException or ArgumentException)
+            {
+                views.Add(new GameView("cyberpunk-2077", "Cyberpunk 2077", CyberpunkNativePreflight.SteamAppId,
+                    selectedInstall, false, "Block", "cyberpunk_configuration_invalid", GameEngine.Redengine, GameReadiness.Blocked,
+                    "Cyberpunk VR compatibility could not be checked: " + ex.Message + " Update or repair AVRcade's configuration. Other game entries remain independent."));
+            }
         }
 
         var rdr2Profile = Path.Combine(RageDir, "rdr2.json");
@@ -1083,11 +1102,13 @@ public sealed partial class AppController
         if (CyberpunkBackend is not { } backend)
             return new ActionOutcome(false, "This copy of AVRcade has no Cyberpunk VR backend package.");
         var preflight = EvaluateCyberpunk(gameDir);
+        if (preflight.VersionCompatibility is { } policy && policy.PackageVersion != backend.Package.Version)
+            return new ActionOutcome(false, "The VR package and its compatibility metadata do not match. Update AVRcade before installing VR components.");
         if (preflight.ActualSha256 is null)
             return new ActionOutcome(false, "Cyberpunk2077.exe was not found in that folder. Nothing was installed.");
         if (preflight.IdentityMismatch)
             return new ActionOutcome(false,
-                $"This Cyberpunk 2077 build is not the one the VR backend supports (Steam build {preflight.ExpectedBuildId}). Nothing was installed.");
+                preflight.CompatibilityDetail + " Nothing was installed.");
         var installConflicts = CyberpunkInstallConflicts(preflight, backend, gameDir);
         if (installConflicts.Count > 0)
             return new ActionOutcome(false,

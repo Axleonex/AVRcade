@@ -208,7 +208,8 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public string CyberpunkSetupTitle => _cyberpunkSetupBusy ? "VR setup in progress"
         : View.Readiness is GameReadiness.Blocked ? "VR setup blocked"
         : CyberpunkSetupComplete ? "VR setup complete" : "VR setup incomplete";
-    public string CyberpunkSetupStatus => _cyberpunkSetupMessage ??
+    public string CyberpunkSetupStatus => View.Readiness is GameReadiness.Blocked && !_cyberpunkSetupBusy
+        ? View.ReadinessDetail : _cyberpunkSetupMessage ??
         (View.Readiness is GameReadiness.Blocked ? View.ReadinessDetail
         : CyberpunkSetupComplete ? "VR port and More Occluders are installed. Choose a VR mode below; headset validation remains pending."
         : !IsInstalled ? "Install or locate Cyberpunk 2077 first."

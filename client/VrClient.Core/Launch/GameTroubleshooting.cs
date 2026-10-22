@@ -5,7 +5,7 @@ using VrClient.Core.Redengine;
 
 namespace VrClient.Core.Launch;
 
-public enum TroubleshootingAction { None, RepairSetup, VerifyFiles, VrSetup, Mods, Controls }
+public enum TroubleshootingAction { None, RepairSetup, VerifyFiles, VrSetup, Mods, Controls, UpdateMods }
 
 public sealed record TroubleshootingFinding(string Title, string Status, string Detail, string Instructions,
     TroubleshootingAction Action = TroubleshootingAction.None)
@@ -19,6 +19,7 @@ public sealed record TroubleshootingFinding(string Title, string Status, string 
         TroubleshootingAction.VrSetup => "Open VR setup",
         TroubleshootingAction.Mods => "Open Mods",
         TroubleshootingAction.Controls => "Open Controls",
+        TroubleshootingAction.UpdateMods => "Check compatible VR updates",
         _ => string.Empty
     };
 }
@@ -70,7 +71,9 @@ public sealed class GameTroubleshooting
                     "Close this game, then repair its setup to recover the existing update transaction. Saved preferences are preserved.", TroubleshootingAction.RepairSetup);
             if (game.Readiness is GameReadiness.Blocked)
                 Add("Game and VR compatibility", "Attention", game.ReadinessDetail,
-                    "Review this game's VR setup and supported build requirements. A changed game build may need a compatible VR mod release; Steam verification is not a downgrade.", TroubleshootingAction.VrSetup);
+                    game.VersionCompatibility is not null ? GameVersionCompatibility.RecoveryInstructions
+                        : "Review this game's VR setup and supported build requirements. A changed game build may need a compatible VR mod release; Steam verification is not a downgrade.",
+                    game.VersionCompatibility is not null ? TroubleshootingAction.UpdateMods : TroubleshootingAction.VrSetup);
             else if (game.Readiness is GameReadiness.NeedsVrMod or GameReadiness.NeedsUevr || !game.ModInstalled)
                 Add("VR components", "Attention", game.ReadinessDetail,
                     "Open this game's VR setup and complete its listed component or profile requirements. Diagnostics does not download anything.", TroubleshootingAction.VrSetup);

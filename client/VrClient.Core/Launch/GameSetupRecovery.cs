@@ -45,6 +45,9 @@ public sealed class GameSetupRecovery(ControllerCustomization? controllers = nul
             var native = new NativeDependencyHealth().Check(root, executables);
             if (!native.Healthy) return new(false, native.Message);
             if (!controls.Ok) return controls;
+            if (game.Readiness is GameReadiness.Blocked)
+                return new(false, "Installation and controller checks finished, but VR remains blocked: " +
+                    game.ReadinessDetail + " Open Troubleshooting at the bottom of this game's page.");
             return new(true, (interrupted ? "Interrupted update recovered. " : "Setup rechecked. ") + controls.Message +
                 " " + native.Message + " Package and headset readiness are shown below for this installation: " + root);
         }
@@ -90,7 +93,7 @@ public sealed class GameSetupRecovery(ControllerCustomization? controllers = nul
             var start = new ProcessStartInfo($"steam://validate/{appId}") { UseShellExecute = true };
             if (request is not null) request(start);
             else using (Process.Start(start)) { }
-            return new(true, $"Steam verification requested for {game.DisplayName}. Wait for Steam to finish checking and repairing its original files, then press Recheck setup. Mod compatibility still needs its own checks.");
+            return new(true, $"Steam verification requested for {game.DisplayName}. Wait for Steam to finish checking and repairing its original files, then press Recheck setup. Verification does not establish VR compatibility or restore an older game version. Use Update mods to check compatible VR releases.");
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or
             UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException or System.ComponentModel.Win32Exception)
