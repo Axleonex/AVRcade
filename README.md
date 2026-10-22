@@ -12,7 +12,7 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
 
-**Current packaged release: [v0.5.2](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.2).** The controller-tab consolidation and game-version compatibility fixes on `main` are source changes awaiting the next Windows release; they are not included in the v0.5.2 downloads. See [Game versions and updates](#game-versions-and-updates).
+**Current packaged release: [v0.5.3](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.3).** This installer includes the controller-tab consolidation and game-version compatibility fixes. See [Game versions and updates](#game-versions-and-updates).
 
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
 2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. It installs to `%LOCALAPPDATA%\Programs\AVRcade`; no administrator access is needed.
@@ -26,7 +26,7 @@ The installer is unsigned. If Windows SmartScreen shows **Windows protected your
 
 **Updating an existing installation?** Close AVRcade and run the latest installer. Your saved game selections and preferences are preserved. A clean application install does not require deleting your games, mod-manager profiles or saves.
 
-> **v0.5.2 adds a Troubleshooting tab for each of the ten catalogue games, Steam game-file verification, native startup checks and clearer VR launch feedback.** YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
+> **v0.5.3 puts controller mapping only in each game's Controls tab, checks Cyberpunk compatibility against the VR package's supported game versions, and keeps update checks available when VR is blocked.** Per-game troubleshooting, Steam game-file verification and native startup checks are retained. YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 
@@ -85,7 +85,7 @@ If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stere
 
 AVRcade uses each player's own game installation. Compatibility depends on that game's VR conversion; a game update can require a newer VR package. CyberpunkVR Port 0.1.7's [author requirements](https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#requirements) specify Cyberpunk **2.31**. The configured package does not establish VR support for **2.5**. Steam verification repairs original game files; it does not prove mod compatibility or restore an older game version.
 
-The following fixes are on `main`, awaiting a packaged Windows release:
+The v0.5.3 installer and portable ZIP include these fixes:
 
 - Cyberpunk checks the VR package's declared game versions instead of requiring every player's Steam build ID and executable hash to match the developer's recorded copy. Exact-binary integrations such as classic San Andreas retain their separate adapter requirements.
 - **Update mods** can check author releases while VR is blocked. It reports newer releases and keeps incompatible or unreviewed packages from being installed. It does not automatically install every author's newest release.
@@ -93,7 +93,7 @@ The following fixes are on `main`, awaiting a packaged Windows release:
 - Controller keymapping appears only in each game's bottom **Controls** tab, with custom assignments, saved defaults, reset and original bindings preserved.
 - Cyberpunk monitor launches are checked independently of VR-only game-version requirements.
 
-The v0.5.2 installer linked above retains the earlier exact-build check. Downloading GitHub's **Source code** ZIP does not install these newer source changes; use a packaged Windows release for installation.
+Use v0.5.3 or later to get these fixes. Downloading GitHub's **Source code** ZIP does not install AVRcade; use the Windows installer or portable ZIP linked above.
 
 ## Troubleshoot one game
 

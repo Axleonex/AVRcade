@@ -1,70 +1,73 @@
-# Windows v0.5.2 — current installation links
+# Windows v0.5.3 — packaged controller and compatibility fixes
 
-This release adds a bottom Troubleshooting tab to each public catalogue game,
-on-demand diagnostics scoped to its installation, selected-game setup recovery,
-Steam original-file verification, native startup checks and clearer VR launch
-feedback. Diagnostic results stay in memory; no logs or history are saved.
-Existing per-game mod updates, OBS streaming, controller preferences and
-Cyberpunk setup are retained. GTA IV/V and Fallout 3/New Vegas remain excluded
-from the public catalogue.
+This release includes the controller-tab consolidation and consumer game-version
+compatibility fixes in the Windows installer and portable ZIP. It retains v0.5.2's
+per-game Troubleshooting tab, on-demand diagnostics, setup recovery, Steam file
+verification, native startup checks and clearer VR launch feedback.
 
-## Downloads and future releases
+## Changes
 
-The versioned installer is `AVRcade-Setup-0.5.2.exe`; the portable archive is
-`AVRcade-0.5.2-win-x64.zip`. Each release also publishes identical copies named
-`AVRcade-Setup.exe` and `AVRcade-win-x64.zip`. README links use GitHub's
-`releases/latest/download/<name>` URLs and follow subsequent releases.
-Every future release must include those same permanent asset names plus
-`SHA256SUMS.txt`, covering both permanent and versioned binary names.
-Version-specific archives and checksums remain available for reproducibility.
+- Controller keymapping appears only in each game's bottom Controls tab. Custom
+  assignments, selected defaults, reset and original bindings are retained.
+- Cyberpunk checks the executable's product version against its VR package's
+  declared supported versions. Developer-observed Steam build IDs and hashes no
+  longer reject another player's supported copy. Exact-binary native integrations
+  such as classic San Andreas retain their own adapter requirements.
+- Update mods can check upstream releases while VR is blocked. Blocked checks do
+  not write game files or install an unreviewed/incompatible package.
+- Recheck preserves compatibility problems after successful native/controller
+  checks. Diagnostics refreshes only the selected game's play buttons.
+- An older installed Cyberpunk VR package must update before using a newer
+  package's compatibility policy. Monitor launches do not require VR-only version
+  compatibility. Damaged Cyberpunk configuration does not stop other game entries.
+
+CyberpunkVR Port remains on the supported 0.1.7 integration, whose author requires
+Cyberpunk 2.31. This release does not establish VR support for game version 2.5.
+Steam validation repairs original files; it does not downgrade a game or certify
+third-party mod compatibility. Newer author releases are reported separately.
+
+## Downloads
+
+Versioned files are `AVRcade-Setup-0.5.3.exe` and
+`AVRcade-0.5.3-win-x64.zip`, with individual SHA-256 files. Publish identical copies
+named `AVRcade-Setup.exe` and `AVRcade-win-x64.zip`, plus `SHA256SUMS.txt` covering
+both permanent and versioned binary names. README installation links use
+`releases/latest/download/<name>` and must resolve to the published v0.5.3 assets.
 
 ## Build and provenance
 
-Use `scripts/package-windows.ps1 -Version 0.5.2` with the native inputs described
-in the previous release guide. The package manifest records the source commit
-and each payload hash. Retained native game/helper binaries must match their
-previous published archive. Controller remapping and its lease helper are built
-from current public source. No personal game files or Nexus-only dependencies
-are redistributed.
+Run `scripts/package-windows.ps1 -Version 0.5.3` with the verified native inputs.
+The app, CLI, controller lease and both controller-remapping architectures are
+rebuilt. Retained native inputs must match the previous published portable
+archive. The package manifest records the exact source commit and every payload
+hash. No personal game files or Nexus-only dependencies are redistributed.
 
 ## Installation
 
-Close AVRcade, run `AVRcade-Setup.exe`, then launch AVRcade from the Start menu or
-desktop shortcut. New installations use `%LOCALAPPDATA%\Programs\AVRcade` and
-`AVRcade.exe`, accompanied by `avrcade-cli.exe`. Settings migration preserves
-existing selections. Previous installations remain available for older Steam
-links. For portable use, extract the entire ZIP into its own directory first.
+Close AVRcade and run `AVRcade-Setup.exe`, then launch AVRcade from the Start menu
+or desktop shortcut. New installs use `%LOCALAPPDATA%\Programs\AVRcade` without
+administrator access. Saved game selections and controller preferences are kept.
+For portable use, extract the complete ZIP into a new, empty folder and launch
+`AVRcade.exe`. Do not use GitHub's Source code ZIP as an installer.
 
-Cyberpunk uses AVRcade's supported 0.1.7 integration and existing Nexus dependency
-flow. Update mods reports newer upstream releases separately where integration
-is required. Thunderstore routes resolve current dependencies; manager profiles
-remain manager-owned. YAPYAP requires its paired UUVR/AVRcade bridge installation.
+YAPYAP still requires its separately prepared paired UUVR/AVRcade bridge package.
+Escape the Backrooms retains its game-specific VR setup. GTA IV/V and Fallout
+3/New Vegas remain outside the public catalogue.
 
-For a clean portable installation, extract the complete ZIP into a new, empty
-folder. Existing installer users close AVRcade and run the latest installer;
-saved selections and preferences are preserved.
+## Validation and publication
 
-If a game moved, use **Locate installed game** on its page. Close the affected
-game and press **Recheck setup** to refresh its selected installation and recover
-interrupted setup. Conflicting foreign files are preserved and explained. An
-unavailable selected disk never silently switches to another copy. The bottom
-**Troubleshooting** tab offers read-only diagnostics and explanatory issue cards.
-Steam verification is requested explicitly for the selected registered installation;
-Steam reports completion. It does not establish third-party mod compatibility.
+The implementation passed 658 core tests and all 30 app tests, including checks
+across all ten public catalogue entries. App and CLI builds passed with zero
+warnings/errors. A read-only preflight on the installed Cyberpunk 2.5 copy correctly
+reported its unsupported VR version; its monitor-launch dry run passed without
+starting the game. No new gameplay or headset acceptance run was performed.
 
-## Publication and validation limits
+Rebuild/package checks verify staged catalogue discovery, native safety-helper
+discovery, GTA bridge pins, manifest hashes, ZIP contents, executable versions and
+the matching permanent aliases. Record actual results with the prepared assets.
 
-Upload all versioned files plus both permanent binary aliases and SHA256SUMS.txt
-under `v0.5.2`, mark it latest, and keep the source tag on the manifest's commit.
-Publish the prepared source/README and release as one approved update.
-Build and file-integrity inspections do not certify headset/gameplay behavior.
-Record which build, inspection and runtime checks were actually performed;
-do not inherit prior releases' test claims as evidence for the new packages.
-
-The updated source passed **646 core tests**, with zero failures or skips. UI
-and diagnostic checks covered all ten catalogue entries (nine installed games),
-selection changes during a check, installation isolation, rejection of stale
-actions and disabling actions while busy. The installed local app/CLI match the
-committed update. No new gameplay or headset acceptance run was performed.
-Release packaging performs its own staged catalogue, safety-helper and payload
-integrity checks; record the resulting source commit and hashes with the assets.
+After the required owner confirmation, push the release documentation, create
+`v0.5.3` on the manifest's exact commit, upload all seven assets and verify GitHub's
+asset digests before marking the release latest. Verify the README installer,
+portable and checksum links after publication. Do not represent a source push as
+an updated downloadable installer.
