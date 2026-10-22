@@ -315,25 +315,6 @@
               </ItemsControl>
             </StackPanel>
 
-            <Border Classes="card" IsVisible="{Binding HasControllerReference}">
-              <StackPanel Spacing="14">
-                <TextBlock Classes="heading" Text="{Binding ControllerReferenceTitle}" />
-                <TextBlock Classes="secondary" Text="Select a button on the guide to change its action. Assignments are saved independently for this game and controller." TextWrapping="Wrap" />
-                <TabControl ItemsSource="{Binding ControllerDevices}" SelectedItem="{Binding SelectedController, Mode=TwoWay}">
-                  <TabControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ControllerEditorViewModel">
-                      <TextBlock Text="{Binding DisplayName}" />
-                    </DataTemplate>
-                  </TabControl.ItemTemplate>
-                  <TabControl.ContentTemplate>
-                    <DataTemplate x:DataType="vm:ControllerEditorViewModel">
-                      <views:ControllerDiagram Margin="0,12,0,0" />
-                    </DataTemplate>
-                  </TabControl.ContentTemplate>
-                </TabControl>
-              </StackPanel>
-            </Border>
-
             <!-- Deferred engines keep their experimental panels; their games are not
                  listed in the catalogue yet. -->
             <Border Classes="card" IsVisible="{Binding IsFalloutNewVegas}">
