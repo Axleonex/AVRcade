@@ -12,6 +12,8 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
 
+**Current packaged release: [v0.5.2](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.2).** The controller-tab consolidation and game-version compatibility fixes on `main` are source changes awaiting the next Windows release; they are not included in the v0.5.2 downloads. See [Game versions and updates](#game-versions-and-updates).
+
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
 2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. It installs to `%LOCALAPPDATA%\Programs\AVRcade`; no administrator access is needed.
 3. **Open AVRcade** from the Windows Start menu.
@@ -69,7 +71,7 @@ A mode that is not ready says why and offers its one next step, such as *Install
 | Escape the Backrooms | [UEVR](https://github.com/praydog/UEVR), community profile and AVRcade keyboard, HUD, menus and controller arms | [Quest-tested source checkpoint; helper setup required](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
 | RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
 | Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
-| Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; **Install VR backend** adds the VR plugins and downloads the modding frameworks they need. Supports one specific game build, which AVRcade checks first. Monitor modes work without it |
+| Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; **Install VR backend** adds the VR plugins and downloads their modding frameworks. The configured VR package requires Cyberpunk 2.31; see [version compatibility](#game-versions-and-updates) |
 
 "Installs and launches" means AVRcade downloads the pinned mod, checks its hashes and starts the game with it. Whether a mod still matches the game's current build is up to that mod's author; the game page links to each project.
 
@@ -78,6 +80,20 @@ A mode that is not ready says why and offers its one next step, such as *Install
 In the current release, open Cyberpunk 2077 and choose **Install VR** at the top. AVRcade downloads CyberpunkVR Port 0.1.7 and opens the required More Occluders Scripted v0.3 download on Nexus. Sign in and confirm the download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
 
 If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
+
+## Game versions and updates
+
+AVRcade uses each player's own game installation. Compatibility depends on that game's VR conversion; a game update can require a newer VR package. CyberpunkVR Port 0.1.7's [author requirements](https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#requirements) specify Cyberpunk **2.31**. The configured package does not establish VR support for **2.5**. Steam verification repairs original game files; it does not prove mod compatibility or restore an older game version.
+
+The following fixes are on `main`, awaiting a packaged Windows release:
+
+- Cyberpunk checks the VR package's declared game versions instead of requiring every player's Steam build ID and executable hash to match the developer's recorded copy. Exact-binary integrations such as classic San Andreas retain their separate adapter requirements.
+- **Update mods** can check author releases while VR is blocked. It reports newer releases and keeps incompatible or unreviewed packages from being installed. It does not automatically install every author's newest release.
+- **Recheck setup** retains compatibility problems even when file and controller checks pass. **Run diagnostics** refreshes only the selected game's play buttons. Results remain isolated by game and installation.
+- Controller keymapping appears only in each game's bottom **Controls** tab, with custom assignments, saved defaults, reset and original bindings preserved.
+- Cyberpunk monitor launches are checked independently of VR-only game-version requirements.
+
+The v0.5.2 installer linked above retains the earlier exact-build check. Downloading GitHub's **Source code** ZIP does not install these newer source changes; use a packaged Windows release for installation.
 
 ## Troubleshoot one game
 
