@@ -31,7 +31,7 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     private bool _runtimeDetected;
     private UnrealModInventory _unrealMods = new(string.Empty, []);
 
-    private readonly ControllerCustomization _controllerSettings = new();
+    private readonly ControllerCustomization _controllerSettings;
     private ControllerEditorViewModel? _selectedController;
     public ControllerEditorViewModel? SelectedController
     {
@@ -51,14 +51,15 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
         CyberpunkHudMode? hudMode,
         GtaTurnPreference gtaTurnPreference,
         CyberpunkTurnPreference cyberpunkTurnPreference,
-        Bitmap? coverImage, IReadOnlyList<GameModCredit>? modCredits = null)
+        Bitmap? coverImage, IReadOnlyList<GameModCredit>? modCredits = null, ControllerCustomization? controllerSettings = null)
     {
         View = view;
+        _controllerSettings = controllerSettings ?? new();
         ControllerReference = controllerReference;
         ModCredits = modCredits ?? (controllerReference?.ConversionCredit is { } credit
             ? [new GameModCredit(credit.Project, credit.Creator, credit.ProjectUrl)] : []);
         ControllerDevices = (controllerReference ?? ControllerCustomization.Generic(view.Slug)).Devices
-            .Select(device => new ControllerEditorViewModel(view.Slug, device)).ToArray();
+            .Select(device => new ControllerEditorViewModel(view.Slug, device, _controllerSettings)).ToArray();
         string device;
         try { device = _controllerSettings.ActiveDevice(view.Slug); }
         catch (IOException) { device = "quest-touch"; }
@@ -93,7 +94,14 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public void RefreshPlayModes()
     {
         if (_playModeSource is null) return;
-        _playModes = _playModeSource(this).Select(state => new PlayModeViewModel(state)).ToArray();
+        _playModes = _playModeSource(this).Select(state =>
+        {
+            if (state.Mode == PlayMode.Vanilla && IsInstalled)
+                state = new(PlayMode.Vanilla, PlayModeAvailability.Ready, "Detected mod loaders and deployed mod files are parked; no VR injection", "Play vanilla");
+            else if (IsInstalled && state.Mode is PlayMode.VrOnly or PlayMode.VrWithMods && CompatibilityState is { CanTryVr: false } compatibility)
+                state = new(state.Mode, PlayModeAvailability.Unavailable, compatibility.Message, "VR unavailable");
+            return new PlayModeViewModel(state);
+        }).ToArray();
         OnPropertyChanged(nameof(PlayModes));
         OnPropertyChanged(nameof(HasPlayModes));
         OnPropertyChanged(nameof(IsVrReady));

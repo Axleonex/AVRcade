@@ -49,7 +49,7 @@ public sealed class ControllerRuntimeBindings(ControllerCustomization? settings 
         try
         {
             ModRoots = modRoots ?? [];
-            var runtime = Path.Combine(_settings.Root, "runtime");
+            var runtime = Path.Combine(_settings.RuntimeRoot, "runtime");
             var file = Path.Combine(runtime, game.Slug + ".bindings");
             var mapping = BuildOpenXr(game.Slug);
             var adapter = _adapters.GetValueOrDefault(game.Slug, ControllerBindingAdapters.OpenXr);
@@ -90,7 +90,7 @@ public sealed class ControllerRuntimeBindings(ControllerCustomization? settings 
         try
         {
             _ = BuildOpenXr(game.Slug); // Validate saved mappings without resetting them.
-            var runtime = Path.Combine(_settings.Root, "runtime");
+            var runtime = Path.Combine(_settings.RuntimeRoot, "runtime");
             Directory.CreateDirectory(runtime);
             var file = Path.Combine(runtime, game.Slug + ".bindings");
             var routesFile = Path.Combine(runtime, "routes.txt");

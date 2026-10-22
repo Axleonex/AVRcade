@@ -518,7 +518,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         ReportGameSetup(game.Slug, root, "Checking this game's installation and controller routes...", true);
         if (game.IsCyberpunk) ReportCyberpunkSetup(root, "Checking this game's installation and controller routes...", true);
         ActionOutcome outcome;
-        try { outcome = await Task.Run(() => new VrClient.Core.Launch.GameSetupRecovery().Recheck(_controller.RepoRoot, game.View)); }
+        try { outcome = await Task.Run(() => new VrClient.Core.Launch.GameSetupRecovery(_controller.Compatibility.ControllersFor(game.View)).Recheck(_controller.RepoRoot, game.View)); }
         catch (Exception ex) { outcome = new(false, "Setup check could not complete: " + ex.Message); }
         finally { Busy = false; }
         ReportGameSetup(game.Slug, root, outcome.Message, false, !outcome.Ok);
@@ -618,7 +618,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             game.Engine is GameEngine.LegacyD3D9
                 ? controller.GetGtaSanAndreasTurnPreference() : GtaSanAndreasTurnSettings.Default,
             controller.GetCyberpunkTurnPreference(game),
-            CoverFor(game.SteamAppId), controller.GetModCredits(game.Slug));
+            CoverFor(game.SteamAppId), controller.GetModCredits(game.Slug), controller.Compatibility.ControllersFor(game));
         if (CommunityVrRoutes.All.TryGetValue(game.Slug, out var route))
         {
             var modded = new ModdedGameViewModel(controller.RepoRoot, route, game.InstallDir,
@@ -632,6 +632,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 _installedManagers.FirstOrDefault(manager => manager.Kind == kind) is { } manager)
                 modded.SelectedManager = manager;
         }
+        item.SetCompatibility(controller.Compatibility, choice => SelectInstallationChoice(game, choice));
         item.SetPlayModeSource(
             source => BuildPlayModes(source, runtimeDetected), runtimeDetected, controller.GetUnrealMods(game), runtime.SteamVrRunning);
         if (item.IsCyberpunk && game.InstallDir is { } cpRoot && _cyberpunkSetupProgress.TryGetValue(cpRoot, out var cpProgress))
@@ -1027,6 +1028,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public async Task RunPlayModeAsync(PlayMode mode, bool acknowledge)
     {
         if (_controller is null || SelectedGame is not { } game || Busy) return;
+        if (mode == PlayMode.Vanilla) { await RunCleanMonitorAsync(game.View); return; }
         if (game.PlayModeFor(mode) is not { IsLaunch: true })
         {
             StatusText = $"{game.DisplayName}: this way to play is not ready yet. {game.PlayModeFor(mode)?.Status}";
@@ -1044,6 +1046,16 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         StatusText = $"Starting {game.DisplayName}…";
         try
         {
+            if (mode == PlayMode.ModsNoVr && VrClient.Core.Compatibility.MonitorModSession.IsParked(dir))
+            { finalStatus = "Mods are parked for clean monitor play. Close the game and restore parked mods before choosing play with mods."; return; }
+            if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
+            {
+                var fresh = _controller.GetGame(game.Slug);
+                if (fresh is null || !VrClient.Core.Compatibility.GameInstallationStore.SameRoot(fresh.InstallDir, dir))
+                { finalStatus = "The selected installation changed. Refresh and choose the intended game copy before launching."; return; }
+                var prepared = await PrepareCompatibleVrCoreAsync(fresh);
+                if (!prepared.Ok) { finalStatus = prepared.Message; return; }
+            }
             var native = new VrClient.Core.Launch.NativeDependencyHealth().Check(dir,
                 VrClient.Core.Config.ControllerRuntimeBindings.Executables(_controller.RepoRoot, game.View));
             if (!native.Healthy) { finalStatus = native.Message; return; }
@@ -1053,7 +1065,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 { finalStatus = "An interrupted mod update needs recovery. Close the game and choose Recheck setup before launching VR."; return; }
                 var modRoots = mode == PlayMode.VrWithMods && game.Modded?.SelectedProfile?.Directory is { } profileRoot
                     ? new[] { profileRoot } : null;
-                var controls = new VrClient.Core.Config.ControllerRuntimeBindings().Prepare(_controller.RepoRoot, game.View, modRoots);
+                var controls = new VrClient.Core.Config.ControllerRuntimeBindings(_controller.Compatibility.ControllersFor(game.View)).Prepare(_controller.RepoRoot, game.View, modRoots);
                 if (!controls.Ok) { finalStatus = controls.Message; return; }
             }
             var outcome = game.View.Engine switch
@@ -1066,7 +1078,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 GameEngine.Unity => LaunchUnity(game, dir, mode, acknowledge),
                 GameEngine.Unreal => mode is PlayMode.VrOnly or PlayMode.VrWithMods
                     ? await _controller.LaunchUnrealAsync(game.Slug, acknowledge, gameRoot: dir)
-                    : _controller.LaunchUnrealFlat(game.Slug),
+                    : _controller.Compatibility.CanUseStoreHandoff(game.View)
+                        ? _controller.LaunchUnrealFlat(game.Slug)
+                        : _controller.Compatibility.LaunchSelectedExecutable(game.View),
                 GameEngine.Redengine => await LaunchCyberpunkAsync(game, mode),
                 GameEngine.LegacyD3D9 => LaunchGtaSanAndreas(dir, mode),
                 _ => new ActionOutcome(false, "This game has no launch route in AVRcade yet.")
@@ -1082,6 +1096,28 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     Ok = startup.Running,
                     Message = $"{game.DisplayName}: {startup.Message}"
                 };
+                if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
+                    feedbackOutcome = feedbackOutcome with { Message = feedbackOutcome.Message +
+                        _controller.Compatibility.CompleteStartup(game.View, startup.Running,
+                            startup.ExitCode is not null and not 0) };
+            }
+            else if (mode is PlayMode.VrOnly or PlayMode.VrWithMods)
+            {
+                if (outcome.Ok)
+                {
+                    StatusText = $"Checking {game.DisplayName}'s selected process…";
+                    var observed = await _controller.Compatibility.ObserveStartupAsync(game.View);
+                    feedbackOutcome = outcome with { Ok = observed == VrClient.Core.Compatibility.StartupObservation.Running,
+                        Message = outcome.Message + (observed == VrClient.Core.Compatibility.StartupObservation.Running
+                            ? " Startup was observed; check stereo, tracking and controls in the headset."
+                            : " Startup was not confirmed for the selected installation; no VR readiness claim was made.") +
+                            _controller.Compatibility.CompleteStartup(game.View,
+                                observed == VrClient.Core.Compatibility.StartupObservation.Running,
+                                observed == VrClient.Core.Compatibility.StartupObservation.ExitedWithError) };
+                }
+                else if (outcome.Message.Contains("closed during startup (exit code 0x", StringComparison.Ordinal) &&
+                    !outcome.Message.Contains("exit code 0x00000000", StringComparison.Ordinal))
+                    feedbackOutcome = outcome with { Message = outcome.Message + _controller.Compatibility.CompleteStartup(game.View, false, true) };
             }
             (finalStatus, launchSucceeded) = DescribeLaunchFeedback(game.DisplayName, mode, feedbackOutcome);
         }
@@ -1143,6 +1179,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Enum.TryParse<Verdict>(game.View.SafetyVerdict, out var safety);
         var modded = game.Modded;
         var launcher = new ModdedVrLauncher();
+        if (mode is PlayMode.VrWithMods or PlayMode.ModsNoVr &&
+            (modded?.SelectedProfile is not null || modded?.SelectedFlatProfile is not null) &&
+            !_controller!.Compatibility.CanUseStoreHandoff(game.View))
+            return new(false, "This mod manager's Steam handoff cannot guarantee the selected older copy. Use game-folder mods for this copy, or configure and launch that copy in the manager itself.");
         static ActionOutcome Outcome(ModdedLaunchResult result) =>
             new(result.GameLaunchRequested || result.ManagerOpened, result.Message);
 
@@ -1182,7 +1222,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         // off; without it a normal Steam start is the only route.
         return game.View.ModInstalled && game.View.Readiness is not GameReadiness.Blocked
             ? await _controller!.LaunchRedengineAsync(CyberpunkLaunchMode.Flat, withMods: withMods, gameRoot: game.View.InstallDir)
-            : _controller!.LaunchCyberpunkFlatViaSteam(withMods);
+            : _controller!.Compatibility.CanUseStoreHandoff(game.View)
+                ? _controller.LaunchCyberpunkFlatViaSteam(withMods)
+                : new(false, "This installation needs a compatible VR backend to disable VR while retaining mods. Use Clean monitor play, or prepare a compatible package for this copy first.");
     }
 
     private ActionOutcome LaunchGtaSanAndreas(string dir, PlayMode mode) => mode switch

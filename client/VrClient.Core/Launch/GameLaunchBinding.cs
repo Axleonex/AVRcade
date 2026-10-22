@@ -37,8 +37,19 @@ public static class GameLaunchBinding
     {
         start.ArgumentList.Add("--game-dir");
         start.ArgumentList.Add(Path.GetFullPath(gameRoot));
-        start.ArgumentList.Add("--steam-manifest");
-        start.ArgumentList.Add(ManifestFor(gameRoot, appId));
+        if (OptionalManifestFor(gameRoot, appId) is { } manifest)
+        {
+            start.ArgumentList.Add("--steam-manifest");
+            start.ArgumentList.Add(manifest);
+        }
+    }
+
+    /// A separate legitimate older copy has no adjacent Steam manifest. It is
+    /// identified by its own executable and package policy, never another copy's ID.
+    public static string? OptionalManifestFor(string gameRoot, string appId)
+    {
+        try { return ManifestFor(gameRoot, appId); }
+        catch (InvalidDataException) { return null; }
     }
 
     public static bool MatchesExecutable(string? actual, string gameRoot, string relativeExecutable)

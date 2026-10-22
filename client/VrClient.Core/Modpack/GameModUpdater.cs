@@ -15,6 +15,45 @@ public sealed record GameModUpdateResult(bool Ok, string Message, string Checked
 /// package policy; newer author releases are reported separately from installation.
 public sealed class GameModUpdater(string repoRoot, HttpClient http)
 {
+    /// Automatic preparation never substitutes an unreviewed latest upstream build.
+    /// Unsupported/native-local integrations keep their dedicated exact-build setup.
+    public async Task<ActionOutcome> UpdateReviewedAsync(GameView game, AppController controller,
+        IProgress<string>? progress = null, CancellationToken ct = default, bool leaseHeld = false)
+    {
+        if (game.InstallDir is null) return new(false, "Select a game installation first.");
+        if (game.Readiness is GameReadiness.Blocked) return new(false, game.ReadinessDetail);
+        if (game.Engine == GameEngine.Redengine)
+        {
+            var installed = CyberpunkUpstreamSession.ReadState(game.InstallDir)?.Version;
+            var approved = CyberpunkBackendInstaller.LoadPackage(Path.Combine(repoRoot, "config", "redengine", "native", game.Slug + "-backend.json")).Version;
+            if (Version.TryParse(installed, out var current) && Version.TryParse(approved, out var supported) && current > supported)
+                return new(false, "A newer manually installed VR package is present. Automatic preparation will not downgrade it; review that package's game compatibility first.");
+        }
+        if (!GameModUpdateRoutes.Load(repoRoot, game.Slug).TryGetValue(game.Slug, out var route))
+            return game.ModInstalled ? new(true, "The installed native integration has no downloadable update.")
+                : new(false, "This native integration needs its game-specific setup. No automatic package is published.");
+        void EnsureClosed() => EnsureProcessesClosed(route.ProcessNames);
+        EnsureClosed();
+        var leasePath = ModUpdateTransaction.Resolve(game.InstallDir, ".avrcade/mod-updates/update.lock");
+        Directory.CreateDirectory(Path.GetDirectoryName(leasePath)!);
+        using var lease = leaseHeld ? null : new FileStream(leasePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        ModUpdateTransaction.Recover(game.InstallDir);
+        if (route.Adapter == "thunderstore")
+        {
+            var lockPath = Path.Combine(repoRoot, "config", "modpacks", game.Slug + ".lock.json");
+            if (!File.Exists(lockPath)) return new(false, "No hash-pinned automatic update is available. Use manual VR setup.");
+            return await ThunderstoreModUpdater.UpdateAsync(repoRoot, game, new LiveThunderstoreApi(http),
+                new Download(http), EnsureClosed, progress, ct, LockfileIo.Read(lockPath));
+        }
+        return route.Adapter switch
+        {
+            "cyberpunk" => await UpdateCyberpunkAsync(game, controller, progress, ct),
+            "uevr" => await UpdateUnrealAsync(game, controller, progress, ct),
+            "paired" => await UpdatePairedAsync(game, controller, progress, ct),
+            _ => new(false, "No reviewed update adapter is configured.")
+        };
+    }
+
     private sealed class Download(HttpClient client) : IHttpDownloader
     {
         public Task<byte[]> GetBytesAsync(string url, CancellationToken ct = default) => client.GetByteArrayAsync(url, ct);
@@ -98,7 +137,7 @@ public sealed class GameModUpdater(string repoRoot, HttpClient http)
         // the game page and upstream release request are still open.
         var preflight = new CyberpunkNativePreflight().Evaluate(
             Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077.json"),
-            game.InstallDir, GameLaunchBinding.ManifestFor(game.InstallDir!, game.SteamAppId));
+            game.InstallDir, GameLaunchBinding.OptionalManifestFor(game.InstallDir!, game.SteamAppId));
         if (preflight.IdentityMismatch) return new(false, preflight.CompatibilityDetail);
         var state = CyberpunkUpstreamSession.ReadState(game.InstallDir!);
         var package = CyberpunkBackendInstaller.LoadPackage(Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json"));

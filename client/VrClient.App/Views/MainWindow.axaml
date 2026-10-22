@@ -281,6 +281,42 @@
               </StackPanel>
             </Border>
 
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="eyebrow" Text="GAME COMPATIBILITY" />
+                <TextBlock Text="{Binding CompatibilityText}" TextWrapping="Wrap" />
+                <TextBlock Classes="secondary" Text="{Binding BuildIdentityText}" TextWrapping="Wrap" FontSize="12" />
+                <Expander Header="Game versions and automatic VR updates" HorizontalAlignment="Stretch">
+                  <StackPanel Spacing="10" Margin="0,10,0,0">
+                    <TextBlock Text="Installation to use" FontWeight="SemiBold" />
+                    <ComboBox ItemsSource="{Binding InstallationChoices}" SelectedItem="{Binding SelectedInstallation, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch" AutomationProperties.AutomationId="CompatibleInstallationSelector">
+                      <ComboBox.ItemTemplate><DataTemplate x:DataType="vm:InstallationChoice"><TextBlock Text="{Binding Label}" TextWrapping="Wrap" /></DataTemplate></ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Content="Choose another / older game installation" Click="ChooseCompatibleInstallation_Click"
+                            HorizontalAlignment="Left" AutomationProperties.AutomationId="ChooseCompatibleInstallation" />
+                    <TextBlock Classes="secondary" Text="{Binding SaveCompatibilityWarning}" TextWrapping="Wrap" />
+                    <TextBlock Classes="secondary" Text="Use the store's older-version branch when one is offered, or choose your own legitimate local copy. AVRcade does not download old game binaries. Store authentication still applies." TextWrapping="Wrap" />
+                    <CheckBox Content="Automatically prepare approved VR package updates before VR play"
+                              IsChecked="{Binding AutomaticCompatibilityUpdates, Mode=TwoWay}" IsEnabled="{Binding CanUseCompatibility}" />
+                    <WrapPanel>
+                      <Button Content="Prepare approved VR package" Margin="0,0,8,8"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PrepareCompatibleVrCommand}" />
+                      <Button Content="Clean monitor play" Margin="0,0,8,8"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CleanMonitorCommand}" />
+                      <Button Content="Restore parked mods" Margin="0,0,8,8" IsVisible="{Binding HasParkedMods}"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RestoreParkedModsCommand}" />
+                      <Button Content="Restore previous VR package" Margin="0,0,8,8" IsVisible="{Binding HasPackageBackup}"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RollBackVrPackageCommand}" />
+                    </WrapPanel>
+                    <TextBlock Classes="secondary" Text="Clean monitor play disables detected mod loaders and parks detected deployed mods. Unmanaged changes to original game files may require store verification or a separate clean copy. Backups remain in the selected game folder." TextWrapping="Wrap" />
+                    <Button Content="I tested stereo, tracking and controls in this build" HorizontalAlignment="Left"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ConfirmCompatibleHeadsetTestCommand}" />
+                  </StackPanel>
+                </Expander>
+              </StackPanel>
+            </Border>
+
             <!-- The four ways to play: the same block on every game. -->
             <StackPanel Spacing="12" IsVisible="{Binding HasPlayModes}">
               <TextBlock Classes="eyebrow" Text="CHOOSE HOW TO PLAY" />

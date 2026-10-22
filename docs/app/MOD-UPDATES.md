@@ -1,5 +1,7 @@
 # Manual game mod updates
 
+Catalogue-wide automatic preparation and older-installation selection are described in [Game compatibility](GAME-COMPATIBILITY.md). Manual **Update mods** still checks upstream releases; automatic preparation installs only the approved hash-pinned package and never treats a newly published release as compatibility proof.
+
 Games with public VR conversions show **OBS Stream**, then **Update mods**, then
 the title, game image and creator credits in the left column. Credits sit directly
 below the image and above the status/install-location card. The update action belongs to

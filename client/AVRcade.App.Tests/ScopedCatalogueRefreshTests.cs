@@ -35,7 +35,8 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
             File.Copy(file, target);
         }
         _controller = new(_root, (app, _) => { _calls.Add(app); return _installs.GetValueOrDefault(app); },
-            headsetConnected: () => false, gtaSanAndreasLocator: () => { _calls.Add("12120"); return null; });
+            headsetConnected: () => false, gtaSanAndreasLocator: () => { _calls.Add("12120"); return null; },
+            installationStore: new VrClient.Core.Compatibility.GameInstallationStore(Path.Combine(_root, "preferences", "installations.json")));
     }
 
     public void Dispose() => Directory.Delete(_root, true);

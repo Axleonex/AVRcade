@@ -49,9 +49,13 @@ public sealed partial class AppController
             return new(false, "YAPYAP launch was cancelled.");
         // Profile selection needs the desktop; do not take the headset into Home first.
         if (mode == PlayMode.VrWithMods && managerExecutable is not null)
+        {
+            if (Compatibility.Installations.SelectedRoot("yapyap") is not null && GetGame("yapyap") is { } selected && !Compatibility.CanUseStoreHandoff(selected))
+                return new(false, "The mod-manager handoff cannot guarantee the selected older installation. Use game-folder mods or launch that copy in the manager itself.");
             return OpenYapyapManager(managerExecutable, dryRun,
                 "Choose a YAPYAP profile containing UUVR and the AVRcade bridge, then Start Modded. " +
                 "SteamVR is required when the game enters VR. An extra game mod is optional.");
+        }
         // Without the server the game can open on the monitor while VR appears to have launched.
         if (!dryRun || !SteamVrStartup.IsServerRunning())
         {
@@ -60,6 +64,8 @@ public sealed partial class AppController
         }
         if (ct.IsCancellationRequested)
             return new(false, "YAPYAP launch was cancelled.");
+        if (Compatibility.Installations.SelectedRoot("yapyap") is not null && GetGame("yapyap") is { } local && !Compatibility.CanUseStoreHandoff(local))
+            return Compatibility.LaunchSelectedExecutable(local, dryRun: dryRun);
         var launch = new SteamOwnedLauncher().Launch("3834090", steamRoot, dryRun);
         return new(launch.Success, launch.Success
             ? dryRun ? "YAPYAP VR Steam launch plan: 3834090"
@@ -79,8 +85,12 @@ public sealed partial class AppController
         if (!dryRun && Process.GetProcessesByName("yapyap").Length != 0)
             return new(false, "YAPYAP is already running. Close it before switching launch modes.");
         if (mode == PlayMode.ModsNoVr)
+        {
+            if (Compatibility.Installations.SelectedRoot("yapyap") is not null && GetGame("yapyap") is { } selected && !Compatibility.CanUseStoreHandoff(selected))
+                return new(false, "The mod-manager handoff cannot guarantee the selected older installation. Configure and launch that copy in the manager itself, or use Clean monitor play.");
             return OpenYapyapManager(managerExecutable, dryRun,
                 "Select a YAPYAP desktop mod profile without UUVR or the AVRcade VR bridge, then Start Modded.");
+        }
 
         string[] args = ["--doorstop-enabled", "false", "--doorstop-enable", "false", "--disable-vr"];
         var launch = new SteamOwnedLauncher().Launch("3834090", steamRoot, dryRun,

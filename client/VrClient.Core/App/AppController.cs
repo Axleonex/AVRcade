@@ -16,6 +16,7 @@ using VrClient.Core.Legacy;
 using VrClient.Core.FalloutNewVegas;
 using VrClient.Core.Fallout3;
 using VrClient.Core.ModManagers;
+using VrClient.Core.Compatibility;
 
 public enum GameEngine { Unity, Unreal, Redengine, Rage, LegacyD3D9, FalloutNewVegas, Fallout3 }
 public enum GameReadiness
@@ -68,6 +69,7 @@ public sealed partial class AppController
 
     private readonly string _repoRoot;
     public string RepoRoot => _repoRoot;
+    public GameCompatibilityService Compatibility { get; }
     private readonly SteamInstallLocator _locator;
     private readonly Func<UevrReleasePin, bool> _uevrFetched;
     private readonly Func<DotNetDesktopPin, bool> _dotNetFetched;
@@ -89,15 +91,20 @@ public sealed partial class AppController
         Func<FnvDiscoveryResult>? falloutNewVegasDiscovery = null,
         Func<Fallout3DiscoveryResult>? fallout3Discovery = null,
         GtaSanAndreasVanillaSettings? gtaVanillaSettings = null,
-        string? cyberpunkStateDir = null)
+        string? cyberpunkStateDir = null, GameInstallationStore? installationStore = null)
     {
         _cyberpunkStateDir = cyberpunkStateDir;
         _repoRoot = repoRoot;
-        _locator = locator ?? DefaultLocator;
+        Compatibility = new GameCompatibilityService(repoRoot, installationStore);
+        var discoveredLocator = locator ?? DefaultLocator;
+        _locator = (appId, executable) => Compatibility.Installations.SelectedForApp(appId) is { } selected
+            ? File.Exists(Path.Combine(selected, executable)) ? selected : null
+            : discoveredLocator(appId, executable);
         _uevrFetched = uevrFetched ?? (pin => UevrTools.IsFetched(pin));
         _dotNetFetched = dotNetFetched ?? (pin => UevrTools.IsDotNetFetched(pin));
         _headsetConnected = headsetConnected ?? DefaultHeadsetConnected;
-        _gtaSanAndreasLocator = gtaSanAndreasLocator ?? GtaSanAndreasPreflight.FindDefaultInstall;
+        _gtaSanAndreasLocator = () => Compatibility.Installations.SelectedRoot("gta-san-andreas")
+            ?? (gtaSanAndreasLocator ?? GtaSanAndreasPreflight.FindDefaultInstall)();
         _falloutNewVegasDiscovery = falloutNewVegasDiscovery ?? (() => new FalloutNewVegasDiscovery().Discover());
         _fallout3Discovery = fallout3Discovery ?? (() => new Fallout3Discovery().Discover());
         _gtaVanillaSettings = gtaVanillaSettings ?? new GtaSanAndreasVanillaSettings();

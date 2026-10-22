@@ -257,6 +257,14 @@ public partial class MainWindow : Window
         return string.IsNullOrWhiteSpace(path) ? null : path;
     }
 
+    private async void ChooseCompatibleInstallation_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel { SelectedGame: { } game, Busy: false } vm) return;
+        var captured = game.View;
+        if (await PickFolderAsync("Select this game's older or alternate installation") is { } path)
+            vm.SelectGameInstallation(captured, path);
+    }
+
     private async Task<string?> PickFolderAsync(string title)
     {
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions

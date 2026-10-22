@@ -12,20 +12,25 @@ public static class ThunderstoreModUpdater
 
     public static async Task<ActionOutcome> UpdateAsync(string repoRoot, GameView game,
         IThunderstoreApi api, IHttpDownloader downloader, Action ensureGameClosed,
-        IProgress<string>? progress = null, CancellationToken ct = default)
+        IProgress<string>? progress = null, CancellationToken ct = default, Lockfile? reviewedLock = null)
     {
         var root = game.InstallDir ?? throw new InvalidOperationException("Install the game first.");
         var manifestPath = ModUpdateTransaction.Resolve(root, Manifest);
-        if (!File.Exists(manifestPath)) return new(false, "Install this game's VR mod through AVRcade first. Mod-manager profiles are updated in their manager.");
+        if (!File.Exists(manifestPath) && reviewedLock is null) return new(false, "Install this game's VR mod through AVRcade first. Mod-manager profiles are updated in their manager.");
         var spec = ModpackResolver.LoadSpec(Path.Combine(repoRoot, "config", "modpacks", game.Slug + ".modpack.json"));
         if (spec.GameSlug != game.Slug) throw new InvalidDataException("The mod specification belongs to another game.");
-        using var oldManifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        using var oldManifest = JsonDocument.Parse(File.Exists(manifestPath) ? File.ReadAllText(manifestPath) : "{\"files\":[]}");
         var owned = oldManifest.RootElement.GetProperty("files").EnumerateArray()
             .Select(item => item.GetString()!.Replace('\\', '/')).ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var path in owned) ValidatePackagePath(root, path);
 
         progress?.Report("Checking current mod releases and their dependencies...");
-        var resolved = await new ModpackResolver(api).ResolveAsync(spec, DateTime.UtcNow.ToString("O"), ct);
+        if (reviewedLock is not null)
+        {
+            if (reviewedLock.GameSlug != game.Slug) throw new InvalidDataException("The reviewed package belongs to another game.");
+            LockfileIo.RequireHashesFilled(reviewedLock);
+        }
+        var resolved = reviewedLock ?? await new ModpackResolver(api).ResolveAsync(spec, DateTime.UtcNow.ToString("O"), ct);
         if (oldManifest.RootElement.TryGetProperty("packages", out var previousPackages))
         {
             var recorded = previousPackages.Deserialize<LockedPackage[]>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
@@ -51,6 +56,8 @@ public static class ThunderstoreModUpdater
                     throw new InvalidDataException("A mod download is outside the configured Thunderstore source.");
                 progress?.Report($"Downloading {package.Name} {package.Version} ({++index}/{resolved.Packages.Count})...");
                 var bytes = await downloader.GetBytesAsync(package.DownloadUrl, ct);
+                if (reviewedLock is not null && !Hashing.Sha256OfBytes(bytes).Equals(package.Sha256, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException($"Reviewed package hash mismatch: {package.Name}. Nothing was installed.");
                 if (package.SizeBytes > 0 && bytes.LongLength != package.SizeBytes)
                     throw new InvalidDataException($"Download size mismatch: {package.Name}");
                 var pinned = package with { Sha256 = Hashing.Sha256OfBytes(bytes) };

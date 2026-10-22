@@ -318,14 +318,7 @@ try
                 .FindGame(CyberpunkNativePreflight.SteamAppId, Path.Combine("bin", "x64", "Cyberpunk2077.exe"), steamRoot);
             var gameDir = GetOption("--game-dir") ?? discovered?.InstallDir;
             var manifestPath = GetOption("--steam-manifest") ?? (GetOption("--game-dir") is { } selectedCyberpunk
-                ? GameLaunchBinding.ManifestFor(selectedCyberpunk, CyberpunkNativePreflight.SteamAppId) : discovered?.ManifestPath);
-            if (manifestPath is null && gameDir is not null)
-            {
-                var steamApps = Directory.GetParent(gameDir)?.Parent?.FullName;
-                if (steamApps is not null)
-                    manifestPath = Path.Combine(steamApps, $"appmanifest_{CyberpunkNativePreflight.SteamAppId}.acf");
-            }
-
+                ? GameLaunchBinding.OptionalManifestFor(selectedCyberpunk, CyberpunkNativePreflight.SteamAppId) : discovered?.ManifestPath);
             var profilePath = Path.Combine(
                 repoRoot, "config", "redengine", "native", "cyberpunk-2077.json");
             var preflight = new CyberpunkNativePreflight().Evaluate(
@@ -1470,13 +1463,28 @@ try
                 return 2;
             }
 
-            Console.WriteLine($"UEVR-LAUNCH: starting app {uevrGame.SteamAppId} via Steam...");
-            var steamStart = new SteamOwnedLauncher().Launch(uevrGame.SteamAppId, steamRoot,
-                launchArguments: uevrGame.SteamLaunchArguments);
-            if (!steamStart.Success)
+            var storeInstall = new VrClient.Core.Discovery.SteamLibraryScanner()
+                .FindGame(uevrGame.SteamAppId, uevrGame.LauncherStub, steamRoot);
+            if (VrClient.Core.Compatibility.GameInstallationStore.SameRoot(selectedUevrRoot, storeInstall?.InstallDir))
             {
-                Console.WriteLine($"RESULT: error=uevr_steam_launch_failed - {steamStart.FailureText}");
-                return 1;
+                Console.WriteLine($"UEVR-LAUNCH: starting app {uevrGame.SteamAppId} via Steam...");
+                var steamStart = new SteamOwnedLauncher().Launch(uevrGame.SteamAppId, steamRoot,
+                    launchArguments: uevrGame.SteamLaunchArguments);
+                if (!steamStart.Success)
+                {
+                    Console.WriteLine($"RESULT: error=uevr_steam_launch_failed - {steamStart.FailureText}");
+                    return 1;
+                }
+            }
+            else
+            {
+                Console.WriteLine("UEVR-LAUNCH: starting the selected local installation; normal store authentication still applies.");
+                var selectedExecutable = ModUpdateTransaction.Resolve(selectedUevrRoot, uevrGame.LauncherStub);
+                var selectedStart = new System.Diagnostics.ProcessStartInfo(selectedExecutable)
+                { WorkingDirectory = Path.GetDirectoryName(selectedExecutable)!, UseShellExecute = false };
+                foreach (var argument in uevrGame.SteamLaunchArguments ?? []) selectedStart.ArgumentList.Add(argument);
+                using var selectedProcess = System.Diagnostics.Process.Start(selectedStart);
+                if (selectedProcess is null) throw new IOException("The selected game copy did not start.");
             }
 
             Console.WriteLine($"UEVR-LAUNCH: waiting up to {attachTimeout}s for process '{attachProcess}'...");
