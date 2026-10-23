@@ -43,6 +43,21 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
     private MainWindowViewModel Window() => new(_ => null, controller: _controller);
 
     [Fact]
+    public void Switching_games_does_not_carry_the_previous_troubleshooting_step()
+    {
+        _ui.Run(() =>
+        {
+            using var window = Window();
+            window.SelectedGame = window.Games.Single(g => g.Slug == "repo");
+            window.TroubleshootingFindings = [new("VR components", "Attention", "missing package", "open setup", VrClient.Core.Launch.TroubleshootingAction.VrSetup)];
+            Assert.Equal("Finish VR setup", window.TroubleshootingGuide.Next.Title);
+            window.SelectedGame = window.Games.Single(g => g.Slug == "peak");
+            Assert.Empty(window.TroubleshootingFindings);
+            Assert.Equal(HelpAction.CheckGame, window.TroubleshootingGuide.Next.Action);
+        });
+    }
+
+    [Fact]
     public void GameVersionMismatchOffersRecoveryThroughBothVrButtonsWhileMonitorPlayRemainsAvailable()
     {
         _ui.Run(() =>

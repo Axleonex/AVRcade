@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 using VrClient.Core.App;
 using VrClient.Core.ModManagers;
 using VrClient.Core.Legacy;
@@ -40,6 +42,8 @@ public partial class MainWindow : Window
                     // Every game page opens at its top, whatever the last one was scrolled to.
                     if (change.PropertyName == nameof(MainWindowViewModel.ShowGameDetail) && vm.ShowGameDetail)
                         this.FindControl<ScrollViewer>("GameScroll")?.ScrollToHome();
+                    if (vm.DetailTabIndex == 4 && change.PropertyName is nameof(MainWindowViewModel.DetailTabIndex) or nameof(MainWindowViewModel.TroubleshootingGuide))
+                        PositionTroubleshooting(false);
                 };
         };
     }
@@ -213,6 +217,50 @@ public partial class MainWindow : Window
             recovery.IsExpanded = true;
             recovery.BringIntoView();
         }
+    }
+
+    private void OpenTroubleshooting_Click(object? sender, RoutedEventArgs e)
+    {
+        FocusTroubleshooting();
+    }
+
+    private void OpenTroubleshootingDetails_Click(object? sender, RoutedEventArgs e)
+    {
+        FocusTroubleshooting(details: true);
+    }
+
+    public void FocusTroubleshooting(bool details = false)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+        vm.DetailTabIndex = 4;
+        PositionTroubleshooting(details);
+    }
+
+    private void PositionTroubleshooting(bool details)
+    {
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            Control? anchor = this.FindControl<TextBlock>("TroubleshootingStart");
+            if (details && this.FindControl<Expander>("TroubleshootingTechnical") is { } technical)
+            { technical.IsExpanded = true; anchor = technical; }
+            UpdateLayout();
+            if (this.FindControl<ScrollViewer>("GameScroll") is { Content: Visual content } scroll &&
+                anchor?.TranslatePoint(new Avalonia.Point(0, 0), content) is { } point)
+                scroll.Offset = new Avalonia.Vector(0, point.Y);
+        });
+    }
+
+    private async void TroubleshootingHelp_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel { SelectedGame: { } game, Busy: false, IsInstallingCyberpunkRequirements: false } vm ||
+            sender is not Button { Tag: TroubleshootingCardViewModel card }) return;
+        if (card.Action == HelpAction.RecoverVersion) await ShowGameVersionRecoveryAsync(vm, game.View);
+        else if (card.Action == HelpAction.LocateGame)
+        {
+            var captured = game.View;
+            if (await PickFolderAsync("Choose this game's installed folder") is { } path) vm.SelectGameInstallation(captured, path);
+        }
+        else await vm.RunHelpActionAsync(card);
     }
 
     private async void SelectGtaVanillaFolder_Click(object? sender, RoutedEventArgs e)

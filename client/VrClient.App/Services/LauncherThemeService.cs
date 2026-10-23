@@ -69,12 +69,13 @@ public sealed class LauncherThemeService
         Application.Current.TryFindResource(key, null, out var value) && value is IBrush brush
             ? brush : Brushes.Gray;
 
-    public void SetPalette(string? paletteId)
+    public void SetPalette(string? paletteId, bool persist = true)
     {
         if (paletteId is null || !Palettes.ContainsKey(paletteId))
             return;
         PaletteId = paletteId;
-        ApplyAndSave();
+        if (persist) ApplyAndSave();
+        else Apply();
     }
 
     public void Apply()
@@ -94,6 +95,7 @@ public sealed class LauncherThemeService
         SetBrush("WarningBrush", colors.Warning);
         SetBrush("DangerBrush", colors.Danger);
         SetBrush("LineBrush", colors.Line);
+        foreach (var entry in HelpColors(IsDark)) SetBrush(entry.Key, entry.Value);
 
         // Fluent's own input and expander surfaces follow the palette too, so a
         // text box or expander inside a card does not fall back to plain black or white.
@@ -113,6 +115,16 @@ public sealed class LauncherThemeService
                  })
             SetBrush(key, colors.Line);
     }
+
+    /// Stable meanings across all decorative palettes, with separate light/dark contrast.
+    public static IReadOnlyDictionary<string, string> HelpColors(bool dark) => new Dictionary<string, string>
+    {
+        ["HelpActionBrush"] = dark ? "#8AB4F8" : "#1454A4",
+        ["HelpActionInkBrush"] = dark ? "#071E35" : "#FFFFFF",
+        ["HelpWarningBrush"] = dark ? "#FFD17A" : "#804900",
+        ["HelpSuccessBrush"] = dark ? "#80D8AE" : "#17603D",
+        ["HelpStopBrush"] = dark ? "#FFA7A0" : "#A31515"
+    };
 
     /// Recolour the brush in place: everything already painted with it, including
     /// brushes view models handed to bindings, follows without being rebuilt.

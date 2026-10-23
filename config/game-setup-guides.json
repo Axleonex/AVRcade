@@ -3,32 +3,47 @@
   "games": {
     "escape-the-backrooms": {
       "steps": [
-        "Close the game before preparing its VR setup. Use the install button at the top; AVRcade downloads UEVR, its runtime and the reviewed game profile automatically.",
-        "If the profile download fails, use View profile source and obtain the reviewed profile ZIP. Choose Import VR profile ZIP here; AVRcade validates and places its files. Do not unpack it into the game folder.",
-        "For VR + mods, set -dx11 in your selected mod manager. The ordinary AVRcade VR launch supplies this option itself.",
-        "Connect the headset and start its runtime. Recheck setup after changing files or updating the game. Installed packages do not establish compatibility with a newer game build."
+        "Close the game.",
+        "Choose Prepare UEVR. AVRcade adds the approved tools and game profile.",
+        "If the profile download fails, open View profile source.",
+        "Download the reviewed profile ZIP.",
+        "Choose Import VR profile ZIP. Do not unpack it into the game folder.",
+        "For a mod-manager VR launch, add -dx11 to that profile’s launch options.",
+        "Start your headset software.",
+        "Choose Recheck setup. A new game build still needs a compatible VR package."
       ]
     },
     "rv-there-yet": {
       "steps": [
-        "Close the game and use the install button at the top. AVRcade downloads the pinned UEVR tools, runtime and reviewed profile automatically.",
-        "If the profile download fails, use View profile source and obtain its reviewed ZIP. Choose Import VR profile ZIP; AVRcade validates and installs it in the correct profile folder. Do not extract it into the game directory.",
-        "Start your headset runtime before launching. Experimental tracked hands are optional; they are not required to finish package installation."
+        "Close the game.",
+        "Choose Download VR setup. AVRcade adds the approved UEVR tools and game profile.",
+        "If the profile download fails, open View profile source.",
+        "Download the reviewed profile ZIP.",
+        "Choose Import VR profile ZIP. Do not unpack it into the game folder.",
+        "Start your headset software.",
+        "Choose Recheck setup. Experimental tracked hands are optional."
       ]
     },
     "yapyap": {
       "source_url": "https://github.com/Axleonex/AVRcade/tree/main/mods/yapyap-vr",
       "steps": [
-        "This route requires both UUVR and the AVRcade YAPYAP bridge. A generic UUVR install alone does not complete this game's setup. Follow the linked AVRcade bridge package instructions for the supported build, then choose Recheck setup.",
-        "Use SteamVR for headset play, including when Virtual Desktop provides the connection. Package installation and headset connection are reported separately.",
-        "For VR + mods, use a manager profile containing both UUVR and the AVRcade bridge. Select a separate profile without those VR plugins for monitor mods. Close the game before switching modes."
+        "Close the game.",
+        "Open the package source below.",
+        "Install the matched UUVR and AVRcade YAPYAP bridge package. Generic UUVR alone is not enough.",
+        "Start SteamVR, including when you connect through Virtual Desktop.",
+        "Choose Recheck setup.",
+        "For VR + mods, choose a profile containing both VR components.",
+        "For monitor mods, choose a profile without those VR plugins."
       ]
     },
     "gta-san-andreas": {
       "steps": [
-        "Locate your installed classic Windows game if it was not found. The bridge supports one specific executable build; the status above explains a build mismatch.",
-        "Close the game and use Install VR bridge at the top. AVRcade places its bridge and OpenXR loader beside the supported game executable.",
-        "For Vanilla, choose a separate clean game folder in the Mods tab when requested. Do not copy a different VR mod over the managed bridge to clear a setup error."
+        "Choose the supported classic Windows game folder.",
+        "Close the game.",
+        "Choose Install VR bridge. AVRcade adds the bridge and OpenXR loader.",
+        "If the build is blocked, choose a compatible game version.",
+        "For Vanilla, choose a separate clean folder when requested in Mods.",
+        "Do not place another VR conversion over the managed bridge."
       ]
     },
     "gta-iv": {
@@ -57,6 +72,66 @@
         "Use Set up New Vegas VR and Vortex sync on this page. The setup dialog checks the game, native prerequisites and optional one-way Vortex synchronization.",
         "Resolve each preparation error in the dialog, then close it and choose Recheck setup. Avoid copying an unrelated VR package into the game folder.",
         "The native VR route is experimental. After preparation, connect the headset and use the native headset-test launch; package status does not imply that this hardware test has passed."
+      ]
+    },
+    "big-walk": {
+      "steps": [
+        "Close the game.",
+        "Choose Install VR mod at the top of this page.",
+        "Start SteamVR. Virtual Desktop still needs SteamVR for this VR package.",
+        "Choose Recheck setup after installation.",
+        "Test the image, tracking and controls in your headset.",
+        "For VR + mods, choose a manager profile that includes this game’s VR mod and its requirements."
+      ]
+    },
+    "content-warning": {
+      "steps": [
+        "Close the game.",
+        "Choose Install VR mod at the top of this page.",
+        "Start the headset software named in VR setup.",
+        "Choose Recheck setup after installation.",
+        "Test the image, tracking and controls in your headset.",
+        "For VR + mods, choose a manager profile that includes this game’s VR mod and its requirements."
+      ]
+    },
+    "lethal-company": {
+      "steps": [
+        "Close the game.",
+        "Choose Install VR mod at the top of this page.",
+        "Start the headset software named in VR setup.",
+        "Choose Recheck setup after installation.",
+        "Test the image, tracking and controls in your headset.",
+        "For VR + mods, choose a manager profile that includes this game’s VR mod and its requirements."
+      ]
+    },
+    "peak": {
+      "steps": [
+        "Close the game.",
+        "Choose Install VR mod at the top of this page.",
+        "Start the headset software named in VR setup.",
+        "Choose Recheck setup after installation.",
+        "Test the image, tracking and controls in your headset.",
+        "For VR + mods, choose a manager profile that includes this game’s VR mod and its requirements."
+      ]
+    },
+    "repo": {
+      "steps": [
+        "Close the game.",
+        "Choose Install VR mod at the top of this page.",
+        "Start the headset software named in VR setup.",
+        "Choose Recheck setup after installation.",
+        "Test the image, tracking and controls in your headset.",
+        "For VR + mods, choose a manager profile that includes this game’s VR mod and its requirements."
+      ]
+    },
+    "cyberpunk-2077": {
+      "steps": [
+        "Close the game.",
+        "If the game version is blocked, choose Use a compatible game version.",
+        "Complete the missing VR setup step at the top of this page.",
+        "Authorize the Nexus download yourself if More Occluders is requested.",
+        "Choose Recheck setup after Steam or the installer finishes.",
+        "Test the image, tracking and controls in your headset."
       ]
     }
   }

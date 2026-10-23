@@ -12,6 +12,37 @@
         Background="{DynamicResource GroundBrush}"
         Foreground="{DynamicResource InkBrush}"
         Title="AVRcade">
+  <Window.Resources>
+    <DataTemplate x:Key="TroubleshootingCardTemplate" x:DataType="vm:TroubleshootingCardViewModel">
+      <Border Classes="inset" BorderBrush="{Binding ToneBrush}" BorderThickness="4,0,0,0" Padding="20" Margin="0,0,0,12">
+        <StackPanel Spacing="12">
+          <TextBlock Text="{Binding Label}" Foreground="{Binding ToneBrush}" FontWeight="Bold" FontSize="13" />
+          <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontSize="22" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding Summary}" Classes="helpBody" />
+          <ItemsControl ItemsSource="{Binding Steps}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:HelpInstruction">
+                <Grid ColumnDefinitions="30,*" Margin="0,0,0,10">
+                  <TextBlock Text="{Binding Number}" Foreground="{DynamicResource HelpActionBrush}" FontWeight="Bold" FontSize="16" />
+                  <TextBlock Grid.Column="1" Text="{Binding Text}" Classes="helpBody" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Button Content="{Binding ActionLabel}" Tag="{Binding}" IsVisible="{Binding HasAction}"
+                  IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanRunGameDiagnostics}"
+                  Click="TroubleshootingHelp_Click" Classes="helpAction" HorizontalAlignment="Left"
+                  AutomationProperties.AutomationId="TroubleshootingStepAction" />
+          <Expander Header="Technical details for this check" IsVisible="{Binding HasTechnicalDetails}" HorizontalAlignment="Stretch">
+            <StackPanel Spacing="10" Margin="0,10,0,0">
+              <TextBlock Text="{Binding Detail}" Classes="helpBody" />
+              <TextBlock Text="{Binding OriginalInstructions}" Classes="helpBody" />
+            </StackPanel>
+          </Expander>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+  </Window.Resources>
   <Grid RowDefinitions="Auto,*,Auto">
 
     <!-- Top bar -->
@@ -250,7 +281,7 @@
               <StackPanel Spacing="10">
                 <TextBlock Classes="eyebrow" Text="VR SETUP" />
                 <TextBlock Text="{Binding SetupTitle}" Foreground="{Binding SetupBrush}" FontSize="20" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding SetupStatus}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding SetupQuickStatus}" Classes="helpBody" />
                 <ProgressBar IsVisible="{Binding SetupBusy}" IsIndeterminate="True" Height="5" />
                 <TextBlock Classes="secondary" Text="{Binding SetupPackageStatus}" />
                 <TextBlock Classes="secondary" Text="{Binding CyberpunkDependencyStatus}" IsVisible="{Binding IsCyberpunk}" />
@@ -277,14 +308,18 @@
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CancelCyberpunkRequirementsCommand}" />
                   <Button Content="Recheck setup" Margin="0,0,0,8" IsVisible="{Binding !SetupBusy}"
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RecheckGameSetupCommand}" />
+                  <Button Content="Troubleshooting: start here" Margin="10,0,0,8" Click="OpenTroubleshooting_Click" />
                 </WrapPanel>
+                <Expander Header="Setup details" HorizontalAlignment="Stretch">
+                  <TextBlock Text="{Binding SetupStatus}" Classes="helpBody" Margin="0,10,0,0" />
+                </Expander>
               </StackPanel>
             </Border>
 
             <Border Classes="card">
               <StackPanel Spacing="10">
                 <TextBlock Classes="eyebrow" Text="GAME COMPATIBILITY" />
-                <TextBlock Text="{Binding CompatibilityText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding CompatibilityQuickText}" Classes="helpBody" />
                 <TextBlock Classes="secondary" Text="{Binding BuildIdentityText}" TextWrapping="Wrap" FontSize="12" />
                 <Button Content="Use a compatible game version" IsVisible="{Binding CanRecoverGameVersion}"
                         HorizontalAlignment="Left" Click="RecoverGameVersion_Click"
@@ -298,8 +333,9 @@
                     </ComboBox>
                     <Button Content="Choose another / older game installation" Click="ChooseCompatibleInstallation_Click"
                             HorizontalAlignment="Left" AutomationProperties.AutomationId="ChooseCompatibleInstallation" />
-                    <TextBlock Classes="secondary" Text="{Binding SaveCompatibilityWarning}" TextWrapping="Wrap" />
-                    <TextBlock Classes="secondary" Text="Use the store's older-version branch when one is offered, or choose your own legitimate local copy. AVRcade does not download old game binaries. Store authentication still applies." TextWrapping="Wrap" />
+                  <TextBlock Text="! Back up saves before switching game versions. Newer saves may not load in older games."
+                             Foreground="{DynamicResource HelpWarningBrush}" Classes="helpBody" />
+                  <TextBlock Classes="helpBody" Text="Choose a version offered by your store, or select a compatible copy you already own." />
                     <CheckBox Content="Automatically prepare approved VR package updates before VR play"
                               IsChecked="{Binding AutomaticCompatibilityUpdates, Mode=TwoWay}" IsEnabled="{Binding CanUseCompatibility}" />
                     <WrapPanel>
@@ -312,7 +348,14 @@
                       <Button Content="Restore previous VR package" Margin="0,0,8,8" IsVisible="{Binding HasPackageBackup}"
                               Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RollBackVrPackageCommand}" />
                     </WrapPanel>
-                    <TextBlock Classes="secondary" Text="Clean monitor play disables detected mod loaders and parks detected deployed mods. Unmanaged changes to original game files may require store verification or a separate clean copy. Backups remain in the selected game folder." TextWrapping="Wrap" />
+                  <Expander Header="How versions, backups and monitor play work" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="12" Margin="0,10,0,0">
+                      <TextBlock Text="{Binding CompatibilityText}" Classes="helpBody" />
+                      <TextBlock Text="{Binding SaveCompatibilityWarning}" Classes="helpBody" />
+                      <TextBlock Text="Clean monitor play parks detected mod loaders and deployed mods. Backups stay in the selected game folder. Changes to original game files may need Steam verification or a clean copy." Classes="helpBody" />
+                      <TextBlock Text="AVRcade does not download old game binaries. Your store still controls access and sign-in." Classes="helpBody" />
+                    </StackPanel>
+                  </Expander>
                     <Button Content="I tested stereo, tracking and controls in this build" HorizontalAlignment="Left"
                             Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ConfirmCompatibleHeadsetTestCommand}" />
                   </StackPanel>
@@ -402,13 +445,17 @@
 
                 <TabItem Header="VR setup">
                   <StackPanel Spacing="16" Margin="6,14,6,8">
-                    <Expander x:Name="SetupRecovery" Header="Setup help and manual recovery"
+                    <Expander x:Name="SetupRecovery" Header="Step-by-step setup help"
                               IsVisible="{Binding HasSetupHelp}" IsExpanded="False" HorizontalAlignment="Stretch">
                       <StackPanel Spacing="12" Margin="0,10,0,0">
-                        <ItemsControl ItemsSource="{Binding SetupRecoverySteps}">
+                        <TextBlock Text="→ Follow these steps in order. Stop when setup is complete." Foreground="{DynamicResource HelpActionBrush}" Classes="helpBody" />
+                        <ItemsControl ItemsSource="{Binding NumberedSetupSteps}">
                           <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                              <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                            <DataTemplate x:DataType="vm:HelpInstruction">
+                              <Grid ColumnDefinitions="30,*" Margin="0,0,0,12">
+                                <TextBlock Text="{Binding Number}" FontWeight="Bold" Foreground="{DynamicResource HelpActionBrush}" FontSize="16" />
+                                <TextBlock Grid.Column="1" Text="{Binding Text}" Classes="helpBody" />
+                              </Grid>
                             </DataTemplate>
                           </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -849,52 +896,63 @@
                 </TabItem>
 
                 <TabItem Header="Troubleshooting">
-                  <StackPanel Spacing="16" Margin="6,14,6,8">
-                    <TextBlock Classes="heading" Text="Troubleshoot this game" />
-                    <TextBlock Classes="secondary" TextWrapping="Wrap"
-                               Text="Checks run only when requested, for this game's selected installation. Results stay in memory; no troubleshooting reports or history are saved." />
-                    <TextBlock x:Name="TroubleshootingSummary" TextWrapping="Wrap"
-                               Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingSummary}" />
+                  <StackPanel Spacing="16" Margin="6,14,6,8" MinHeight="{Binding $parent[ScrollViewer].Viewport.Height}">
+                    <TextBlock x:Name="TroubleshootingStart" Text="{Binding DisplayName, StringFormat='Start here: {0}'}" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Text="Follow one highlighted step. Check again after making a change." Classes="helpBody" />
                     <WrapPanel>
-                      <Button Content="Run diagnostics" Margin="0,0,10,8" Classes="primary"
-                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RunGameDiagnosticsCommand}" />
-                      <Button Content="Repair this game's setup" Margin="0,0,10,8"
-                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RecheckGameSetupCommand}" />
+                      <TextBlock Text="→ Next step" Foreground="{DynamicResource HelpActionBrush}" FontWeight="SemiBold" Margin="0,0,18,8" />
+                      <TextBlock Text="! Check needed" Foreground="{DynamicResource HelpWarningBrush}" FontWeight="SemiBold" Margin="0,0,18,8" />
+                      <TextBlock Text="✓ Check passed" Foreground="{DynamicResource HelpSuccessBrush}" FontWeight="SemiBold" Margin="0,0,18,8" />
+                      <TextBlock Text="■ VR blocked" Foreground="{DynamicResource HelpStopBrush}" FontWeight="SemiBold" Margin="0,0,0,8" />
                     </WrapPanel>
-                    <TextBlock Classes="secondary" TextWrapping="Wrap"
-                               Text="Repair setup recovers interrupted managed updates and prepares this game's saved controller routes. It preserves your preferences. Close the game before repairing." />
-                    <TextBlock TextWrapping="Wrap"
-                               Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingActionStatus}" />
-                    <ItemsControl ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingFindings}">
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="launch:TroubleshootingFinding">
-                          <Border Classes="inset" Margin="0,0,0,10">
-                            <StackPanel Spacing="8">
-                              <TextBlock Classes="eyebrow" Text="{Binding Status}" />
-                              <TextBlock Classes="heading" Text="{Binding Title}" />
-                              <TextBlock TextWrapping="Wrap" Text="{Binding Detail}" />
-                              <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Instructions}" />
-                              <Button Content="{Binding ActionLabel}" IsVisible="{Binding HasAction}" HorizontalAlignment="Left"
-                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingActionCommand}"
-                                      CommandParameter="{Binding}" />
-                            </StackPanel>
-                          </Border>
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <Border Classes="inset">
-                      <StackPanel Spacing="10">
-                        <TextBlock Classes="heading" Text="Game file repair" />
-                        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                                   Text="Steam can check this game's original files and download missing or damaged files. Steam handles the verification; wait for it to finish, then run diagnostics again. Mod compatibility needs its own checks." />
-                        <Button x:Name="VerifyGameFilesButton" Content="Verify game files in Steam"
-                                HorizontalAlignment="Left"
+                    <ContentControl Content="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.Next}"
+                                    ContentTemplate="{StaticResource TroubleshootingCardTemplate}" />
+                    <Button Content="Check this game again" HorizontalAlignment="Left"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RunGameDiagnosticsCommand}" />
+                    <Expander Header="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.OtherChecksLabel}"
+                              IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.HasOtherChecks}" HorizontalAlignment="Stretch">
+                      <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.OtherChecks}"
+                                    ItemTemplate="{StaticResource TroubleshootingCardTemplate}" />
+                    </Expander>
+                    <Expander Header="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.PassedChecksLabel}"
+                              IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.HasPassedChecks}" HorizontalAlignment="Stretch">
+                      <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingGuide.PassedChecks}"
+                                    ItemTemplate="{StaticResource TroubleshootingCardTemplate}" />
+                    </Expander>
+                    <Expander Header="More repair options" HorizontalAlignment="Stretch">
+                      <StackPanel Spacing="14" Margin="0,12,0,0">
+                        <TextBlock Text="! Close the game before repairing files." Foreground="{DynamicResource HelpWarningBrush}" Classes="helpBody" />
+                        <TextBlock Text="Repair setup: recover an interrupted VR update and restore saved controller routes. Your preferences are kept." Classes="helpBody" />
+                        <Button Content="Repair setup" HorizontalAlignment="Left"
+                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RecheckGameSetupCommand}" />
+                        <TextBlock Text="Steam file check: restore missing or damaged original game files. Wait for Steam to finish, then check again." Classes="helpBody" />
+                        <TextBlock Text="! Steam verification does not downgrade the game or fix incompatible mods." Foreground="{DynamicResource HelpWarningBrush}" Classes="helpBody" />
+                        <Button x:Name="VerifyGameFilesButton" Content="Verify game files in Steam" HorizontalAlignment="Left"
                                 Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VerifyGameFilesCommand}" />
-                        <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding NotInstalled}"
-                                   Text="Install or locate this game first to verify its files." />
+                        <TextBlock Text="Install or locate the game first." Classes="helpBody" IsVisible="{Binding NotInstalled}" />
                       </StackPanel>
-                    </Border>
-
+                    </Expander>
+                    <Expander x:Name="TroubleshootingTechnical" Header="Technical details and latest action" HorizontalAlignment="Stretch">
+                      <StackPanel Spacing="12" Margin="0,12,0,0">
+                        <TextBlock Text="These results apply only to this game's selected folder. Check results stay in memory until AVRcade closes." Classes="helpBody" />
+                        <TextBlock x:Name="TroubleshootingSummary" Classes="helpBody"
+                                   Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingSummary}" />
+                        <TextBlock Text="Latest app message" FontWeight="SemiBold" />
+                        <TextBlock Classes="helpBody" Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).StatusText}" />
+                        <TextBlock Classes="helpBody" Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingActionStatus}" />
+                        <ItemsControl ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TroubleshootingFindings}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="launch:TroubleshootingFinding">
+                              <StackPanel Spacing="8" Margin="0,8,0,12">
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Detail}" Classes="helpBody" />
+                                <TextBlock Text="{Binding Instructions}" Classes="helpBody" />
+                              </StackPanel>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </Expander>
                   </StackPanel>
                 </TabItem>
               </TabControl>
@@ -956,9 +1014,10 @@
 
     <!-- Status line -->
     <Border Grid.Row="2" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="28,10">
-      <Grid ColumnDefinitions="*,16,Auto">
+      <Grid ColumnDefinitions="*,16,Auto,16,Auto">
         <TextBlock x:Name="LaunchStatusText" Classes="secondary" Classes.launchSuccess="{Binding StatusSuccess}"
-                   Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center">
+                   Text="{Binding StatusText}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
+                   ToolTip.Tip="{Binding StatusText}" FontSize="13" VerticalAlignment="Center">
           <TextBlock.Styles>
             <Style Selector="TextBlock.launchSuccess">
               <Setter Property="Foreground" Value="{DynamicResource GoodBrush}" />
@@ -966,7 +1025,8 @@
             </Style>
           </TextBlock.Styles>
         </TextBlock>
-        <ProgressBar Grid.Column="2" Width="120" Height="4" IsIndeterminate="True" IsVisible="{Binding Busy}" />
+        <Button Grid.Column="2" Content="Full message" Click="OpenTroubleshootingDetails_Click" IsVisible="{Binding ShowGameDetail}" />
+        <ProgressBar Grid.Column="4" Width="120" Height="4" IsIndeterminate="True" IsVisible="{Binding Busy}" />
       </Grid>
     </Border>
   </Grid>

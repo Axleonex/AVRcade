@@ -16,6 +16,10 @@ public sealed partial class GameItemViewModel
     public bool CanRecoverGameVersion => VersionRecovery is not null;
     public IReadOnlyList<InstallationChoice> InstallationChoices { get; private set; } = [];
     public string CompatibilityText => CompatibilityState?.Message ?? "Compatibility checks are unavailable.";
+    public string CompatibilityQuickText => VersionRecovery is { } version
+        ? $"Installed: {version.InstalledBuild}. VR needs: {version.RequiredBuild}."
+        : CompatibilityState is { CanTryVr: true } ? "Build check complete. Headset testing is still separate."
+        : "A compatibility check needs attention. Open Troubleshooting.";
     public string SaveCompatibilityWarning => GameCompatibilityService.SaveWarning;
     public bool CanUseCompatibility => IsInstalled;
     public bool HasParkedMods => CompatibilityState?.ModsParked == true;
@@ -61,6 +65,6 @@ public sealed partial class GameItemViewModel
         foreach (var name in new[] { nameof(CompatibilityState), nameof(CompatibilityText), nameof(BuildIdentityText),
             nameof(InstallationChoices), nameof(SelectedInstallation), nameof(AutomaticCompatibilityUpdates),
             nameof(HasParkedMods), nameof(HasPackageBackup), nameof(CanUseCompatibility),
-            nameof(VersionRecovery), nameof(CanRecoverGameVersion) }) OnPropertyChanged(name);
+            nameof(VersionRecovery), nameof(CanRecoverGameVersion), nameof(CompatibilityQuickText), nameof(SetupQuickStatus) }) OnPropertyChanged(name);
     }
 }

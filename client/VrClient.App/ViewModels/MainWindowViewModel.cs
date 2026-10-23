@@ -401,6 +401,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 : $"Run diagnostics to check {selected.DisplayName}. Results stay in memory until AVRcade closes.";
             TroubleshootingActionStatus = string.Empty;
         }
+        RefreshTroubleshootingGuide();
     }
     private void StoreTroubleshooting(GameView game, GameTroubleshootingReport report, string action = "")
     {

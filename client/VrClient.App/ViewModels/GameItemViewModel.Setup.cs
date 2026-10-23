@@ -36,6 +36,14 @@ public sealed partial class GameItemViewModel
         : IsYapyap || IsFallout3 || IsFalloutNewVegas ? View.ReadinessDetail
         : SetupCanInstall ? "Install the required VR components here. AVRcade downloads, checks and places them for this game."
         : View.ReadinessDetail);
+    public string SetupQuickStatus => SetupBusy ? "Please wait. VR setup is in progress."
+        : CanRecoverGameVersion ? "Choose a game version supported by this VR port."
+        : ModUpdateFailed || _setupFailed || SetupBlocked ? "Open Troubleshooting for one next step."
+        : !IsInstalled ? "Install the game or choose its folder."
+        : SetupPackagesInstalled ? "VR files are present. Test the image and controls in your headset."
+        : "Complete the missing VR setup step below.";
+    public IReadOnlyList<HelpInstruction> NumberedSetupSteps => SetupRecoverySteps
+        .Select((text, index) => new HelpInstruction(index + 1, text)).ToArray();
     public string SetupPackageStatus => IsCyberpunk ? CyberpunkBackendStatus
         : (IsUnreal ? "UEVR tools and runtime" : "VR package") + (View.ModInstalled ? ": installed" : ": not installed");
     public bool HasSetupProfileStatus => !IsCyberpunk && View.ProfileImportRequired;
@@ -49,13 +57,13 @@ public sealed partial class GameItemViewModel
         PlayModes.Any(mode => mode.IsVr && mode.State.Setup is PlayModeSetup.InstallVr);
     public bool SetupCanImportProfile => CanImportUevrProfile && !SetupBusy && !SetupBlocked;
     public bool SetupNeedsProfileImport => SetupCanImportProfile && !View.ProfileImported && _setupFailed;
-    public bool HasSetupHelp => !IsCyberpunk && HasSetupCard && (_setupGuide?.Steps.Count > 0 || _setupFailed);
+    public bool HasSetupHelp => HasSetupCard && (_setupGuide?.Steps.Count > 0 || _setupFailed);
     public bool SetupNeedsDetails => IsInstalled && !SetupBusy && !SetupPackagesInstalled && !SetupCanInstall && HasSetupHelp;
     public string? SetupSourceUrl => _setupGuide?.SourceUrl ?? UevrProfileSourceUrl ?? ModCredits.FirstOrDefault()?.Url;
     public bool HasSetupSource => !CanImportUevrProfile && !string.IsNullOrWhiteSpace(SetupSourceUrl);
     public IReadOnlyList<string> SetupRecoverySteps => _setupGuide?.Steps ??
-        ["Close the game, check the reported error and retry the install action at the top. AVRcade installs the configured packages in the correct location.",
-         "If you changed the installation or deployed mods in a manager, choose Recheck setup. Manager profiles are separate from the VR-only game-folder installation."];
+        ["Close the game.", "Complete the missing setup step at the top of this page.",
+         "Choose Recheck setup after changing files or mod-manager profiles."];
 
     public void SetSetupGuide(GameSetupGuide? guide)
     {
@@ -76,7 +84,7 @@ public sealed partial class GameItemViewModel
         foreach (var name in new[] { nameof(HasSetupCard), nameof(SetupBusy), nameof(SetupTitle), nameof(SetupBrush),
             nameof(SetupStatus), nameof(SetupPackageStatus), nameof(SetupProfileStatus), nameof(SetupRuntimeStatus),
             nameof(SetupCanInstall), nameof(SetupCanImportProfile), nameof(SetupNeedsProfileImport), nameof(HasSetupHelp), nameof(SetupNeedsDetails),
-            nameof(SetupRecoverySteps), nameof(SetupSourceUrl), nameof(HasSetupSource) })
+            nameof(SetupRecoverySteps), nameof(NumberedSetupSteps), nameof(SetupQuickStatus), nameof(SetupSourceUrl), nameof(HasSetupSource) })
             OnPropertyChanged(name);
     }
 }

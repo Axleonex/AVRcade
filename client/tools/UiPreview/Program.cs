@@ -40,6 +40,39 @@ AppBuilder.Configure<VrClient.App.App>()
 if (args.Contains("--dark") || args.Contains("--light"))
     LauncherThemeService.Current.SetMode(args.Contains("--dark"), persist: false);
 var suffix = LauncherThemeService.Current.IsDark ? "-dark" : string.Empty;
+var helpPreview = args.Contains("--help-preview");
+if (helpPreview)
+{
+    var theme = LauncherThemeService.Current;
+    var savedPalette = theme.PaletteId;
+    var savedDark = theme.IsDark;
+    double Luminance(Avalonia.Media.Color c)
+    {
+        double Channel(byte value) { var n = value / 255.0; return n <= 0.04045 ? n / 12.92 : Math.Pow((n + 0.055) / 1.055, 2.4); }
+        return 0.2126 * Channel(c.R) + 0.7152 * Channel(c.G) + 0.0722 * Channel(c.B);
+    }
+    double Contrast(string foreground, string background)
+    {
+        var a = Luminance(((Avalonia.Media.SolidColorBrush)Application.Current!.Resources[foreground]!).Color);
+        var b = Luminance(((Avalonia.Media.SolidColorBrush)Application.Current!.Resources[background]!).Color);
+        return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
+    }
+    foreach (var palette in theme.AvailablePalettes)
+        foreach (var dark in new[] { false, true })
+        {
+            theme.SetPalette(palette.Id, persist: false);
+            theme.SetMode(dark, persist: false);
+            foreach (var foreground in new[] { "HelpActionBrush", "HelpWarningBrush", "HelpSuccessBrush", "HelpStopBrush" })
+                foreach (var background in new[] { "GroundBrush", "SurfaceBrush" })
+                    if (Contrast(foreground, background) < 4.5)
+                        throw new InvalidOperationException($"Help contrast failed: {palette.Id}, dark={dark}, {foreground}/{background}");
+            if (Contrast("HelpActionInkBrush", "HelpActionBrush") < 4.5)
+                throw new InvalidOperationException("Help button contrast failed: " + palette.Id);
+        }
+    theme.SetPalette(savedPalette, persist: false);
+    theme.SetMode(savedDark, persist: false);
+    Console.WriteLine("Help contrast passed: all 6 palettes, both modes, minimum 4.5:1.");
+}
 var modularChecks = args.Contains("--streaming-modular-check");
 var spectatorFixtureDirectory = modularChecks
     ? Path.Combine(Path.GetTempPath(), "avrcade-ui-spectators-" + Guid.NewGuid().ToString("N")) : null;
@@ -197,6 +230,34 @@ viewModel.BackToLibraryCommand.Execute(null);
 foreach (var game in viewModel.Games.Where(g => slugs.Length == 0 || slugs.Contains(g.Slug)).ToArray())
 {
     viewModel.OpenGameCommand.Execute(game);
+    if (helpPreview)
+    {
+        // Controlled presentation fixture: never run checks, repair or launch a game.
+        viewModel.TroubleshootingFindings = [
+            new("Game installation", game.IsInstalled ? "Passed" : "Attention", "UI preview fixture only.", "Not a real diagnostics result."),
+            new("VR runtime observation", "Attention", "UI preview fixture only.", "Start the runtime.", VrClient.Core.Launch.TroubleshootingAction.VrSetup),
+            new("Optional mods and controls", "Instructions", "UI preview fixture only.", "Check mods.", VrClient.Core.Launch.TroubleshootingAction.Mods)
+        ];
+        viewModel.StatusText = "UI preview only: synthetic findings.";
+        window.FocusTroubleshooting();
+        Capture($"help-{game.Slug}");
+        var helpScroll = window.FindControl<ScrollViewer>("GameScroll")!;
+        var helpHeading = window.FindControl<TextBlock>("TroubleshootingStart")!;
+        if (helpHeading.TranslatePoint(new Point(0, 0), helpScroll) is not { Y: >= -2 and <= 80 })
+            throw new InvalidOperationException("Troubleshooting did not focus the first step: " + game.Slug);
+        if (game.VersionRecovery is { } recovery)
+        {
+            var dialog = new GameVersionRecoveryDialog(recovery);
+            dialog.Show(window);
+            Dispatcher.UIThread.RunJobs();
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            using var frame = dialog.CaptureRenderedFrame() ?? throw new InvalidOperationException("No recovery popup frame.");
+            frame.Save(Path.Combine(outputDir, $"help-{game.Slug}-version{suffix}.png"));
+            dialog.Close();
+        }
+        viewModel.BackToLibraryCommand.Execute(null);
+        continue;
+    }
     Capture($"detail-{game.Slug}");
     // Taller frames show each tab of the game page without scrolling.
     window.Height = height * 2;
