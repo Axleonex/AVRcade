@@ -88,6 +88,9 @@ public partial class MainWindow : Window
                     vm.DetailTabIndex = ModsTab;
                     await ChooseGtaVanillaFolderAsync(vm);
                     break;
+                case PlayModeSetup.RecoverGameVersion:
+                    await ShowGameVersionRecoveryAsync(vm, game.View);
+                    break;
             }
             return;
         }
@@ -263,6 +266,29 @@ public partial class MainWindow : Window
         var captured = game.View;
         if (await PickFolderAsync("Select this game's older or alternate installation") is { } path)
             vm.SelectGameInstallation(captured, path);
+    }
+
+    private async void RecoverGameVersion_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel { SelectedGame: { } game, Busy: false, IsInstallingCyberpunkRequirements: false } vm)
+            await ShowGameVersionRecoveryAsync(vm, game.View);
+    }
+
+    private async Task ShowGameVersionRecoveryAsync(MainWindowViewModel vm, GameView captured)
+    {
+        if (vm.Busy || vm.IsInstallingCyberpunkRequirements) return;
+        if (vm.CreateVersionRecovery(captured) is not { } plan)
+        { vm.RecheckCompatibleVersion(captured); return; }
+        switch (await new GameVersionRecoveryDialog(plan).ShowDialog<GameVersionRecoveryAction>(this))
+        {
+            case GameVersionRecoveryAction.OpenSteam: vm.OpenGameVersionStore(captured); break;
+            case GameVersionRecoveryAction.ChooseInstallation:
+                if (await PickFolderAsync("Select this game's compatible older installation") is { } path)
+                    vm.SelectGameInstallation(captured, path);
+                break;
+            case GameVersionRecoveryAction.Recheck: vm.RecheckCompatibleVersion(captured); break;
+            case GameVersionRecoveryAction.Monitor: await vm.LaunchRecoveryMonitorAsync(captured); break;
+        }
     }
 
     private async Task<string?> PickFolderAsync(string title)

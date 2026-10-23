@@ -99,7 +99,9 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
             if (state.Mode == PlayMode.Vanilla && IsInstalled)
                 state = new(PlayMode.Vanilla, PlayModeAvailability.Ready, "Detected mod loaders and deployed mod files are parked; no VR injection", "Play vanilla");
             else if (IsInstalled && state.Mode is PlayMode.VrOnly or PlayMode.VrWithMods && CompatibilityState is { CanTryVr: false } compatibility)
-                state = new(state.Mode, PlayModeAvailability.Unavailable, compatibility.Message, "VR unavailable");
+                state = CanRecoverGameVersion
+                    ? new(state.Mode, PlayModeAvailability.NeedsSetup, compatibility.Message, "Choose compatible version", PlayModeSetup.RecoverGameVersion)
+                    : new(state.Mode, PlayModeAvailability.Unavailable, compatibility.Message, "VR unavailable");
             return new PlayModeViewModel(state);
         }).ToArray();
         OnPropertyChanged(nameof(PlayModes));

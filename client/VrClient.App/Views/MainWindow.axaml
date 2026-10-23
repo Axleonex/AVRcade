@@ -286,6 +286,9 @@
                 <TextBlock Classes="eyebrow" Text="GAME COMPATIBILITY" />
                 <TextBlock Text="{Binding CompatibilityText}" TextWrapping="Wrap" />
                 <TextBlock Classes="secondary" Text="{Binding BuildIdentityText}" TextWrapping="Wrap" FontSize="12" />
+                <Button Content="Use a compatible game version" IsVisible="{Binding CanRecoverGameVersion}"
+                        HorizontalAlignment="Left" Click="RecoverGameVersion_Click"
+                        AutomationProperties.AutomationId="RecoverGameVersion" />
                 <Expander Header="Game versions and automatic VR updates" HorizontalAlignment="Stretch">
                   <StackPanel Spacing="10" Margin="0,10,0,0">
                     <TextBlock Text="Installation to use" FontWeight="SemiBold" />

@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:compat="clr-namespace:VrClient.Core.Compatibility;assembly=VrClient.Core"
+        x:Class="VrClient.App.Views.GameVersionRecoveryDialog" x:DataType="compat:GameVersionRecovery"
+        Width="680" MaxHeight="740" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner" Title="Choose a compatible game version"
+        Background="{DynamicResource GroundBrush}" Foreground="{DynamicResource InkBrush}">
+  <Border Margin="20" Padding="20" Background="{DynamicResource SurfaceBrush}"
+          BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="10">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="14">
+        <TextBlock Classes="eyebrow" Text="GAME VERSION RECOVERY" />
+        <TextBlock Text="{Binding Title}" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <StackPanel Spacing="6">
+          <TextBlock Text="Installed game build" Classes="secondary" />
+          <TextBlock Text="{Binding InstalledBuild}" FontSize="19" />
+          <TextBlock Text="{Binding Requirement}" TextWrapping="Wrap" FontWeight="SemiBold" />
+        </StackPanel>
+        <Border Background="{DynamicResource GroundBrush}" Padding="12" CornerRadius="6">
+          <TextBlock Text="{Binding SaveWarning}" TextWrapping="Wrap" />
+        </Border>
+        <TextBlock Text="{Binding StoreInstructions}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding InstallationNote}" Classes="secondary" TextWrapping="Wrap" />
+        <Button Content="Open Steam game properties" IsVisible="{Binding HasSteamOptions}"
+                Click="OpenSteam_Click" HorizontalAlignment="Left" Classes="primary"
+                AutomationProperties.AutomationId="OpenStoreVersionOptions" />
+        <Button Content="Choose an existing compatible copy" Click="ChooseInstallation_Click" HorizontalAlignment="Left" />
+        <TextBlock Text="After Steam finishes or you select another copy, recheck its actual build. VR stays blocked until compatibility checks pass."
+                   Classes="secondary" TextWrapping="Wrap" />
+        <WrapPanel>
+          <Button Content="Recheck this installation" Click="Recheck_Click" Margin="0,0,8,8" />
+          <Button Content="Clean monitor play" Click="Monitor_Click" Margin="0,0,8,8" />
+          <Button Content="Close" Click="Cancel_Click" Margin="0,0,0,8" />
+        </WrapPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</Window>

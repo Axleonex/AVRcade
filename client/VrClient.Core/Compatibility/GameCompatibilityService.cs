@@ -170,6 +170,31 @@ public sealed class GameCompatibilityService(string repoRoot, GameInstallationSt
     public static bool SameBuild(GameBuildIdentity? left, GameBuildIdentity? right) => left is not null && right is not null &&
         left.ExecutableSha256.Equals(right.ExecutableSha256, StringComparison.OrdinalIgnoreCase);
 
+    public GameVersionRecovery? VersionRecoveryFor(GameView game, GameCompatibilityState? inspected = null)
+    {
+        var state = inspected ?? Inspect(game, observe: false);
+        if (state.Identity is null) return null;
+        try { return GameVersionRecovery.Create(game, state, Describe(game), ReadVersionPolicy(game, state.Identity.Version)); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or ArgumentException) { return null; }
+    }
+
+    public ActionOutcome OpenStoreVersionOptions(GameView game, Action<ProcessStartInfo>? request = null)
+    {
+        var plan = VersionRecoveryFor(game);
+        if (plan is null) return new(false, "This installation does not currently have a game-build mismatch. Recheck setup for its actual next step.");
+        if (plan.SteamPropertiesUri is null) return new(false, "This entry has no valid Steam identity. Use the game's store to check older-version options, or choose an existing compatible copy.");
+        try
+        {
+            EnsureClosed(game);
+            var start = new ProcessStartInfo(plan.SteamPropertiesUri) { UseShellExecute = true };
+            if (request is not null) request(start);
+            else { using var process = Process.Start(start); }
+            return new(true, $"Requested Steam properties for {game.DisplayName}. Look in Game Versions & Betas for {plan.RequiredBuild}; availability has not been checked. After Steam finishes, recheck your selected installation. AVRcade has not changed the game version.");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or System.ComponentModel.Win32Exception)
+        { return new(false, "Could not open Steam version options: " + ex.Message); }
+    }
+
     private bool InstalledPackageMatches(GameView game)
     {
         if (game.InstallDir is null) return false;

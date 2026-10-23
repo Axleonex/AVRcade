@@ -42,6 +42,37 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
     public void Dispose() => Directory.Delete(_root, true);
     private MainWindowViewModel Window() => new(_ => null, controller: _controller);
 
+    [Fact]
+    public void GameVersionMismatchOffersRecoveryThroughBothVrButtonsWhileMonitorPlayRemainsAvailable()
+    {
+        _ui.Run(() =>
+        {
+            var root = Path.Combine(_root, "older-copy");
+            Directory.CreateDirectory(root);
+            File.WriteAllText(Path.Combine(root, "REPO.exe"), "fixture");
+            var game = new GameView("repo", "R.E.P.O.", "3241660", root, true, "Allow", "test",
+                GameEngine.Unity, GameReadiness.ProfileUnverified, "Experimental");
+            var config = Path.Combine(_root, "config", "games", "repo.json");
+            File.WriteAllText(config, """{"executable_names":["REPO.exe"],"game_compatibility":{"supported_versions":["2.31"],"package_version":"1.0","source_url":"https://example.com/reviewed"}}""");
+            using var row = new GameItemViewModel(game, null, null,
+                VrClient.Core.Legacy.GtaSanAndreasTurnSettings.Default,
+                VrClient.Core.Redengine.CyberpunkTurnSettings.Default, null);
+            row.SetCompatibility(_controller.Compatibility, _ => { });
+            row.SetPlayModeSource(_ => Enum.GetValues<PlayMode>().Select(mode =>
+                new PlayModeState(mode, PlayModeAvailability.Ready, "ready", "Play")).ToArray(),
+                false, new("", []));
+            Assert.True(row.CanRecoverGameVersion);
+            Assert.Equal("2.31", row.VersionRecovery!.RequiredBuild);
+            foreach (var mode in new[] { PlayMode.VrOnly, PlayMode.VrWithMods })
+            {
+                Assert.True(row.PlayModeFor(mode)!.CanAct);
+                Assert.False(row.PlayModeFor(mode)!.IsLaunch);
+                Assert.Equal(PlayModeSetup.RecoverGameVersion, row.PlayModeFor(mode)!.State.Setup);
+            }
+            Assert.True(row.PlayModeFor(PlayMode.Vanilla)!.IsLaunch);
+        });
+    }
+
     [Theory, MemberData(nameof(Games))]
     public void RefreshOnlyReplacesTheRequestedGameAndPreservesFourModes(string slug, string appId)
     {

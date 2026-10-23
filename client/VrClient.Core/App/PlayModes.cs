@@ -6,7 +6,7 @@ public enum PlayMode { VrOnly, VrWithMods, ModsNoVr, Vanilla }
 public enum PlayModeAvailability { Ready, NeedsSetup, Unavailable }
 
 /// What the mode's button does when the mode is not ready to launch.
-public enum PlayModeSetup { None, InstallVr, OpenVrSetup, OpenMods, ChooseCleanFolder, InstallCyberpunkRequirements }
+public enum PlayModeSetup { None, InstallVr, OpenVrSetup, OpenMods, ChooseCleanFolder, InstallCyberpunkRequirements, RecoverGameVersion }
 
 public sealed record PlayModeState(
     PlayMode Mode, PlayModeAvailability Availability, string Status, string Action,

@@ -22,6 +22,12 @@ There is no scheduled background updater. Checks happen in AVRcade and during th
 
 ## Older game installations
 
+When the installed build does not match the VR integration, **Use a compatible game version** opens a recovery popup. The blocked VR buttons also open this popup instead of attempting launch. It shows the installed build and the supported version from the package metadata (for example, Cyberpunk 2.5 versus VR package 0.1.7's supported 2.31).
+
+**Open Steam game properties** opens that title's properties. Select **Game Versions & Betas** (**Betas** in older clients) and choose a matching publisher-provided branch, if offered. Steam controls availability and performs the download, replacing its registered installation. AVRcade does not claim that every historical version is available, choose an unverified branch, download depot files, or edit game manifests. See [Valve's branch documentation](https://partner.steamgames.com/doc/store/application/branches). A separate selected copy is explicitly distinguished from Steam's registered installation.
+
+The popup also offers selection of an existing compatible copy, a recheck after the store finishes, and clean monitor play. Opening the popup or Steam properties does not change game files, update preferences or save data, or clear a VR compatibility block. A successful process request is not reported as a completed game rollback. Rechecking stays bound to the captured game and installation; changing the selected copy requires reopening the recovery options.
+
 Choose **Choose another / older game installation** and select the folder containing that game's expected executable. The selector remembers multiple roots. Choosing a missing/disconnected copy never silently launches another installation.
 
 Use a store-provided older-version branch when one exists, or select a legitimate local copy you already have. AVRcade does not obtain old game binaries, promise that a store offers every historical version, edit Steam manifests to pretend a downgrade happened, or bypass ownership/authentication. A separate older copy carries its own executable identity; it does not borrow another copy's Steam manifest. Unity/Cyberpunk/native launch paths use the selected folder. UEVR starts a selected separate copy through its normal executable and attaches only to that exact path; the default store installation retains the Steam route.

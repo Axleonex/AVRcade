@@ -12,6 +12,8 @@ public sealed partial class GameItemViewModel
     private InstallationChoice? _installation;
     private bool _automaticUpdates;
     public GameCompatibilityState? CompatibilityState { get; private set; }
+    public GameVersionRecovery? VersionRecovery { get; private set; }
+    public bool CanRecoverGameVersion => VersionRecovery is not null;
     public IReadOnlyList<InstallationChoice> InstallationChoices { get; private set; } = [];
     public string CompatibilityText => CompatibilityState?.Message ?? "Compatibility checks are unavailable.";
     public string SaveCompatibilityWarning => GameCompatibilityService.SaveWarning;
@@ -46,6 +48,7 @@ public sealed partial class GameItemViewModel
         _compatibility = compatibility;
         _selectInstallation = select;
         CompatibilityState = compatibility.Inspect(View);
+        VersionRecovery = compatibility.VersionRecoveryFor(View, CompatibilityState);
         GameInstallations saved;
         try { saved = compatibility.Installations.ForGame(Slug); }
         catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException or UnauthorizedAccessException)
@@ -57,6 +60,7 @@ public sealed partial class GameItemViewModel
         _automaticUpdates = CompatibilityState.Profile?.AutomaticUpdates ?? true;
         foreach (var name in new[] { nameof(CompatibilityState), nameof(CompatibilityText), nameof(BuildIdentityText),
             nameof(InstallationChoices), nameof(SelectedInstallation), nameof(AutomaticCompatibilityUpdates),
-            nameof(HasParkedMods), nameof(HasPackageBackup), nameof(CanUseCompatibility) }) OnPropertyChanged(name);
+            nameof(HasParkedMods), nameof(HasPackageBackup), nameof(CanUseCompatibility),
+            nameof(VersionRecovery), nameof(CanRecoverGameVersion) }) OnPropertyChanged(name);
     }
 }

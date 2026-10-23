@@ -8,6 +8,42 @@ namespace VrClient.App.ViewModels;
 
 public partial class MainWindowViewModel
 {
+    public GameVersionRecovery? CreateVersionRecovery(GameView captured) =>
+        _controller?.Compatibility.VersionRecoveryFor(captured);
+
+    private bool CanActOnRecovery(GameView captured)
+    {
+        if (_controller is null || Busy || IsInstallingCyberpunkRequirements) return false;
+        try
+        {
+            var current = _controller.GetGame(captured.Slug);
+            if (GameInstallationStore.SameRoot(current?.InstallDir, captured.InstallDir)) return true;
+            StatusText = "The selected installation changed. Open the version options again for the intended copy.";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
+        { StatusText = "Game version recovery could not recheck this installation: " + ex.Message; }
+        return false;
+    }
+    public void OpenGameVersionStore(GameView captured)
+    {
+        if (CanActOnRecovery(captured)) StatusText = _controller!.Compatibility.OpenStoreVersionOptions(captured).Message;
+    }
+    public void RecheckCompatibleVersion(GameView captured)
+    {
+        if (!CanActOnRecovery(captured)) return;
+        try
+        {
+            RefreshGame(captured.Slug);
+            StatusText = Games.FirstOrDefault(g => g.Slug == captured.Slug)?.CompatibilityText
+                ?? "The selected installation is unavailable. Reconnect its drive or choose another copy.";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or ArgumentException)
+        { StatusText = "Game version recheck could not complete: " + ex.Message; }
+    }
+    public async Task LaunchRecoveryMonitorAsync(GameView captured)
+    {
+        if (CanActOnRecovery(captured)) await RunCleanMonitorAsync(captured);
+    }
     public void SelectGameInstallation(GameView captured, string root)
     {
         if (_controller is null || Busy || IsInstallingCyberpunkRequirements) return;
