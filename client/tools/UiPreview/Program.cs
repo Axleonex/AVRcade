@@ -241,6 +241,16 @@ foreach (var game in viewModel.Games.Where(g => slugs.Length == 0 || slugs.Conta
         viewModel.StatusText = "UI preview only: synthetic findings.";
         window.FocusTroubleshooting();
         Capture($"help-{game.Slug}");
+        var stepButton = window.GetVisualDescendants().OfType<Button>().FirstOrDefault(button =>
+            button.IsEffectivelyVisible && Avalonia.Automation.AutomationProperties.GetAutomationId(button) == "TroubleshootingStepAction");
+        if (stepButton?.Tag is not TroubleshootingCardViewModel)
+            throw new InvalidOperationException("Help action lost its instruction context: " + game.Slug);
+        viewModel.Busy = true;
+        Dispatcher.UIThread.RunJobs();
+        if (stepButton.IsEnabled) throw new InvalidOperationException("Help action must be disabled during a check: " + game.Slug);
+        viewModel.Busy = false;
+        Dispatcher.UIThread.RunJobs();
+        if (!stepButton.IsEnabled) throw new InvalidOperationException("Help action did not become available after a check: " + game.Slug);
         var helpScroll = window.FindControl<ScrollViewer>("GameScroll")!;
         var helpHeading = window.FindControl<TextBlock>("TroubleshootingStart")!;
         if (helpHeading.TranslatePoint(new Point(0, 0), helpScroll) is not { Y: >= -2 and <= 80 })

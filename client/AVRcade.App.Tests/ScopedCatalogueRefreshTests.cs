@@ -43,6 +43,25 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
     private MainWindowViewModel Window() => new(_ => null, controller: _controller);
 
     [Fact]
+    public void Busy_changes_refresh_the_guided_action_availability()
+    {
+        _ui.Run(() =>
+        {
+            using var window = Window();
+            window.SelectedGame = window.Games.Single(g => g.Slug == "repo");
+            var changes = new List<string?>();
+            window.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
+            window.Busy = true;
+            Assert.Contains(nameof(window.CanRunGameDiagnostics), changes);
+            Assert.False(window.CanRunGameDiagnostics);
+            changes.Clear();
+            window.Busy = false;
+            Assert.Contains(nameof(window.CanRunGameDiagnostics), changes);
+            Assert.True(window.CanRunGameDiagnostics);
+        });
+    }
+
+    [Fact]
     public void Switching_games_does_not_carry_the_previous_troubleshooting_step()
     {
         _ui.Run(() =>

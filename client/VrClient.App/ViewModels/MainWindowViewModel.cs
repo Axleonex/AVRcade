@@ -153,6 +153,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private void RefreshRepairAvailability()
     {
         OnPropertyChanged(nameof(CanRepairSelectedGame));
+        OnPropertyChanged(nameof(CanRunGameDiagnostics));
         VerifyGameFilesCommand.NotifyCanExecuteChanged();
         RecheckGameSetupCommand.NotifyCanExecuteChanged();
         RunGameDiagnosticsCommand.NotifyCanExecuteChanged();
