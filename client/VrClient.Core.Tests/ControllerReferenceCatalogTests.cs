@@ -55,7 +55,7 @@ public sealed class ControllerReferenceCatalogTests
         Assert.NotNull(reference);
         Assert.Equal(["quest-touch", "valve-index"], reference.Devices.Select(d => d.Id));
         Assert.Contains(reference.Devices[0].Bindings, binding =>
-            binding.Control == "Both stick clicks, hold 1 second" && binding.Action == "Toggle VR settings overlay");
+            binding.Control == "Both stick clicks, hold 0.5 seconds" && binding.Action == "Open / close VR menu");
         Assert.Equal("dariulone", reference.ConversionCredit?.Creator);
         Assert.Equal("source_verified", reference.VerificationState);
         Assert.Equal("Interact / reload", reference.Devices[0].LeftPrimary.Action);

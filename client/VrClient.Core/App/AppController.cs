@@ -269,7 +269,7 @@ public sealed partial class AppController
         if (game.Engine is not GameEngine.Redengine || string.IsNullOrEmpty(game.InstallDir))
             return new ActionOutcome(false, "HUD modes are available only for an installed Cyberpunk 2077 conversion.");
         if (CyberpunkUpstreamSession.ReadState(game.InstallDir) is not null)
-            return new(false, "CyberpunkVR Port 0.1.7 controls its HUD in the headset: hold L3+R3 for one second or press F10.");
+            return new(false, "CyberpunkVR Port controls its HUD in the headset: hold L3+R3 for half a second or press F10.");
         try
         {
             CyberpunkHudSettings.WriteMode(game.InstallDir, mode);
@@ -500,7 +500,8 @@ public sealed partial class AppController
                 var conflicts = installDir is not null && managedPackage is not null
                     ? CyberpunkInstallConflicts(preflight, managedPackage, installDir) : preflight.Conflicts;
                 var needsManagedInstall = installDir is not null && managedPackage?.Package.UpstreamRelease is not null &&
-                    CyberpunkUpstreamSession.ReadState(installDir)?.Version != managedPackage.Package.Version;
+                    (CyberpunkUpstreamSession.ReadState(installDir)?.Version != managedPackage.Package.Version ||
+                     managedPackage.Plan(installDir).ToDownload.Count > 0);
                 var installed = installDir is not null &&
                     preflight.MissingDependencies.Count == 0 && !needsManagedInstall;
                 var blocked = conflicts.Count > 0 || preflight.IdentityMismatch || compatibilityMetadataMismatch;

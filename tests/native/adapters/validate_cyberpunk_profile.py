@@ -28,19 +28,20 @@ def main() -> int:
     require(native["loading"]["mode"] == "red4ext_plugin", "RED4ext must load the bridge")
     require(native["loading"]["proxy_dll_forbidden"], "proxy DLL loading must be refused")
     require(native["conversion"]["stereo_method"] == "engine_second_view", "AER is not the product path")
-    require(native["game"]["steam_buildid_observed"] == "20383525", "Steam build must be pinned")
+    require(native["game"]["steam_buildid_observed"] == "26161058", "Steam build must be pinned")
     require(
-        native["game"]["executable_sha256_observed"] == "a7de82945c03e041fc7339fcf9066224d98db2f5d80fea50f7947bb350a60991",
+        native["game"]["executable_sha256_observed"] == "d36e74c47592e9c656ae250078cb40b2be63c782af5bfbeff2280d43e653fab4",
         "shipping executable hash must be pinned",
     )
-    require(native["game"]["adapter_build_id"] == "steam-1091500-build-20383525", "adapter build must match profile")
+    require(native["game"]["adapter_build_id"] == "steam-1091500-build-26161058", "adapter build must match profile")
+    require(native["game_compatibility"]["supported_versions"] == ["2.5"], "the author-supported game version must be current")
     package = json.loads((NATIVE_PROFILE.parent / "cyberpunk-2077-backend.json").read_text())
-    require(package["backend"]["version"] == "0.1.7", "official release version must be pinned")
+    require(package["backend"]["version"] == "0.1.9", "official release version must be pinned")
     require(package["backend"]["creator"] == "dariulone", "creator attribution must be retained")
     require(native["verification"]["status"] == "preflight_ready", "0.1.2 headset results cannot verify the new release")
     require(native["loading"]["activation_mode"] == "managed_session", "ungated upstream files require session isolation")
     require(all(state == "planned" for state in native["conversion"]["capabilities"].values()),
-            "0.1.7 capabilities require new game/headset evidence")
+            "0.1.9 capabilities require new game/headset evidence")
     dependency_paths = {item["path"].replace("\\", "/").lower() for item in native["dependencies"]}
     require("red4ext/red4ext.dll" in dependency_paths, "RED4ext loader dependency missing")
     require(
@@ -49,7 +50,7 @@ def main() -> int:
     )
     require(
         "red4ext/plugins/cyberpunkvr_hands/cyberpunkvr_hands.dll" not in dependency_paths,
-        "0.1.7 incorporates hands into the stereo DLL",
+        "0.1.9 incorporates hands into the stereo DLL",
     )
     require("red4ext/plugins/archivexl/archivexl.dll" in dependency_paths, "ArchiveXL dependency missing")
     require("red4ext/plugins/tweakxl/tweakxl.dll" in dependency_paths, "TweakXL dependency missing")

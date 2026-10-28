@@ -393,6 +393,9 @@ try
                     throw new InvalidOperationException("Install CyberpunkVR Port through AVRcade first so monitor and VR modes can be isolated safely.");
                 if (launchMode is CyberpunkLaunchMode.Vr && installedState is not null && installedState.Version != package.Version)
                     throw new InvalidOperationException("Update mods before launching VR: the installed Cyberpunk VR package does not match this version's compatibility requirements.");
+                if (launchMode is CyberpunkLaunchMode.Vr && package.UpstreamRelease is not null &&
+                    new CyberpunkBackendInstaller(backendPackagePath, repoRoot).Plan(gameDir!).ToDownload.Count > 0)
+                    throw new InvalidOperationException("Update mods before launching VR: one or more Cyberpunk frameworks need the compatible version.");
                 if (launchMode is CyberpunkLaunchMode.Vr && preflight.VersionCompatibility is { } policy && policy.PackageVersion != package.Version)
                     throw new InvalidOperationException("The Cyberpunk VR package and its compatibility metadata do not match. Update AVRcade before launching VR.");
             }

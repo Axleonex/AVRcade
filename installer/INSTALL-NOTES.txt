@@ -17,7 +17,7 @@ Supported games in this release:
   places its supported CyberpunkVR Port package. If More Occluders is missing,
   authorize its Nexus download; AVRcade detects and installs the supported ZIP.
   Nexus requires an account for that download. Manual ZIP import is available.
-  (Experimental; one specific game build.)
+  (Experimental; Cyberpunk 2.5 with VR port 0.1.9. Headset testing pending.)
 
 You provide:
 * The game, owned and installed through Steam.

@@ -1,20 +1,15 @@
 {
   "schema": "redengine-native/1",
-  "profile_id": "cyberpunk-2077-redengine4-native-steam-20383525",
-  "game_compatibility": {
-    "supported_versions": ["2.31"],
-    "package_version": "0.1.7",
-    "source_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#requirements"
-  },
+  "profile_id": "cyberpunk-2077-redengine4-native-steam-26161058",
   "game": {
     "slug": "cyberpunk-2077",
     "display_name": "Cyberpunk 2077",
     "steam_app_id": "1091500",
-    "steam_buildid_observed": "20383525",
+    "steam_buildid_observed": "26161058",
     "launcher_executable": "REDprelauncher.exe",
     "shipping_binary": "bin\\x64\\Cyberpunk2077.exe",
-    "executable_sha256_observed": "a7de82945c03e041fc7339fcf9066224d98db2f5d80fea50f7947bb350a60991",
-    "adapter_build_id": "steam-1091500-build-20383525"
+    "executable_sha256_observed": "d36e74c47592e9c656ae250078cb40b2be63c782af5bfbeff2280d43e653fab4",
+    "adapter_build_id": "steam-1091500-build-26161058"
   },
   "engine": {
     "family": "redengine",
@@ -79,7 +74,7 @@
     },
     {
       "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_Stereo\\init.lua",
-      "reason": "Official CyberpunkVR Port 0.1.7 camera selector by dariulone"
+      "reason": "Official CyberpunkVR Port 0.1.9 camera selector by dariulone"
     },
     {
       "path": "bin\\x64\\plugins\\cyber_engine_tweaks\\mods\\CyberpunkVRPort_VRIK\\init.lua",
@@ -87,11 +82,19 @@
     },
     {
       "path": "red4ext\\plugins\\CyberpunkVR_Stereo\\CyberpunkVR_VisionCs.dxil",
-      "reason": "Required by the official 0.1.7 release"
+      "reason": "Required by the official 0.1.9 release"
     },
     {
       "path": "r6\\scripts\\CyberpunkVRPort_Holster\\vrport_holster.reds",
-      "reason": "Required by the official 0.1.7 release"
+      "reason": "Required by the official 0.1.9 release"
+    },
+    {
+      "path": "red4ext\\plugins\\input_loader\\input_loader.dll",
+      "reason": "Required by CyberpunkVR Port 0.1.9 for game 2.5"
+    },
+    {
+      "path": "r6\\scripts\\CyberpunkVRPort_EngineStereo\\vrport_engine_stereo_menu.reds",
+      "reason": "Required by CyberpunkVR Port 0.1.9 for game 2.5"
     }
   ],
   "conflicts": [
@@ -141,10 +144,19 @@
   "verification": {
     "status": "preflight_ready",
     "evidence": [
-      "2026-10-18: Official 0.1.7 tag a0c23fe110530bb74a73b3adf1ffa7d83050c43d; archive SHA-256 A77B211D4DB4E75B61B08951762E9034F60511731F3A441F21B11D1F723C7C84 verified against the author's GitHub release asset digest.",
-      "The earlier 0.1.2 Quest 2 headset evidence remains historical; it does not verify 0.1.7.",
-      "Unmodified official package is downloaded directly from dariulone. AVRcade parks its files outside mod scan paths between VR sessions.",
-      "More Occluders (Scripted v0.3) is a separate upstream requirement; no local 0.1.7 headset acceptance has been recorded."
+      "Official CyberpunkVR Port 0.1.9 supports Cyberpunk 2077 2.5; 2.31 is not supported by this package.",
+      "Official release archive and all 692 runtime files are hash-pinned. Framework archives use maintainer release digests.",
+      "Observed game build and executable hashes are diagnostic evidence. Compatibility uses the author-supported game version, while the native plugin performs its own build guard.",
+      "A startup test loaded the plugin and compiled all scripts after the More Occluders compatibility transform. A responding game window and engine stereo eye regions were observed.",
+      "No available headset system was reported by VirtualDesktopXR. Save loading, in-headset stereo, tracking, controls and performance remain unverified.",
+      "The known More Occluders Scripted v0.3 dependency receives a local compatibility transform that skips unsupported instanced-node fields. Ordinary mesh occlusion and original-file backups are retained."
     ]
+  },
+  "game_compatibility": {
+    "supported_versions": [
+      "2.5"
+    ],
+    "package_version": "0.1.9",
+    "source_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.9/README.md#requirements"
   }
 }

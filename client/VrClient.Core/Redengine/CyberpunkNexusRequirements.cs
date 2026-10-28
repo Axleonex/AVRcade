@@ -26,7 +26,8 @@ public sealed class CyberpunkNexusRequirements
                 state.Files.Contains(file.Key, StringComparer.OrdinalIgnoreCase) &&
                 File.Exists(CyberpunkUpstreamSession.PayloadPath(gameRoot, file.Key)) &&
                 Hashing.Sha256OfFile(CyberpunkUpstreamSession.PayloadPath(gameRoot, file.Key))
-                    .Equals(file.Value, StringComparison.OrdinalIgnoreCase));
+                    .Equals(file.Value, StringComparison.OrdinalIgnoreCase) &&
+                CyberpunkOccludersCompatibility.IsCompatible(gameRoot, file.Key));
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
         { return false; }
@@ -186,6 +187,7 @@ public sealed class CyberpunkNexusRequirements
                 PreviousFiles = previous,
                 RequirementFiles = scripts.Keys.ToArray()
             }));
+            CyberpunkOccludersCompatibility.Apply(gameRoot);
         }
         catch
         {

@@ -177,7 +177,7 @@ public sealed class CyberpunkNativePreflightTests
     {
         var source = TestRepoRoot.Find();
         using var profile = JsonDocument.Parse(File.ReadAllText(Path.Combine(source, "config", "redengine", "native", "cyberpunk-2077.json")));
-        var compatibility = VrClient.Core.Config.GameVersionCompatibility.Read(profile.RootElement, "2.31")!;
+        var compatibility = VrClient.Core.Config.GameVersionCompatibility.Read(profile.RootElement, "2.5")!;
         var package = CyberpunkBackendInstaller.LoadPackage(Path.Combine(source, "config", "redengine", "native", "cyberpunk-2077-backend.json"));
         Assert.Equal(package.Version, compatibility.PackageVersion);
         Assert.True(compatibility.Supported);
@@ -195,6 +195,8 @@ public sealed class CyberpunkNativePreflightTests
         profile["game"]!["slug"] = "cyberpunk-2077";
         profile["game"]!["display_name"] = "Cyberpunk 2077";
         profile["game"]!["steam_app_id"] = "1091500";
+        profile["game_compatibility"]!["package_version"] = CyberpunkBackendInstaller.LoadPackage(
+            Path.Combine(TestRepoRoot.Find(), "config", "redengine", "native", "cyberpunk-2077-backend.json")).Version;
         var native = Path.Combine(fixture.Root, "config", "redengine", "native"); Directory.CreateDirectory(native);
         File.WriteAllText(Path.Combine(native, "cyberpunk-2077.json"), profile.ToJsonString());
         File.Copy(Path.Combine(TestRepoRoot.Find(), "config", "redengine", "native", "cyberpunk-2077-backend.json"),

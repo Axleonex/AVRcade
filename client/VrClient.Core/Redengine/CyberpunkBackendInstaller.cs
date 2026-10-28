@@ -10,7 +10,8 @@ public sealed record CyberpunkBackendFile(string Path, string Sha256);
 /// A modding framework the backend needs. It is downloaded from its maintainer's
 /// own release, never bundled; `Marker` is the file that says it is already there.
 public sealed record CyberpunkFramework(
-    string Name, string Version, string DownloadUrl, string ArchiveSha256, string Marker);
+    string Name, string Version, string DownloadUrl, string ArchiveSha256, string Marker,
+    string? MarkerSha256 = null, IReadOnlyList<CyberpunkBackendFile>? LegacyFiles = null);
 
 public sealed record CyberpunkBackendPackage(
     string Version,
@@ -36,7 +37,7 @@ public sealed record CyberpunkInstallPlan(
 public sealed record CyberpunkBackendOutcome(bool Ok, string Message);
 
 /// Puts AVRcade's Cyberpunk 2077 VR backend into a game folder and takes it out
-/// again. It never overwrites a framework the player already has, backs up any
+/// again. It upgrades recognized framework files with backups, preserves unknown files, backs up any
 /// backend file it replaces, and removes only files that are still byte-identical
 /// to what it installed. Game-build checks belong to CyberpunkNativePreflight.
 public sealed class CyberpunkBackendInstaller
@@ -80,7 +81,10 @@ public sealed class CyberpunkBackendInstaller
                 item.GetProperty("version").GetString()!,
                 item.GetProperty("download_url").GetString()!,
                 item.GetProperty("archive_sha256").GetString()!,
-                item.GetProperty("marker").GetString()!)).ToArray(),
+                item.GetProperty("marker").GetString()!,
+                item.TryGetProperty("marker_sha256", out var markerHash) ? markerHash.GetString() : null,
+                item.TryGetProperty("legacy_files", out var legacy) ? legacy.EnumerateArray().Select(f =>
+                    new CyberpunkBackendFile(f.GetProperty("path").GetString()!, f.GetProperty("sha256").GetString()!)).ToArray() : null)).ToArray(),
             backend.TryGetProperty("upstream_release", out var release)
                 ? new CyberpunkUpstreamRelease(release.GetProperty("download_url").GetString()!,
                     release.GetProperty("archive_sha256").GetString()!,
@@ -119,7 +123,9 @@ public sealed class CyberpunkBackendInstaller
     public CyberpunkInstallPlan Plan(string gameRoot)
     {
         var present = Package.Frameworks
-            .Where(framework => File.Exists(Resolve(gameRoot, framework.Marker)))
+            .Where(framework => File.Exists(Resolve(gameRoot, framework.Marker)) &&
+                (framework.MarkerSha256 is null || HashEquals(
+                    Hashing.Sha256OfFile(Resolve(gameRoot, framework.Marker)), framework.MarkerSha256)))
             .ToArray();
         var copy = 0;
         var replace = 0;
@@ -316,24 +322,87 @@ public sealed class CyberpunkBackendInstaller
         var wasInstalled = CyberpunkUpstreamSession.ReadState(gameRoot) is not null;
         try
         {
-            installed.AddRange(await CyberpunkUpstreamInstaller.InstallAsync(gameRoot, Package, downloader, ct));
+            // Validate every replacement before changing either frameworks or the VR payload.
             foreach (var (framework, bytes) in archives)
-                ExtractFramework(framework, bytes, gameRoot, installed);
+                CheckFrameworkUpdate(framework, bytes, gameRoot);
+            foreach (var (framework, bytes) in archives)
+                InstallFrameworkUpdate(framework, bytes, gameRoot, installed);
+            installed.AddRange(await CyberpunkUpstreamInstaller.InstallAsync(gameRoot, Package, downloader, ct));
+            CyberpunkOccludersCompatibility.Apply(gameRoot);
             // The old package is preserved by the upstream migration, not by
             // canonical-path records that would delete it during uninstall.
             var frameworkRecord = previous is null ? null : previous with
                 { Files = previous.Files.Where(f => f.Framework is not null).ToArray() };
             WriteRecord(gameRoot, MergeWithPrevious(frameworkRecord, gameRoot, installed));
-            return new(true, $"CyberpunkVR Port {Package.Version} by dariulone downloaded, verified and installed. AVRcade activates it only for VR sessions. Nexus download authorization is needed for More Occluders Scripted v0.3. New release headset validation is pending.");
+            return new(true, $"CyberpunkVR Port {Package.Version} by dariulone downloaded, verified and installed. AVRcade activates it only for VR sessions. More Occluders uses the separate authorized Nexus import; its known 2.5 compatibility patch is applied automatically. New release headset validation is pending.");
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
+            or HashMismatchException or HttpRequestException or OperationCanceledException)
         {
             // A failed first migration restores the older package. A reinstall
             // keeps its existing store and backups for recovery.
             if (!wasInstalled && CyberpunkUpstreamSession.ReadState(gameRoot) is not null)
                 CyberpunkUpstreamInstaller.RestorePrevious(gameRoot);
             Undo(gameRoot, installed.Where(f => f.Framework is not null));
+            if (ex is OperationCanceledException) throw;
             return new(false, $"Cyberpunk VR update failed: {ex.Message}");
+        }
+    }
+
+    private static bool KnownFrameworkFile(CyberpunkFramework framework, string relative, string hash) =>
+        framework.LegacyFiles?.Any(f =>
+            f.Path.Replace('\\', '/').Equals(relative.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase) &&
+            HashEquals(f.Sha256, hash)) == true;
+
+    private static bool FrameworkPreference(string path) =>
+        new[] { ".ini", ".json", ".toml", ".txt", ".md", ".log", ".pdb" }
+            .Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+
+    private static void CheckFrameworkUpdate(CyberpunkFramework framework, byte[] bytes, string gameRoot)
+    {
+        using var archive = new ZipArchive(new MemoryStream(bytes), ZipArchiveMode.Read);
+        foreach (var entry in archive.Entries.Where(e => e.Name.Length != 0))
+        {
+            var target = Resolve(gameRoot, entry.FullName);
+            if (!File.Exists(target)) continue;
+            using var source = entry.Open();
+            using var memory = new MemoryStream();
+            source.CopyTo(memory);
+            var current = Hashing.Sha256OfFile(target);
+            if (HashEquals(current, Hashing.Sha256OfBytes(memory.ToArray())) ||
+                KnownFrameworkFile(framework, entry.FullName, current)) continue;
+            if (!FrameworkPreference(entry.FullName))
+                throw new IOException($"{framework.Name}: {entry.FullName} is an unrecognized version or modification. Update this framework through Vortex, or disable its deployment before retrying. The file was preserved.");
+        }
+    }
+
+    private void InstallFrameworkUpdate(CyberpunkFramework framework, byte[] bytes, string gameRoot,
+        List<CyberpunkInstalledFile> installed)
+    {
+        using var archive = new ZipArchive(new MemoryStream(bytes), ZipArchiveMode.Read);
+        foreach (var entry in archive.Entries.Where(e => e.Name.Length != 0))
+        {
+            var target = Resolve(gameRoot, entry.FullName);
+            using var source = entry.Open();
+            using var memory = new MemoryStream();
+            source.CopyTo(memory);
+            var data = memory.ToArray();
+            var hash = Hashing.Sha256OfBytes(data);
+            string? backup = null;
+            if (File.Exists(target))
+            {
+                var current = Hashing.Sha256OfFile(target);
+                if (HashEquals(current, hash) || !KnownFrameworkFile(framework, entry.FullName, current)) continue;
+                backup = Path.Combine(_backupRoot, Guid.NewGuid().ToString("N"), Path.GetRelativePath(gameRoot, target));
+                Directory.CreateDirectory(Path.GetDirectoryName(backup)!);
+                File.Copy(target, backup, overwrite: false);
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            installed.Add(new(Path.GetRelativePath(gameRoot, target), hash, framework.Name, backup));
+            // Replace the directory entry so Vortex hardlinks keep their original bytes.
+            var pending = target + ".avrcade-" + Guid.NewGuid().ToString("N");
+            try { File.WriteAllBytes(pending, data); File.Move(pending, target, overwrite: true); }
+            finally { if (File.Exists(pending)) File.Delete(pending); }
         }
     }
 

@@ -70,9 +70,9 @@
         },
         {
           "slot": "both_sticks",
-          "control": "Both stick clicks, hold 1 second",
-          "action": "Toggle VR settings overlay",
-          "note": "Hold both stick clicks for one second. F10 opens the same overlay."
+          "control": "Both stick clicks, hold 0.5 seconds",
+          "action": "Open / close VR menu",
+          "note": "Hold both stick clicks for half a second. F10 or Insert opens the settings overlay."
         },
         {
           "slot": "right_stick_click",
@@ -84,7 +84,7 @@
           "slot": "left_stick_click",
           "control": "Left stick click",
           "action": "Cyberware / VR overlay chord modifier",
-          "note": "Combine with left grip for iconic cyberware, or right stick click for VR settings."
+          "note": "Combine with left grip for iconic cyberware, or right stick click for the VR menu."
         },
         {
           "slot": "cyberware",
@@ -93,7 +93,7 @@
           "note": "Hold for 0.5 seconds during gameplay; requires Input Loader."
         }
       ],
-      "context": "Default actions from CyberpunkVR Port 0.1.7. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
+      "context": "Default actions from CyberpunkVR Port 0.1.9. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
       "custom_context": "Your saved AVRcade assignments. Scanner and gesture actions follow their remapped controls. In-game prompts can still show original buttons."
     },
     {
@@ -162,9 +162,9 @@
         },
         {
           "slot": "both_sticks",
-          "control": "Both stick clicks, hold 1 second",
-          "action": "Toggle VR settings overlay",
-          "note": "Hold both stick clicks for one second. F10 opens the same overlay."
+          "control": "Both stick clicks, hold 0.5 seconds",
+          "action": "Open / close VR menu",
+          "note": "Hold both stick clicks for half a second. F10 or Insert opens the settings overlay."
         },
         {
           "slot": "right_stick_click",
@@ -176,7 +176,7 @@
           "slot": "left_stick_click",
           "control": "Left stick click",
           "action": "Cyberware / VR overlay chord modifier",
-          "note": "Combine with left grip for iconic cyberware, or right stick click for VR settings."
+          "note": "Combine with left grip for iconic cyberware, or right stick click for the VR menu."
         },
         {
           "slot": "cyberware",
@@ -185,15 +185,15 @@
           "note": "Hold for 0.5 seconds during gameplay; requires Input Loader."
         }
       ],
-      "context": "Default actions from CyberpunkVR Port 0.1.7. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
+      "context": "Default actions from CyberpunkVR Port 0.1.9. Scanner, driving and menu contexts differ. Click a control to change compatible assignments for the next VR launch.",
       "custom_context": "Your saved AVRcade assignments. Scanner and gesture actions follow their remapped controls. In-game prompts can still show original buttons."
     }
   ],
   "conversion_credit": {
     "creator": "dariulone",
-    "project": "CyberpunkVR Port 0.1.7",
+    "project": "CyberpunkVR Port 0.1.9",
     "project_url": "https://www.nexusmods.com/cyberpunk2077/mods/30093",
-    "controls_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.7/README.md#controls"
+    "controls_url": "https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.9/README.md#controls"
   },
-  "note": "Source checked against dariulone's CyberpunkVR Port 0.1.7 controls. Edit compatible bindings here before launching. Save your preferred layout as your defaults for this game and controller. F10 or the listed stick-click chord opens the upstream HUD settings. Physical gestures and stick tilt retain the conversion's behavior; in-game rebinding can change the actions behind these defaults. Headset validation of custom layouts is pending."
+  "note": "Source checked against dariulone's CyberpunkVR Port 0.1.9 controls. Edit compatible bindings here before launching. Save your preferred layout as your defaults for this game and controller. F10 or the listed stick-click chord opens the upstream HUD settings. Physical gestures and stick tilt retain the conversion's behavior; in-game rebinding can change the actions behind these defaults. Headset validation of custom layouts is pending."
 }
