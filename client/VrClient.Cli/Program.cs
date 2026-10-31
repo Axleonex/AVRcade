@@ -425,7 +425,16 @@ try
                 ? new CyberpunkUpstreamSession(gameDir!, launchMode is CyberpunkLaunchMode.Vr)
                 : null;
             if (upstreamSession is not null)
+            {
                 session.PrepareManagedLauncher(gameDir!, launchMode, dryRun);
+                if (launchMode is CyberpunkLaunchMode.Vr && File.Exists(backendPackagePath))
+                {
+                    var recovered = CyberpunkFrameworkLogRecovery.Prepare(gameDir!,
+                        CyberpunkBackendInstaller.LoadPackage(backendPackagePath), dryRun);
+                    if (recovered.Count > 0)
+                        Console.WriteLine($"CYBERPUNK-RECOVERY: Preserved {recovered.Count} framework log aliases before startup.");
+                }
+            }
             using var gameProcess = new GameLauncher().LaunchProcess(
                 plan, acknowledgeWarn: true, dryRun, xrRuntime,
                 session.BuildEnvironment(launchMode), session.BuildLaunchArguments(withMods));
