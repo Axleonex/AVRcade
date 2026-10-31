@@ -12,7 +12,7 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
 
-**Current packaged release: [v0.5.4](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.4).** Includes Cyberpunk 2077 2.5 support through CyberpunkVR Port 0.1.9, updated frameworks and a More Occluders compatibility repair. [Versioned installer](https://github.com/Axleonex/AVRcade/releases/download/v0.5.4/AVRcade-Setup-0.5.4.exe) · [Versioned portable ZIP](https://github.com/Axleonex/AVRcade/releases/download/v0.5.4/AVRcade-0.5.4-win-x64.zip). See [Game versions and updates](#game-versions-and-updates).
+**Current packaged release: [v0.5.5](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.5).** Adds Cyberpunk startup monitoring fixes, verified repair of its managed VR files, and preservation of personal VR settings. Includes CyberpunkVR Port 0.1.9 for game 2.5. [Versioned installer](https://github.com/Axleonex/AVRcade/releases/download/v0.5.5/AVRcade-Setup-0.5.5.exe) · [Versioned portable ZIP](https://github.com/Axleonex/AVRcade/releases/download/v0.5.5/AVRcade-0.5.5-win-x64.zip) · [Setup and validation notes](docs/release/WINDOWS-V0.5.5.md). See [Game versions and updates](#game-versions-and-updates).
 
 1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
 2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. It installs to `%LOCALAPPDATA%\Programs\AVRcade`; no administrator access is needed.
@@ -26,7 +26,7 @@ The installer is unsigned. If Windows SmartScreen shows **Windows protected your
 
 **Updating an existing installation?** Close AVRcade and run the latest installer. Your saved game selections and preferences are preserved. A clean application install does not require deleting your games, mod-manager profiles or saves.
 
-> **v0.5.4 adds the Cyberpunk 2.5 integration and preserves the controller-tab, game-version checks and mod-update fixes from v0.5.3.** Per-game troubleshooting, Steam game-file verification and native startup checks are retained. YAPYAP still requires its separately prepared UUVR/AVRcade VR package; Escape the Backrooms requires its game-specific VR setup. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
+> **v0.5.5 fixes Cyberpunk startup monitoring and checks its managed VR files before launch.** Missing or damaged files are restored from the same verified official release. Personal camera, grip and overlay settings are preserved. Other games retain their existing setup requirements. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
 
 ## What you need
 
@@ -77,9 +77,11 @@ A mode that is not ready says why and offers its one next step, such as *Install
 
 ## Cyberpunk 2077 VR setup
 
-In v0.5.4, open Cyberpunk 2077 and choose **Install VR** or **Update mods** if an older conversion is already installed. AVRcade downloads CyberpunkVR Port 0.1.9 and the compatible frameworks, including Input Loader. For More Occluders Scripted v0.3, sign in to Nexus and confirm the free download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
+In v0.5.5, open Cyberpunk 2077 and choose **Install VR** or **Update mods** if an older conversion is already installed. AVRcade downloads CyberpunkVR Port 0.1.9 and the compatible frameworks, including Input Loader. For More Occluders Scripted v0.3, sign in to Nexus and confirm the free download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
 
-AVRcade applies a local compatibility repair to the recognized More Occluders v0.3 script: ordinary mesh occluders remain enabled, while the obsolete instanced-mesh branch is skipped on game 2.5. The original script is backed up. Unknown modified files are preserved and can require an update through Vortex. Visual Holsters, Equipment-EX and Nova Optics remain separate author-listed feature dependencies. See the [v0.5.4 setup and validation notes](docs/release/WINDOWS-V0.5.4.md).
+AVRcade applies a local compatibility repair to the recognized More Occluders v0.3 script: ordinary mesh occluders remain enabled, while the obsolete instanced-mesh branch is skipped on game 2.5. The original script is backed up. Unknown modified files are preserved and can require an update through Vortex. Visual Holsters, Equipment-EX and Nova Optics remain separate author-listed feature dependencies. See the [v0.5.5 setup and validation notes](docs/release/WINDOWS-V0.5.5.md).
+
+Before a real VR launch, AVRcade recovers interrupted managed sessions and verifies its stored VR runtime files. If repair is needed, it downloads the same pinned official package and checks both the archive and individual file hashes. Changed stored files are backed up; personal camera, grip and overlay settings remain intact. A healthy launch needs no repair download. Another manager's unknown active deployment is preserved and requires your attention. Framework updates and Nexus authorization remain separate setup steps.
 
 If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
 
