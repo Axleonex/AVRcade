@@ -67,6 +67,9 @@ foreach ($file in $manifest.files) {
 Copy-Item -LiteralPath $AppExecutable -Destination (Join-Path $payload 'AVRcade.exe') -Force
 Copy-Item -LiteralPath $CliExecutable -Destination (Join-Path $payload 'avrcade-cli.exe') -Force
 Copy-Item -LiteralPath (Join-Path $repo 'docs\release\WINDOWS-V0.5.4.md') -Destination (Join-Path $payload 'docs\release\WINDOWS-V0.5.4.md') -Force
+Get-ChildItem -LiteralPath (Join-Path $repo 'docs\release') -Filter 'WINDOWS-V0.5*.md' -File | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $payload ('docs\release\' + $_.Name)) -Force
+}
 Copy-Item -LiteralPath (Join-Path $repo 'README.md') -Destination (Join-Path $payload 'README.md') -Force
 Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $payload "docs\release\WINDOWS-V$Version.md") -Force
 $files = @(Get-ChildItem -LiteralPath $payload -File -Recurse | ForEach-Object {
