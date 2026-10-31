@@ -2,7 +2,9 @@ using System.Diagnostics;
 
 namespace VrClient.Core.Launch;
 
-public sealed record GameStartupResult(bool Running, int? ExitCode, string Message);
+public sealed record GameStartupResult(bool Running, int? ExitCode, string Message,
+    string? FailureKind = null, string? InspectionStage = null,
+    string? InspectionError = null, int? NativeErrorCode = null);
 
 /// Checks startup without claiming that process survival verifies a window or VR.
 /// Never closes, replaces or attaches to another game's process.
@@ -36,30 +38,40 @@ public static class GameStartupMonitor
         if (duration < TimeSpan.Zero || duration > TimeSpan.FromMinutes(2))
             throw new ArgumentOutOfRangeException(nameof(observation));
         var elapsed = Stopwatch.StartNew();
+        var stage = "process_exit";
         try
         {
             while (true)
             {
                 ct.ThrowIfCancellationRequested();
+                stage = "process_exit";
                 if (process.HasExited)
                 {
                     var code = process.ExitCode;
                     return new(false, code, DescribeExitCode(code));
                 }
+                stage = "process_identity";
                 var actual = GameLaunchBinding.ProcessExecutable(process);
                 if (actual is null || !Path.GetFullPath(actual).Equals(Path.GetFullPath(executable), StringComparison.OrdinalIgnoreCase))
                     return new(false, null, "Could not verify that the process belongs to the selected installation. No process was stopped. Use Locate installed game and Recheck setup.");
+                stage = "window_title";
                 if (DescribeLoaderWindow(process.MainWindowTitle) is { } loaderFailure)
                     return new(false, null, loaderFailure);
                 var remaining = duration - elapsed.Elapsed;
                 if (remaining <= TimeSpan.Zero)
                     return new(true, null, "The game process is running. Check the game window or headset; display readiness has not been verified.");
                 await Task.Delay(remaining < TimeSpan.FromMilliseconds(100) ? remaining : TimeSpan.FromMilliseconds(100), ct);
+                process.Refresh();
             }
         }
         catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
         {
-            return new(false, null, "The game stopped or its startup could not be inspected. Use Recheck setup, then try again.");
+            // An inspection error is not evidence of a game crash. Preserve the
+            // exact failing operation and OS error instead of collapsing both.
+            return new(false, null,
+                "AVRcade could not inspect game startup. The game may still be running; check its window before retrying. Diagnostics include the inspection error.",
+                "inspection_failed", stage, ex.GetType().Name + ": " + ex.Message,
+                (ex as System.ComponentModel.Win32Exception)?.NativeErrorCode);
         }
     }
 

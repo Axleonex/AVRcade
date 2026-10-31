@@ -227,8 +227,8 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
         NotifySetupChanged();
     }
     public string CyberpunkBackendNoteText => View.ModInstalled
-        ? "CyberpunkVR Port by dariulone is installed. AVRcade activates its official files for VR sessions and parks them for monitor play. Version 0.1.7 still needs a headset acceptance run."
-        : "Install VR backend downloads CyberpunkVR Port 0.1.7 directly from dariulone's official release and verifies its hashes. AVRcade also installs the required More Occluders Scripted v0.3 package after Nexus download authorization. This release supports Cyberpunk 2077 2.31.";
+        ? "CyberpunkVR Port by dariulone is installed. AVRcade checks and repairs its managed runtime files before VR launch and parks them for monitor play. Version 0.1.9 supports game 2.5; headset acceptance remains pending."
+        : "Install VR backend downloads CyberpunkVR Port 0.1.9 directly from dariulone's official release and verifies its hashes. AVRcade also installs the required More Occluders Scripted v0.3 package after Nexus download authorization. This release supports Cyberpunk 2077 2.5.";
     public string CyberpunkBackendCareText => View.ModInstalled
         ? "AVRcade keeps the earlier VR package as a rollback backup. Keep CyberpunkVR Port disabled in Vortex when using AVRcade's managed copy; Vortex can still deploy your other mods."
         : "Frameworks you already have are never overwritten. Cyber Engine Tweaks asks you to pick an overlay key the first time the game starts, so do one monitor launch first.";

@@ -6,6 +6,26 @@ namespace VrClient.Core.Tests;
 
 public sealed class CyberpunkLaunchSessionTests
 {
+    [Fact]
+    public void InspectionFailureDiagnosticsKeepTheOperatingSystemEvidence()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "avrcade-inspection-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var session = new CyberpunkLaunchSession();
+            var path = session.WriteDiagnostics(root, CyberpunkLaunchMode.Vr, "test", null, 42);
+            session.WriteStartupResult(path, new(false, null, "Could not inspect startup", "inspection_failed",
+                "window_title", "Win32Exception: Access is denied", 5));
+            using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            Assert.Equal("inspection_failed", json.RootElement.GetProperty("startup_status").GetString());
+            Assert.Equal("window_title", json.RootElement.GetProperty("inspection_stage").GetString());
+            Assert.Equal(5, json.RootElement.GetProperty("native_error_code").GetInt32());
+            Assert.Contains("Access is denied", json.RootElement.GetProperty("inspection_error").GetString());
+            Assert.Equal(System.Text.Json.JsonValueKind.Null, json.RootElement.GetProperty("startup_exit_code").ValueKind);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     [Theory]
     [InlineData("bin")]
     [InlineData(".avrcade/cyberpunk-2077/launcher-config-backups")]

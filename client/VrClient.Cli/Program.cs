@@ -344,6 +344,25 @@ try
                 var invalid => throw new InvalidOperationException(
                     $"cyberpunk_launch_refused - invalid launch mode '{invalid}' (expected vr or flat)")
             };
+            // Recover interrupted activation and repair only AVRcade's owned,
+            // already installed release. Preflight/dry-run/monitor never repair it.
+            var repairPackagePath = Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json");
+            if (verb == "cyberpunk-launch" && launchMode is CyberpunkLaunchMode.Vr && !HasFlag("--dry-run") &&
+                gameDir is not null && !preflight.IdentityMismatch && preflight.Conflicts.Count == 0 &&
+                File.Exists(repairPackagePath))
+            {
+                var repairPackage = CyberpunkBackendInstaller.LoadPackage(repairPackagePath);
+                if (repairPackage.UpstreamRelease is not null &&
+                    (preflight.VersionCompatibility is null || preflight.VersionCompatibility.PackageVersion == repairPackage.Version) &&
+                    CyberpunkUpstreamSession.ReadState(gameDir)?.Version == repairPackage.Version)
+                {
+                    using var repairHttp = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
+                    repairHttp.DefaultRequestHeaders.UserAgent.ParseAdd("AVRcade-Cyberpunk-Repair/1.0");
+                    if (await CyberpunkUpstreamInstaller.RepairAsync(gameDir, repairPackage, new CliHttpDownloader(repairHttp)))
+                        Console.WriteLine("CYBERPUNK-REPAIR: Restored the verified managed VR package. Personal camera selection was kept.");
+                    preflight = new CyberpunkNativePreflight().Evaluate(profilePath, gameDir, manifestPath);
+                }
+            }
             if (verb == "cyberpunk-preflight" || !preflight.CanLaunch(launchMode))
             {
                 Console.WriteLine($"RESULT: cyberpunk-preflight status={preflight.Status}" +
@@ -407,20 +426,26 @@ try
                 : null;
             if (upstreamSession is not null)
                 session.PrepareManagedLauncher(gameDir!, launchMode, dryRun);
-            var pid = new GameLauncher().Launch(
+            using var gameProcess = new GameLauncher().LaunchProcess(
                 plan, acknowledgeWarn: true, dryRun, xrRuntime,
                 session.BuildEnvironment(launchMode), session.BuildLaunchArguments(withMods));
+            var pid = gameProcess?.Id ?? -1;
             var activationSource = GetOption("--activation-source") ?? "avrcade-cli";
             var diagnostics = session.WriteDiagnostics(
                 Path.Combine(repoRoot, "artifacts"), launchMode, activationSource, xrRuntime, pid,
                 withVortex: withVortex, withMods: withMods);
-            using var gameProcess = pid > 0 ? System.Diagnostics.Process.GetProcessById(pid) : null;
             if (gameProcess is not null)
             {
                 var startup = await GameStartupMonitor.ObserveAsync(gameProcess, plan.GameExePath);
                 session.WriteStartupResult(diagnostics, startup);
                 if (!startup.Running)
-                    throw new InvalidOperationException($"{startup.Message} Diagnostics: {diagnostics}");
+                {
+                    Console.WriteLine($"RESULT: error={startup.Message} Diagnostics: {diagnostics}");
+                    // Inspection can fail while the game is alive. Keep its
+                    // session lease until exit so cleanup cannot unload live mods.
+                    await gameProcess.WaitForExitAsync();
+                    return 1;
+                }
             }
             Console.WriteLine(
                 $"RESULT: cyberpunk-launch mode={launchMode.ToString().ToLowerInvariant()} pid={pid} started={(!dryRun).ToString().ToLowerInvariant()} " +

@@ -22,6 +22,18 @@ public sealed class GameLauncher
         IReadOnlyDictionary<string, string>? childEnvironment = null,
         IReadOnlyList<string>? launchArguments = null)
     {
+        using var process = LaunchProcess(plan, acknowledgeWarn, dryRun, xrRuntime, childEnvironment, launchArguments);
+        return process?.Id ?? -1;
+    }
+
+    /// Returns the original child and its OS handle, including after an early exit.
+    /// The caller owns disposal and must keep it alive throughout supervision.
+    public Process? LaunchProcess(
+        LaunchPlan plan, bool acknowledgeWarn, bool dryRun,
+        XrRuntimeChoice? xrRuntime = null,
+        IReadOnlyDictionary<string, string>? childEnvironment = null,
+        IReadOnlyList<string>? launchArguments = null)
+    {
         if (plan.Safety.Verdict.IsBlocked())
             throw new InvalidOperationException(
                 $"launch refused: {plan.Safety.ReasonCode} - {plan.Safety.Explanation}");
@@ -32,14 +44,14 @@ public sealed class GameLauncher
             throw new InvalidOperationException(
                 "launch refused: mod_not_installed - run 'vrclient convert' first");
         if (dryRun)
-            return -1;
+            return null;
         if (!File.Exists(plan.GameExePath))
             throw new InvalidOperationException(
                 $"launch refused: game_exe_not_found - {plan.GameExePath}");
         var startInfo = BuildStartInfo(plan, xrRuntime, childEnvironment, launchArguments);
         var process = Process.Start(startInfo)
             ?? throw new InvalidOperationException("launch refused: process_start_failed");
-        return process.Id;
+        return process;
     }
 
     /// Build the exact child-process launch state without mutating VRClient's own environment.

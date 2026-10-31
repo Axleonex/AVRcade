@@ -102,7 +102,8 @@ public sealed class GameModUpdater(string repoRoot, HttpClient http)
         if (preflight.IdentityMismatch) return new(false, preflight.CompatibilityDetail);
         var state = CyberpunkUpstreamSession.ReadState(game.InstallDir!);
         var package = CyberpunkBackendInstaller.LoadPackage(Path.Combine(repoRoot, "config", "redengine", "native", "cyberpunk-2077-backend.json"));
-        if (state?.Version == package.Version && game.ModInstalled)
+        if (state?.Version == package.Version && game.ModInstalled &&
+            CyberpunkUpstreamInstaller.FindDamagedFiles(game.InstallDir!, package).Count == 0)
             return new(true, $"Supported CyberpunkVR Port {package.Version} is installed. Your HUD and controller settings were kept.");
         progress?.Report($"Installing supported CyberpunkVR Port {package.Version}...");
         return await controller.InstallCyberpunkVrAsync(game.InstallDir!, new Download(http), ct);

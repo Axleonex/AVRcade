@@ -11,6 +11,48 @@ public sealed record CyberpunkUpstreamRelease(string Url, string Sha256,
 /// contents are staged before any older files are retired from the game folder.
 public static class CyberpunkUpstreamInstaller
 {
+    /// Checks owned runtime files, including scripts that the dependency marker
+    /// check cannot detect. Camera, grip and overlay preferences remain user state.
+    public static IReadOnlyList<string> FindDamagedFiles(string gameRoot, CyberpunkBackendPackage package)
+    {
+        var state = CyberpunkUpstreamSession.ReadState(gameRoot);
+        return package.Files.Where(file =>
+        {
+            var path = CyberpunkUpstreamSession.PayloadPath(gameRoot, file.Path);
+            return state?.Files.Contains(file.Path, StringComparer.OrdinalIgnoreCase) != true ||
+                !File.Exists(path) || (!IsMutablePreference(file.Path, path) &&
+                !Hashing.Sha256OfFile(path).Equals(file.Sha256, StringComparison.OrdinalIgnoreCase));
+        }).Select(file => file.Path).ToArray();
+    }
+
+    /// Repairs only an already managed copy of this exact pinned release.
+    /// Network/archive errors leave the previous payload intact. A foreign
+    /// deployment in the game folder remains subject to the installer's refusal.
+    public static async Task<bool> RepairAsync(string gameRoot, CyberpunkBackendPackage package,
+        IHttpDownloader downloader, CancellationToken ct = default)
+    {
+        var state = CyberpunkUpstreamSession.ReadState(gameRoot);
+        if (package.UpstreamRelease is null || state?.Version != package.Version)
+            throw new InvalidOperationException("Install or update Cyberpunk VR through AVRcade before repairing this package.");
+        using (var recovery = new CyberpunkUpstreamSession(gameRoot, vr: false)) { }
+        var damaged = FindDamagedFiles(gameRoot, package);
+        if (damaged.Count == 0) return false;
+        foreach (var relative in damaged)
+        {
+            var original = CyberpunkUpstreamSession.PayloadPath(gameRoot, relative);
+            if (!File.Exists(original)) continue;
+            var hash = Hashing.Sha256OfFile(original);
+            var backup = CyberpunkUpstreamSession.Resolve(gameRoot,
+                CyberpunkUpstreamSession.StoreDirectory + "/repair-backups/" + hash + "/" + relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(backup)!);
+            if (!File.Exists(backup)) File.Copy(original, backup);
+            if (!Hashing.Sha256OfFile(backup).Equals(hash, StringComparison.OrdinalIgnoreCase))
+                throw new IOException("Cyberpunk repair backup failed verification. Stored files were preserved.");
+        }
+        await InstallAsync(gameRoot, package, downloader, ct);
+        return true;
+    }
+
     public static async Task<IReadOnlyList<CyberpunkInstalledFile>> InstallAsync(
         string gameRoot, CyberpunkBackendPackage package, IHttpDownloader downloader,
         CancellationToken ct)
@@ -69,9 +111,9 @@ public static class CyberpunkUpstreamInstaller
             {
                 var destination = CyberpunkUpstreamSession.PayloadPath(gameRoot, relative);
                 changedPayload[destination] = File.Exists(destination) ? File.ReadAllBytes(destination) : null;
-                // The authored default was verified above. A managed camera selection
-                // is user state and survives supported package updates/reinstalls.
-                var contents = previousState is not null && IsCameraSelection(relative, destination)
+                // The authored default was verified above. Managed camera, grip
+                // and overlay preferences survive package updates and repairs.
+                var contents = previousState is not null && IsMutablePreference(relative, destination)
                     ? File.ReadAllBytes(destination) : data;
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 File.WriteAllBytes(destination, contents);
@@ -128,6 +170,23 @@ public static class CyberpunkUpstreamInstaller
             throw;
         }
         return added;
+    }
+
+    private static bool IsMutablePreference(string relative, string current)
+    {
+        if (!File.Exists(current)) return false;
+        if (Path.GetExtension(relative).ToLowerInvariant() is ".ini" or ".cfg") return true;
+        if (relative.Replace('\\', '/').Equals("red4ext/plugins/CyberpunkVR_Stereo/UserSettings.json",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                using var json = JsonDocument.Parse(File.ReadAllText(current));
+                return json.RootElement.ValueKind == JsonValueKind.Object;
+            }
+            catch (JsonException) { return false; }
+        }
+        return IsCameraSelection(relative, current);
     }
 
     private static bool IsCameraSelection(string relative, string current)

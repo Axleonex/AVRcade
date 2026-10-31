@@ -1,5 +1,19 @@
 # AVRcade 0.5.4 — Cyberpunk 2077 2.5
 
+## Unpublished startup repair candidate — October 31, 2026
+
+The `work/cyberpunk-launch-self-heal` branch builds the 0.5.5 candidate. It keeps the official 0.1.9/game 2.5 pins. Pushing source alone does not replace GitHub's downloadable installer or portable ZIP; those assets require a separately published release.
+
+Cyberpunk now retains the original child process handle throughout startup and cleanup. Early exits retain their exit code. Inspection errors record the operation, exception and Windows error separately from a game crash. When inspection fails while the game is alive, the CLI reports the failure to the app immediately and continues supervising cleanup until the game exits.
+
+Before a real VR launch, AVRcade recovers an interrupted managed session and checks every owned runtime file. Missing or damaged files are restored only from the same pinned, archive-verified and file-verified official release. Changed stored files receive hash-checked backups under `.avrcade/cyberpunk-2077/repair-backups/`. Camera choice, grip settings and valid overlay UserSettings remain user preferences. Another manager's unknown active deployment is preserved and refused. Healthy launches do not download anything. Preflight, dry-run and monitor launch do not run this repair. Framework upgrades and the authorized Nexus import keep their existing separate flows.
+
+The Update mods action checks stored runtime health before reporting the current version as installed. Setup help now describes port 0.1.9/game 2.5.
+
+To assemble a candidate without rebuilding unchanged native components, publish both managed projects with `dotnet publish`, `-r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:Version=0.5.5`. Then run `[PowerShell] scripts/package-cyberpunk-hotfix.ps1 -BasePayload <intact-0.5.4-folder> -AppExecutable <published-AVRcade.exe> -CliExecutable <published-avrcade-cli.exe>`. The script verifies all baseline manifest hashes, writes a fresh candidate manifest and checksums, and builds a ZIP and installer. Use a new output directory for each build. It does not publish or install the result.
+
+The reported inspection error was intermittent: the unchanged installed CLI also launched successfully on retry. The repair addresses demonstrated process-handle, diagnostic and package-health gaps; it does not establish the original Windows exception, which the old diagnostics discarded. A real patched launch reached a responding Cyberpunk window and compiled scripts successfully. Headset stereo, tracking, controls, save loading and sustained gameplay still need human acceptance.
+
 Install [AVRcade-Setup.exe](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe), or extract the complete [portable ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip) into a new folder. [SHA256SUMS.txt](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt) covers both permanent and versioned filenames. Version-specific assets are on the [v0.5.4 release page](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.4).
 
 ## Cyberpunk setup

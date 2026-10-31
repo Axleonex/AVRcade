@@ -96,9 +96,12 @@ public sealed class CyberpunkLaunchSession
     public void WriteStartupResult(string path, GameStartupResult result)
     {
         var document = JsonSerializer.Deserialize<Dictionary<string, object?>>(File.ReadAllText(path))!;
-        document["startup_status"] = result.Running ? "process_running" : "startup_failed";
+        document["startup_status"] = result.Running ? "process_running" : result.FailureKind ?? "startup_failed";
         document["startup_exit_code"] = result.ExitCode;
         document["startup_message"] = result.Message;
+        document["inspection_stage"] = result.InspectionStage;
+        document["inspection_error"] = result.InspectionError;
+        document["native_error_code"] = result.NativeErrorCode;
         AtomicFile.WriteAllText(path, JsonSerializer.Serialize(document, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

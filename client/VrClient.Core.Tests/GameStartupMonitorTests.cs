@@ -5,6 +5,33 @@ namespace VrClient.Core.Tests;
 
 public sealed class GameStartupMonitorTests
 {
+    [Fact]
+    public async Task LauncherKeepsOriginalProcessHandleAndExitCodeAfterEarlyExit()
+    {
+        var executable = OperatingSystem.IsWindows() ? Path.Combine(Environment.SystemDirectory, "cmd.exe") : "/bin/sh";
+        var plan = new VrClient.Core.Model.LaunchPlan(executable, true,
+            new(VrClient.Core.Model.Verdict.Allow, "test", "", "test"));
+        using var process = new GameLauncher().LaunchProcess(plan, true, false,
+            launchArguments: OperatingSystem.IsWindows() ? ["/c", "exit 23"] : ["-c", "exit 23"]);
+        Assert.NotNull(process);
+        await process.WaitForExitAsync();
+        var result = await GameStartupMonitor.ObserveAsync(process, executable, TimeSpan.Zero);
+        Assert.False(result.Running);
+        Assert.Equal(23, result.ExitCode);
+        Assert.Null(new GameLauncher().LaunchProcess(plan, true, true));
+    }
+
+    [Fact]
+    public async Task InspectionFailureIncludesTheFailedOperationAndException()
+    {
+        using var process = new Process();
+        var result = await GameStartupMonitor.ObserveAsync(process, "unstarted.exe", TimeSpan.Zero);
+        Assert.False(result.Running);
+        Assert.Equal("inspection_failed", result.FailureKind);
+        Assert.Equal("process_exit", result.InspectionStage);
+        Assert.Contains("InvalidOperationException", result.InspectionError);
+    }
+
     [Theory]
     [InlineData(unchecked((int)0xC0000139), "entry point")]
     [InlineData(unchecked((int)0xC0000135), "DLL is missing")]

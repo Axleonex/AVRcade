@@ -1222,6 +1222,8 @@ public sealed partial class AppController
             while (await process.StandardOutput.ReadLineAsync(processToken) is { } line)
             {
                 output.AppendLine(line);
+                if (supervisesCyberpunk && line.StartsWith("RESULT: error=", StringComparison.Ordinal))
+                    started.TrySetResult(new ActionOutcome(false, GameStartupMonitor.FormatCliResult(line, false)));
                 if (line.StartsWith("RESULT: cyberpunk-launch ", StringComparison.Ordinal) &&
                     line.Contains("started=true", StringComparison.Ordinal))
                     started.TrySetResult(new ActionOutcome(true, GameStartupMonitor.FormatCliResult(line, true)));
