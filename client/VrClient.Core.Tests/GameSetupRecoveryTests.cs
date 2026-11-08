@@ -76,11 +76,11 @@ public sealed class GameSetupRecoveryTests : IDisposable
     }
 
     [Fact]
-    public void ActualCatalogueConfigurationsKeepAllTenGamesInsideSeparateInstallations()
+    public void ActualCatalogueConfigurationsKeepGamesInsideSeparateInstallations()
     {
         var source = TestRepoRoot.Find();
         var catalogue = new AppController(source, (_, _) => null, gtaSanAndreasLocator: () => null).ListGames();
-        Assert.Equal(10, catalogue.Count);
+        Assert.Equal(CatalogueStartupIsolationTests.Games.Count(), catalogue.Count);
         foreach (var entry in catalogue)
         {
             var folder = Path.Combine(_root, "disk-" + entry.Engine, "steamapps", "common", entry.Slug);
@@ -265,6 +265,7 @@ public sealed class GameSetupRecoveryTests : IDisposable
     {
         var source = TestRepoRoot.Find();
         var games = new AppController(source, (_, _) => null, gtaSanAndreasLocator: () => null).ListGames();
+        Assert.Contains(games, game => game.Slug == "titanfall-2" && game.SteamAppId == "1237970");
         foreach (var game in games)
         {
             var folder = Path.Combine(_root, "all-games", "steamapps", "common", game.Slug);
@@ -295,7 +296,7 @@ public sealed class GameSetupRecoveryTests : IDisposable
     public void EveryCatalogueGamesCompatibilityBlockSurvivesSuccessfulFileAndControllerChecks()
     {
         var catalogue = new AppController(TestRepoRoot.Find(), (_, _) => null, gtaSanAndreasLocator: () => null).ListGames();
-        Assert.Equal(10, catalogue.Count);
+        Assert.Equal(CatalogueStartupIsolationTests.Games.Count(), catalogue.Count);
         foreach (var entry in catalogue)
         {
             var game = Game(entry.Slug) with { Readiness = GameReadiness.Blocked,

@@ -191,6 +191,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
         var executable = GameModManagerExecutable(game);
         CanOpenGameModManager = executable is not null;
+        OnPropertyChanged(nameof(CanOpenTitanfall2Installer));
+        OnPropertyChanged(nameof(Titanfall2InstallerText));
         GameManagerChooserText = executable is not null ? ChangeManager : ChooseManager;
         GameModManagerText = game is not { UsesFolderMods: true } ? string.Empty
             : _gameModManagers.Load(game.Slug) is { } chosen
@@ -231,6 +233,41 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
           (game.IsYapyap ? _installedManagers.FirstOrDefault(manager =>
               manager.Kind is ModManagerKind.R2Modman or ModManagerKind.Thunderstore)?.LaunchPath : null) ??
           _installedManagers.FirstOrDefault(manager => manager.Kind == ModManagerKind.Vortex)?.LaunchPath;
+
+    private string? Titanfall2Installer => SelectedGame is { IsTitanfall2: true } game
+        ? _gameModManagers.Load(game.Slug) : null;
+
+    public bool CanOpenTitanfall2Installer => Titanfall2Installer is not null;
+    public string Titanfall2InstallerText => Titanfall2Installer is { } path
+        ? $"Installer selected: {path}" : $"Select {AppController.Titanfall2InstallerName} after downloading it.";
+
+    public void SelectTitanfall2Installer(string executable)
+    {
+        if (SelectedGame is not { IsTitanfall2: true } game) return;
+        try
+        {
+            _gameModManagers.Save(game.Slug, executable);
+            StatusText = "CircuitLord installer selected. Open it and choose Titanfall 2 VR.";
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            StatusText = $"Could not select the CircuitLord installer: {ex.Message}";
+        }
+        UpdateSelectedGameFacts();
+        game.RefreshPlayModes();
+    }
+
+    [RelayCommand]
+    private void OpenTitanfall2Installer() =>
+        OpenTitanfall2Installer("Select Titanfall 2 VR to install or update the profile, then choose Launch in VR.");
+
+    private void OpenTitanfall2Installer(string nextStep)
+    {
+        StatusSuccess = false;
+        StatusText = Titanfall2Installer is { } path
+            ? StartManager(path, nextStep)
+            : "Select CircuitLord's downloaded installer in VR setup.";
+    }
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
     partial void OnLibraryFilterChanged(string value)
@@ -511,6 +548,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (game is null) return;
         if (!TroubleshootingKey(game.View).Equals(TroubleshootingKey(selected.View), StringComparison.OrdinalIgnoreCase))
         { StatusText = "This game's installation changed. Confirm its folder, then recheck again."; return; }
+        if (game.IsTitanfall2)
+        {
+            StatusText = game.View.ReadinessDetail;
+            return;
+        }
         var root = game.View.InstallDir;
         if (root is null) { StatusText = "Reconnect this game's disk or choose Locate installed game, then Recheck setup."; return; }
         ClearFinishedModUpdate(game.Slug, root);
@@ -718,6 +760,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var view = item.View;
         var installed = view.InstallDir is not null;
         var allowed = view.Readiness is not GameReadiness.Blocked;
+        if (item.IsTitanfall2)
+            return PlayModePlanner.Titanfall2(installed, view.ModInstalled, _gameModManagers.Load(view.Slug) is not null);
         if (item.IsYapyap)
             return PlayModePlanner.Yapyap(installed, YapyapVrInstall.Inspect(view.InstallDir),
                 GameModManagerExecutable(item) is not null,
@@ -1032,6 +1076,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             StatusText = $"{game.DisplayName}: this way to play is not ready yet. {game.PlayModeFor(mode)?.Status}";
             return;
         }
+        if (game.IsTitanfall2 && mode is (PlayMode.VrOnly or PlayMode.VrWithMods))
+        {
+            OpenTitanfall2Installer(mode == PlayMode.VrWithMods
+                ? "Select Titanfall 2 VR, choose your add-ons, then choose Launch in VR."
+                : "Select Titanfall 2 VR, turn off optional add-ons, then choose Launch in VR.");
+            return;
+        }
         if (game.View.InstallDir is not { } dir)
         {
             StatusText = "Game is not installed on this PC.";
@@ -1069,6 +1120,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     : _controller.LaunchUnrealFlat(game.Slug),
                 GameEngine.Redengine => await LaunchCyberpunkAsync(game, mode),
                 GameEngine.LegacyD3D9 => LaunchGtaSanAndreas(dir, mode),
+                GameEngine.Source when game.IsTitanfall2 && mode is PlayMode.Vanilla => _controller.LaunchTitanfall2Vanilla(),
                 _ => new ActionOutcome(false, "This game has no launch route in AVRcade yet.")
             };
             var feedbackOutcome = outcome;

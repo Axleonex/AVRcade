@@ -186,10 +186,10 @@ public sealed class FourModeLaunchTests : TempTree
 
         Assert.Equal(
             ["big-walk", "content-warning", "cyberpunk-2077", "escape-the-backrooms", "gta-san-andreas",
-             "lethal-company", "peak", "repo", "rv-there-yet", "yapyap"],
+             "lethal-company", "peak", "repo", "rv-there-yet", "titanfall-2", "yapyap"],
             games.Select(game => game.Slug).Order(StringComparer.Ordinal));
         Assert.All(games, game => Assert.Contains(game.Engine,
-            new[] { GameEngine.Unity, GameEngine.Unreal, GameEngine.Redengine, GameEngine.LegacyD3D9 }));
+            new[] { GameEngine.Unity, GameEngine.Unreal, GameEngine.Redengine, GameEngine.LegacyD3D9, GameEngine.Source }));
         // The five Unity games must each have the community route "VR + mods" relies on.
         Assert.All(games.Where(game => game.Engine is GameEngine.Unity && game.Slug != "yapyap"),
             game => Assert.True(CommunityVrRoutes.All.ContainsKey(game.Slug), game.Slug));

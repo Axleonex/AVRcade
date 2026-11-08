@@ -106,6 +106,8 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public bool HasPlayModes => _playModes.Count > 0;
     public PlayModeViewModel? PlayModeFor(PlayMode mode) => _playModes.FirstOrDefault(m => m.Mode == mode);
     public bool IsYapyap => Slug == "yapyap";
+    public bool IsTitanfall2 => Slug == "titanfall-2";
+    public string Titanfall2InstallerUrl => AppController.Titanfall2InstallerReleases;
     public bool IsInstalled => View.InstallDir is not null;
     public bool NotInstalled => !IsInstalled;
     public bool IsVrReady => _playModes.Any(mode => mode.IsVr && mode.IsLaunch);
@@ -141,11 +143,13 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public double CoverOpacity => IsInstalled ? 1 : 0.55;
     public string SteamStoreUrl => SteamLinks.StorePage(View.SteamAppId);
     /// The player can point AVRcade at a copy it did not find by itself.
-    public bool CanLocateGame => HasModded || IsGtaSanAndreas || IsCyberpunk || IsUnreal || IsYapyap;
+    public bool CanLocateGame => HasModded || IsGtaSanAndreas || IsCyberpunk || IsUnreal || IsYapyap || IsTitanfall2;
     /// Classic San Andreas is no longer sold on Steam, so there is no store page to open.
     public bool HasStorePage => !IsGtaSanAndreas;
+    public string NotInstalledTitle => IsTitanfall2 ? "Steam copy not detected" : "This game is not installed yet";
     public string NotInstalledText => IsGtaSanAndreas
         ? "AVRcade plays the classic Windows version you already own. Point it at the folder that contains gta_sa.exe."
+        : IsTitanfall2 ? "AVRcade detects the Steam copy. For an EA app or Xbox copy, use CircuitLord's installer below."
         : "AVRcade plays the copy you own on Steam; it never downloads games. Install it in Steam, then press Refresh.";
 
     public IReadOnlyList<SetupStepViewModel> SetupSteps => IsYapyap
@@ -186,7 +190,10 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     public bool HasModCredits => ModCredits.Count > 0;
     public ControllerReference? ControllerReference { get; }
     public IReadOnlyList<ControllerEditorViewModel> ControllerDevices { get; }
-    public bool HasControllerReference => ControllerDevices.Count > 0;
+    public bool HasControllerReference => !IsTitanfall2 && ControllerDevices.Count > 0;
+    public string NoControllerReferenceText => IsTitanfall2
+        ? "Configure controls in Titanfall 2 VR using the mod's settings."
+        : "No controller map for this game yet. The VR conversion's own page lists its controls.";
     public bool NoControllerReference => !HasControllerReference;
     public string ControllerReferenceTitle => ControllerReference?.Title ?? "Controller reference";
     public string ControllerGuidance => ControllerReference?.Guidance ?? string.Empty;
@@ -338,6 +345,7 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     }));
     public string EngineText => View.Engine switch
     {
+        GameEngine.Source => "NORTHSTAR VR",
         GameEngine.Unity => "UNITY MOD",
         GameEngine.Unreal => "UEVR",
         GameEngine.Redengine => "REDENGINE VR",
@@ -349,6 +357,7 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     };
     public string RouteText => View.Engine switch
     {
+        GameEngine.Source => "Campaign VR through CircuitLord's separate TF2VR profile",
         GameEngine.Unity => "Unity game · community VR mod through BepInEx",
         GameEngine.Unreal when IsRvThereYet => "Unreal game · experimental UEVR profile, not headset-verified",
         GameEngine.Unreal => "Unreal game · UEVR injection",
@@ -409,7 +418,7 @@ public sealed partial class GameItemViewModel : ObservableObject, IDisposable
     /// UEVR, its runtime and (where one is required) the game's VR profile are all in place.
     private bool UnrealVrSetupReady =>
         View.ModInstalled && (!View.ProfileImportRequired || View.ProfileImported);
-    public bool CanPrepare => !IsYapyap && IsInstalled && (HasModded
+    public bool CanPrepare => !IsYapyap && !IsTitanfall2 && IsInstalled && (HasModded
         ? Modded!.CanPrepareManaged
         : (IsRvThereYet && View.Readiness is not GameReadiness.Blocked && !UnrealVrSetupReady) ||
           View.Readiness is GameReadiness.NeedsVrMod or GameReadiness.NeedsUevr ||

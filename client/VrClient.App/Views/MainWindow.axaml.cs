@@ -78,7 +78,9 @@ public partial class MainWindow : Window
                     break;
                 case PlayModeSetup.OpenVrSetup:
                     vm.DetailTabIndex = VrSetupTab;
-                    vm.StatusText = $"{mode.Title}: {mode.Status}. See VR setup below.";
+                    vm.StatusText = game.IsTitanfall2
+                        ? $"{mode.Title}: {mode.Status}. Use the CircuitLord installer controls on this page."
+                        : $"{mode.Title}: {mode.Status}. See VR setup below.";
                     break;
                 case PlayModeSetup.OpenMods:
                     vm.DetailTabIndex = ModsTab;
@@ -240,6 +242,15 @@ public partial class MainWindow : Window
             return;
         if (await PickManagerExecutableAsync($"Choose the mod manager you use for {vm.SelectedGame.DisplayName} (.exe)") is { } path)
             vm.SelectGameModManager(path);
+    }
+
+    private async void SelectTitanfall2Installer_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel { SelectedGame.IsTitanfall2: true } vm) return;
+        var installer = AppController.Titanfall2InstallerName;
+        if (await PickFileAsync($"Select {installer}",
+                new FilePickerFileType("CircuitLord VR Mod Installer") { Patterns = [installer] }) is { } path)
+            vm.SelectTitanfall2Installer(path);
     }
 
     private Task<string?> PickManagerExecutableAsync(string title) =>

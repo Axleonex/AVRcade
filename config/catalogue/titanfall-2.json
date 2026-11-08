@@ -1,0 +1,8 @@
+{
+  "schema": "flat-catalogue-game/1",
+  "game_id": "titanfall-2",
+  "display_name": "Titanfall 2 VR",
+  "steam_app_id": "1237970",
+  "engine": "source",
+  "executable_names": ["Titanfall2.exe"]
+}

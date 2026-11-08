@@ -17,7 +17,7 @@ using VrClient.Core.FalloutNewVegas;
 using VrClient.Core.Fallout3;
 using VrClient.Core.ModManagers;
 
-public enum GameEngine { Unity, Unreal, Redengine, Rage, LegacyD3D9, FalloutNewVegas, Fallout3 }
+public enum GameEngine { Unity, Unreal, Redengine, Rage, LegacyD3D9, FalloutNewVegas, Fallout3, Source }
 public enum GameReadiness
 {
     NeedsGame,
@@ -114,6 +114,8 @@ public sealed partial class AppController
         { appId = route.AppId; (_, exeName) = ReadGameConfigBasics(slug); }
         else if (slug == "cyberpunk-2077")
         { appId = CyberpunkNativePreflight.SteamAppId; exeName = "bin/x64/Cyberpunk2077.exe"; }
+        else if (slug == Titanfall2Slug)
+        { appId = Titanfall2AppId; exeName = Titanfall2Executable; }
         else if (slug == "yapyap")
         {
             using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(_repoRoot, "config", "catalogue", "yapyap.json")));
@@ -370,6 +372,7 @@ public sealed partial class AppController
         bool Includes(string slug) => gameSlug is null || slug.Equals(gameSlug, StringComparison.OrdinalIgnoreCase);
         var views = new List<GameView>();
         if (Includes("yapyap")) AddYapyapCatalogueEntry(views);
+        if (Includes(Titanfall2Slug)) AddTitanfall2CatalogueEntry(views);
         var headset = headsetConnected ?? _headsetConnected();
         foreach (var g in new GameCatalog().Discover(ModpacksDir, GamesDir, ProfilesDir, gameSlug))
         {

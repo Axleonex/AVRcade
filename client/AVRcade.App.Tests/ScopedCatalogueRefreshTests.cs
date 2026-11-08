@@ -16,7 +16,7 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
         { "big-walk", "1478500" }, { "content-warning", "2881650" }, { "cyberpunk-2077", "1091500" },
         { "escape-the-backrooms", "1943950" }, { "gta-san-andreas", "12120" },
         { "lethal-company", "1966720" }, { "peak", "3527290" }, { "repo", "3241660" },
-        { "rv-there-yet", "3949040" }, { "yapyap", "3834090" }
+        { "rv-there-yet", "3949040" }, { "titanfall-2", "1237970" }, { "yapyap", "3834090" }
     };
 
     private readonly CatalogueUiLoop _ui;
@@ -119,9 +119,9 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
         {
             using var window = Window();
             _calls.Clear(); window.RefreshCommand.Execute(null);
-            Assert.Equal(10, _calls.Count);
-            Assert.Equal(10, _calls.Distinct().Count());
-            Assert.Equal(10, window.Games.Count);
+            Assert.Equal(Games.Count(), _calls.Count);
+            Assert.Equal(Games.Count(), _calls.Distinct().Count());
+            Assert.Equal(Games.Count(), window.Games.Count);
         });
     }
 
@@ -166,7 +166,7 @@ public sealed class ScopedCatalogueRefreshTests : IDisposable, IClassFixture<Cat
             File.Move(path, path + ".disabled");
             _calls.Clear(); window.RefreshGame("repo");
             Assert.Null(window.SelectedGame);
-            Assert.Equal(9, window.Games.Count);
+            Assert.Equal(Games.Count() - 1, window.Games.Count);
             foreach (var game in others) Assert.Same(game, window.Games.Single(g => g.Slug == game.Slug));
             Assert.Empty(_calls);
         });

@@ -234,7 +234,7 @@
             <Border Classes="card" Padding="18,14" IsVisible="{Binding NotInstalled}">
               <Grid ColumnDefinitions="*,14,Auto">
                 <StackPanel Spacing="2" VerticalAlignment="Center">
-                  <TextBlock Text="This game is not installed yet" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding NotInstalledTitle}" FontWeight="SemiBold" />
                   <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding NotInstalledText}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
@@ -256,6 +256,20 @@
                 <TextBlock Classes="secondary" Text="{Binding CyberpunkDependencyStatus}" IsVisible="{Binding IsCyberpunk}" />
                 <TextBlock Classes="secondary" Text="{Binding SetupProfileStatus}" IsVisible="{Binding HasSetupProfileStatus}" />
                 <TextBlock Classes="secondary" Text="{Binding SetupRuntimeStatus}" IsVisible="{Binding ShowSetupRuntimeStatus}" />
+                <StackPanel IsVisible="{Binding IsTitanfall2}" Spacing="8">
+                  <TextBlock TextWrapping="Wrap"
+                             Text="Sign in to the EA app and start your OpenXR runtime. In CircuitLord's installer, choose Titanfall 2 VR, install the profile, then choose Launch in VR. Use the Add-ons tab for optional VR mods." />
+                  <TextBlock Classes="secondary" TextWrapping="Wrap"
+                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Titanfall2InstallerText}" />
+                  <WrapPanel>
+                    <Button Content="Download CircuitLord installer" Tag="{Binding Titanfall2InstallerUrl}"
+                            Click="OpenExternalUrl_Click" Margin="0,0,8,6" />
+                    <Button Content="Select downloaded installer" Click="SelectTitanfall2Installer_Click" Margin="0,0,8,6" />
+                    <Button Content="Open CircuitLord installer" Margin="0,0,0,6"
+                            IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanOpenTitanfall2Installer}"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenTitanfall2InstallerCommand}" />
+                  </WrapPanel>
+                </StackPanel>
                 <WrapPanel>
                   <Button Classes="primary" Content="{Binding PrepareText}" Margin="0,0,10,8"
                           IsVisible="{Binding SetupCanInstall}"
@@ -465,6 +479,14 @@
 
                 <TabItem Header="Mods">
                   <StackPanel Spacing="16" Margin="6,14,6,8">
+
+                    <StackPanel IsVisible="{Binding IsTitanfall2}" Spacing="8">
+                      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                 Text="Manage optional VR add-ons in CircuitLord's installer. Use VR setup above to select the installer first." />
+                      <Button Content="Open CircuitLord installer" HorizontalAlignment="Left"
+                              IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CanOpenTitanfall2Installer}"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenTitanfall2InstallerCommand}" />
+                    </StackPanel>
 
                     <!-- Unity games: profiles in r2modman, Thunderstore Mod Manager or Vortex -->
                     <StackPanel IsVisible="{Binding HasModded}">
@@ -765,7 +787,7 @@
                     </StackPanel>
 
                     <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding NoControllerReference}"
-                               Text="No controller map for this game yet. The VR conversion's own page lists its controls." />
+                               Text="{Binding NoControllerReferenceText}" />
 
                     <StackPanel Spacing="14" IsVisible="{Binding HasControllerReference}">
                       <TextBlock Classes="heading" Text="{Binding ControllerReferenceTitle}" />

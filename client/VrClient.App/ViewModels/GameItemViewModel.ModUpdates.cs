@@ -7,7 +7,7 @@ public sealed partial class GameItemViewModel
     private bool _modUpdateBusy;
     private string? _modUpdateMessage;
     private bool _modUpdateFailed;
-    public bool HasPublicModUpdate => HasModCredits;
+    public bool HasPublicModUpdate => HasModCredits && !IsTitanfall2;
     public string StreamButtonLabel => HasPublicModUpdate ? "OBS Stream" : "Stream";
     public bool CanUpdateMods => HasPublicModUpdate && IsInstalled && !_modUpdateBusy;
     public bool ModUpdateBusy => _modUpdateBusy;

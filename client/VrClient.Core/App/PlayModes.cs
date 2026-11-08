@@ -89,6 +89,23 @@ public static class PlayModePlanner
         ];
     }
 
+    public static IReadOnlyList<PlayModeState> Titanfall2(bool steamGameInstalled, bool vrProfileDetected,
+        bool installerSelected)
+    {
+        PlayModeState Vr(PlayMode mode, string instructions) => installerSelected && vrProfileDetected
+            ? Ready(mode, instructions, "Open CircuitLord installer")
+            : Setup(mode, installerSelected
+                ? "Open the installer to set up the TF2VR profile"
+                : "Download and select CircuitLord's installer", "See VR setup", PlayModeSetup.OpenVrSetup);
+        return [
+            Vr(PlayMode.VrOnly, "Turn off optional add-ons in the installer, then choose Launch in VR"),
+            Vr(PlayMode.VrWithMods, "Choose compatible add-ons in the installer, then choose Launch in VR"),
+            Unavailable(PlayMode.ModsNoVr, "The CircuitLord add-ons are for the VR profile"),
+            steamGameInstalled ? Ready(PlayMode.Vanilla, "Normal Steam launch on the monitor", "Play vanilla")
+                : Unavailable(PlayMode.Vanilla, "Install the Steam copy to launch it here")
+        ];
+    }
+
     public static IReadOnlyList<PlayModeState> Unity(UnityPlayFacts f)
     {
         if (Gate(f.GameInstalled, f.LaunchAllowed) is { } gate)

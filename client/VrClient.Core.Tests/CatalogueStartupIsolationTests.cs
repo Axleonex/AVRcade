@@ -19,6 +19,7 @@ public sealed class CatalogueStartupIsolationTests : TempTree
         { "peak", "3527290", "PEAK.exe" },
         { "repo", "3241660", "REPO.exe" },
         { "rv-there-yet", "3949040", "Ride/Binaries/Win64/Ride-Win64-Shipping.exe" },
+        { "titanfall-2", "1237970", "Titanfall2.exe" },
         { "yapyap", "3834090", "yapyap.exe" }
     };
 
@@ -49,7 +50,7 @@ public sealed class CatalogueStartupIsolationTests : TempTree
                 "cyberpunk-2077" => "config/redengine/native/cyberpunk-2077.json",
                 "gta-san-andreas" => "config/legacy/gta-san-andreas.json",
                 "escape-the-backrooms" or "rv-there-yet" => $"config/unreal/{slug}.uevr.json",
-                "yapyap" => "config/catalogue/yapyap.json",
+                "titanfall-2" or "yapyap" => $"config/catalogue/{slug}.json",
                 _ => $"config/games/{slug}.json"
             };
             using var config = JsonDocument.Parse(File.ReadAllText(Path.Combine(TestRepoRoot.Find(), relativeConfig)));
