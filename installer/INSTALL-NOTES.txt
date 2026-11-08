@@ -3,6 +3,11 @@ AVRcade - before you install
 AVRcade is a launcher for playing flat PC games in VR. For each supported game
 it offers four ways to play: VR only, VR + mods, Mods without VR, and Vanilla.
 
+New in v0.5.8:
+* Titanfall 2 VR has its own game page. Open CircuitLord's installer to set up
+  the TF2VR profile, manage add-ons and choose Launch in VR.
+* Vanilla uses Steam. VR requires the EA app and an active OpenXR runtime.
+
 Supported games in this release:
 * R.E.P.O., Lethal Company, PEAK, Content Warning and Big Walk, through
   community Unity VR mods that AVRcade downloads and verifies for you.

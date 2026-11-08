@@ -225,6 +225,13 @@ Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\troubleshooting') -Destination
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\safety\unified-safety.md') -Destination $docsDest.FullName
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs\fallout-new-vegas') -Destination $docsDest.FullName -Recurse
 
+$releaseDocsDest = Join-Path $docsDest.FullName 'release'
+New-Item -ItemType Directory -Force -Path $releaseDocsDest | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'docs\release') -Filter 'WINDOWS-V*.md' -File | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $releaseDocsDest
+}
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'README.md') -Destination $PayloadRoot
+
 $commit = (& git -C $RepoRoot rev-parse HEAD 2>$null)
 if (-not $commit) { $commit = 'unknown' }
 $manifestFiles = @(

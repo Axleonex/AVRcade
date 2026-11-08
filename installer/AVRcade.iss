@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.5.7"
+  #define AppVersion "0.5.8"
 #endif
 #ifndef SourceRoot
   #error SourceRoot must point to the staged AVRcade payload

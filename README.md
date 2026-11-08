@@ -2,7 +2,7 @@
 
 Play the PC games you already own in VR from one library.
 
-AVRcade finds your Steam games, sets up each game's VR conversion for you, and gives every game the same four launch buttons.
+AVRcade finds your Steam games, guides you through VR setup, and gives each game the same four play-mode buttons.
 
 ## Clean install of the latest Windows release
 
@@ -12,7 +12,7 @@ AVRcade finds your Steam games, sets up each game's VR conversion for you, and g
 
 These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
 
-**Current packaged release: [v0.5.7](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.7).** Adds installer upgrade and downgrade protection, and retains the Cyberpunk GUI startup fix, verified VR-file repair and personal settings. Includes CyberpunkVR Port 0.1.9 for game 2.5. [Versioned installer](https://github.com/Axleonex/AVRcade/releases/download/v0.5.7/AVRcade-Setup-0.5.7.exe) · [Versioned portable ZIP](https://github.com/Axleonex/AVRcade/releases/download/v0.5.7/AVRcade-0.5.7-win-x64.zip) · [Setup and validation notes](docs/release/WINDOWS-V0.5.7.md). See [Game versions and updates](#game-versions-and-updates).
+**Current packaged release: [v0.5.8](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.8).** Adds Titanfall 2 VR with CircuitLord's installer and keeps the installer upgrade protection and Cyberpunk 2.5 VR support from v0.5.7. [Versioned installer](https://github.com/Axleonex/AVRcade/releases/download/v0.5.8/AVRcade-Setup-0.5.8.exe) · [Versioned portable ZIP](https://github.com/Axleonex/AVRcade/releases/download/v0.5.8/AVRcade-0.5.8-win-x64.zip) · [Setup and validation notes](docs/release/WINDOWS-V0.5.8.md).
 
 The installer updates the previous installation folder, including custom drives. Newer versions replace older files; reinstalling the same version repairs files. Installers from v0.5.7 onward refuse downgrades. Older downloaded installers lack this check and should not be run after upgrading. Separate portable copies remain independent.
 
@@ -56,7 +56,7 @@ If your game is missing, check that it is installed and supported by your versio
 | **Mods, no VR** | The game on your monitor with your mods. |
 | **Vanilla** | The game as it shipped: no mods, no VR. |
 
-A mode that is not ready says why and offers its one next step, such as *Install VR mod* or *Set up mods*.
+Each unavailable mode explains why. When setup is available, the button offers the next step, such as *Install VR mod* or *Set up mods*.
 
 ![A game page with the four ways to play](docs/images/game-page.png)
 
@@ -72,10 +72,11 @@ A mode that is not ready says why and offers its one next step, such as *Install
 | YAPYAP | [UUVR](https://github.com/Raicuparta/uuvr) with [AVRcade bridge 0.3.39](mods/yapyap-vr/) | Quest 2 stereo, controls, menus and hat clearance tested; Valve Index bindings source verified |
 | Escape the Backrooms | [UEVR](https://github.com/praydog/UEVR), community profile and AVRcade keyboard, HUD, menus and controller arms | [Quest-tested source checkpoint; helper setup required](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
 | RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
+| Titanfall 2 VR | [Titanfall 2 VR by CircuitLord](https://github.com/CircuitLord/CircuitLordVRModInstaller#titanfall-2-vr), using a separate Northstar profile | Campaign VR through the author's installer. Headset gameplay in AVRcade remains unverified. |
 | Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
 | Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; VR port 0.1.9 for Cyberpunk 2.5. Startup and script compilation tested; headset gameplay remains unverified. [Version compatibility](#game-versions-and-updates) |
 
-"Installs and launches" means AVRcade downloads the pinned mod, checks its hashes and starts the game with it. Whether a mod still matches the game's current build is up to that mod's author; the game page links to each project.
+For managed conversions, AVRcade downloads the pinned mod, checks its hashes and starts the game with it. For Titanfall 2 VR, the game page opens CircuitLord's installer for installation, updates, add-ons and VR launch. Each game page links to its VR project.
 
 ## Cyberpunk 2077 VR setup
 
