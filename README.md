@@ -72,7 +72,7 @@ Each unavailable mode explains why. When setup is available, the button offers t
 | YAPYAP | [UUVR](https://github.com/Raicuparta/uuvr) with [AVRcade bridge 0.3.39](mods/yapyap-vr/) | Quest 2 stereo, controls, menus and hat clearance tested; Valve Index bindings source verified |
 | Escape the Backrooms | [UEVR](https://github.com/praydog/UEVR), community profile and AVRcade keyboard, HUD, menus and controller arms | [Quest-tested source checkpoint; helper setup required](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
 | RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
-| Titanfall 2 VR | [Titanfall 2 VR by CircuitLord](https://github.com/CircuitLord/CircuitLordVRModInstaller#titanfall-2-vr), using a separate Northstar profile | Campaign VR through the author's installer. Headset gameplay in AVRcade remains unverified. |
+| Titanfall 2 VR | [Titanfall 2 VR by CircuitLord](https://github.com/CircuitLord/CircuitLordVRModInstaller#titanfall-2-vr), using a separate Northstar profile | Campaign VR through the author's installer.|
 | Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
 | Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; VR port 0.1.9 for Cyberpunk 2.5. Startup and script compilation tested; headset gameplay remains unverified. [Version compatibility](#game-versions-and-updates) |
 
