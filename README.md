@@ -1,188 +1,64 @@
 # AVRcade
 
-Play the PC games you already own in VR from one library.
+Play PC games you already own in VR from one library.
 
-AVRcade finds your Steam games, guides you through VR setup, and gives each game the same four play-mode buttons.
+## Install on Windows
 
-## Clean install of the latest Windows release
+**[Download the Windows installer](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe)**
 
-**[Download the latest AVRcade Windows installer (.exe)](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-Setup.exe)**
+[Portable ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip) · [Checksums](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt) · [Release notes](https://github.com/Axleonex/AVRcade/releases/latest)
 
-[Portable ZIP](https://github.com/Axleonex/AVRcade/releases/latest/download/AVRcade-win-x64.zip) · [SHA-256 checksums](https://github.com/Axleonex/AVRcade/releases/latest/download/SHA256SUMS.txt) · [Latest release notes](https://github.com/Axleonex/AVRcade/releases/latest) · [Report a problem](https://github.com/Axleonex/AVRcade/issues)
+1. Run `AVRcade-Setup.exe` and follow the installer.
+2. Open **AVRcade** from the Windows Start menu.
 
-These permanent links select the latest published release, including its installer, portable ZIP and checksums. You can also choose the assets on the [latest release page](https://github.com/Axleonex/AVRcade/releases/latest).
+Requires 64-bit Windows 10 (1809 or later) or Windows 11. The installer includes the .NET runtime and runs without administrator access.
 
-**Current packaged release: [v0.5.8](https://github.com/Axleonex/AVRcade/releases/tag/v0.5.8).** Adds Titanfall 2 VR with CircuitLord's installer and keeps the installer upgrade protection and Cyberpunk 2.5 VR support from v0.5.7. [Versioned installer](https://github.com/Axleonex/AVRcade/releases/download/v0.5.8/AVRcade-Setup-0.5.8.exe) · [Versioned portable ZIP](https://github.com/Axleonex/AVRcade/releases/download/v0.5.8/AVRcade-0.5.8-win-x64.zip) · [Setup and validation notes](docs/release/WINDOWS-V0.5.8.md).
+**Updating?** Close AVRcade and run the latest installer. It reuses your installation folder and keeps your preferences.
 
-The installer updates the previous installation folder, including custom drives. Newer versions replace older files; reinstalling the same version repairs files. Installers from v0.5.7 onward refuse downgrades. Older downloaded installers lack this check and should not be run after upgrading. Separate portable copies remain independent.
+**Using the portable ZIP?** Extract the entire archive into an empty folder and run `AVRcade.exe` there.
 
-1. **Download** the installer above. Choose the `.exe`, rather than GitHub's **Source code** ZIP.
-2. **Run** `AVRcade-Setup.exe` and follow the setup wizard. A first install defaults to `%LOCALAPPDATA%\Programs\AVRcade`; updates reuse the previous installation folder. No administrator access is needed.
-3. **Open AVRcade** from the Windows Start menu.
+The installer is unsigned. If SmartScreen prompts you, verify the download against the published checksum before choosing **More info → Run anyway**.
 
-The app includes its .NET runtime. You do not need Git, Visual Studio, or a separate .NET installation.
+## Play in VR
 
-The installer is unsigned. If Windows SmartScreen shows **Windows protected your PC**, check that you downloaded the file from this repository's release page. If you trust it, choose **More info → Run anyway**.
+1. Install a supported game you own through Steam. See the game-specific steps below for other supported copies.
+2. Connect your headset and start SteamVR or Virtual Desktop. Some games require SteamVR.
+3. Open the game's page in AVRcade and choose **VR only**. Complete the setup shown on the button, then launch.
 
-**Prefer a portable app?** Download the ZIP above, right-click it and choose **Extract All** into a new, empty folder, then run `AVRcade.exe` there. Keep the complete extracted folder together.
+Choose **VR + mods** to play in VR with extra mods, **Mods, no VR** for modded monitor play, or **Vanilla** for the base game on your monitor. Each game's page shows which modes are available. Choose your mod manager or profiles in the **Mods** tab. [Mod manager setup](docs/onboarding/MOD-MANAGER-COEXISTENCE.md)
 
-**Updating an existing installation?** Close AVRcade and run the latest installer. Your saved game selections and preferences are preserved. A clean application install does not require deleting your games, mod-manager profiles or saves.
-
-> **v0.5.7 fixes Cyberpunk startup monitoring and checks its managed VR files before launch.** Missing or damaged files are restored from the same verified official release. Personal camera, grip and overlay settings are preserved. Other games retain their existing setup requirements. See the [release notes](https://github.com/Axleonex/AVRcade/releases/latest) for details.
-
-## What you need
-
-- **Windows 10 (1809 or later) or Windows 11, 64-bit.**
-- **[Steam](https://store.steampowered.com/about/) and a supported game you own and have installed.** AVRcade does not include or download games. For classic San Andreas, use **Locate installed game** to select your own copy.
-- **A PC VR headset connected to your computer**, using [SteamVR (free)](https://store.steampowered.com/app/250820/SteamVR/) or [Virtual Desktop](https://www.vrdesktop.net/). Some games require SteamVR even when connected through Virtual Desktop.
-- **Optional: a mod manager**, only for **VR + mods** and **Mods, no VR**. You can start with **VR only** without one when the game's required VR components are installed.
-
-## First VR launch
-
-1. Install a game supported by your AVRcade version through Steam.
-2. Connect your headset and start SteamVR or Virtual Desktop. If both are running, AVRcade uses SteamVR.
-3. Open the game's page in AVRcade and choose **VR only**. If its button offers **Install VR mod** or another setup step, complete that first, then press the play button when it becomes available. An internet connection is needed to download VR components.
-
-If your game is missing, check that it is installed and supported by your version. If a launch is blocked, follow the reason shown on the game's page; some integrations require a specific game build.
-
-![AVRcade library](docs/images/library.png)
-
-## Four ways to play every game
-
-| Mode | What you get |
-|---|---|
-| **VR only** | The game in your headset with just its VR conversion. No other mods. |
-| **VR + mods** | VR together with the mods from the mod manager you already use. |
-| **Mods, no VR** | The game on your monitor with your mods. |
-| **Vanilla** | The game as it shipped: no mods, no VR. |
-
-Each unavailable mode explains why. When setup is available, the button offers the next step, such as *Install VR mod* or *Set up mods*.
-
-![A game page with the four ways to play](docs/images/game-page.png)
+![AVRcade game library](docs/images/library.png)
 
 ## Supported games
 
-| Game | How VR works | State |
-|---|---|---|
-| R.E.P.O. | [RepoXR](https://thunderstore.io/c/repo/p/DaXcess/RepoXR/) by DaXcess | Confirmed in a headset |
-| Lethal Company | [LCVR](https://thunderstore.io/c/lethal-company/p/DaXcess/LethalCompanyVR/) by DaXcess | Confirmed in a headset |
-| PEAK | [PeakVR](https://thunderstore.io/c/peak/p/Andrey04o/PeakVR/) by Andrey04o | Confirmed in a headset |
-| Content Warning | [CWVR](https://thunderstore.io/c/content-warning/p/DaXcess/CWVR/) by DaXcess | Confirmed in a headset |
-| Big Walk | [Big Walk VR](https://old.thunderstore.io/c/big-walk/p/CircuitLord/Big_Walk_VR/) by CircuitLord | Confirmed in a headset |
-| YAPYAP | [UUVR](https://github.com/Raicuparta/uuvr) with [AVRcade bridge 0.3.39](mods/yapyap-vr/) | Quest 2 stereo, controls, menus and hat clearance tested; Valve Index bindings source verified |
-| Escape the Backrooms | [UEVR](https://github.com/praydog/UEVR), community profile and AVRcade keyboard, HUD, menus and controller arms | [Quest-tested source checkpoint; helper setup required](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
-| RV There Yet? | [UEVR](https://github.com/praydog/UEVR) by praydog, with a community profile | Experimental |
-| Titanfall 2 VR | [Titanfall 2 VR by CircuitLord](https://github.com/CircuitLord/CircuitLordVRModInstaller#titanfall-2-vr), using a separate Northstar profile | Campaign VR through the author's installer.|
-| Grand Theft Auto: San Andreas (classic) | AVRcade's own Direct3D 9 to OpenXR bridge | Experimental; supports one specific classic `gta_sa.exe` build, which AVRcade checks before installing its bridge |
-| Cyberpunk 2077 | RED4ext VR backend based on [cyberpunk-vr-port](https://github.com/dariulone/cyberpunk-vr-port) | Experimental; VR port 0.1.9 for Cyberpunk 2.5. Startup and script compilation tested; headset gameplay remains unverified. [Version compatibility](#game-versions-and-updates) |
+The library includes R.E.P.O., Lethal Company, PEAK, Content Warning, Big Walk, Escape the Backrooms, and *RV There Yet?*.
 
-For managed conversions, AVRcade downloads the pinned mod, checks its hashes and starts the game with it. For Titanfall 2 VR, the game page opens CircuitLord's installer for installation, updates, add-ons and VR launch. Each game page links to its VR project.
+| Game | Extra setup |
+| --- | --- |
+| Titanfall 2 VR | Sign in to the EA app, start your OpenXR runtime, and choose **Launch in VR** in CircuitLord’s installer. The installer also detects EA app and Xbox copies. [Titanfall 2 setup](docs/release/WINDOWS-V0.5.8.md) |
+| Cyberpunk 2077 | VR requires Cyberpunk 2.5. Follow the in-app Nexus prompt for More Occluders Scripted v0.3. [Cyberpunk setup and compatibility](docs/release/WINDOWS-V0.5.4.md) |
+| YAPYAP | Prepare its VR package separately and start SteamVR, including when using Virtual Desktop. [YAPYAP package](mods/yapyap-vr/README.md) |
+| GTA: San Andreas | Choose **Locate installed game** and select your classic PC installation. AVRcade checks the executable before installing the VR bridge. |
 
-## Cyberpunk 2077 VR setup
+## Help
 
-v0.5.7 retains recovery of recognized framework log aliases before a managed VR launch. This addresses the reproduced ArchiveXL startup abort (`0xC0000409`) when Windows rejects an existing log link as an untrusted mount point. Original links are parked with restoration receipts; regular log contents and Windows security settings stay intact. See the [cause and validation notes](docs/release/WINDOWS-V0.5.6.md).
+- If a game is missing, confirm Steam sees the installation and refresh the library. If launch is blocked, open **Troubleshooting → Run diagnostics** on that game's page.
+- For mod updates, use **Update mods** where available. [Mod update guide](docs/app/MOD-UPDATES.md)
+- For controller settings, open **Controls**. To record or stream, choose **Stream** on the game page. [OBS setup](docs/app/STREAMING.md)
+- Use modded modes in private sessions with players who agree to it.
 
-In v0.5.7, open Cyberpunk 2077 and choose **Install VR** or **Update mods** if an older conversion is already installed. AVRcade downloads CyberpunkVR Port 0.1.9 and the compatible frameworks, including Input Loader. For More Occluders Scripted v0.3, sign in to Nexus and confirm the free download; Premium is not required. Keep the original ZIP filename. AVRcade detects the completed download in Downloads or Vortex's default Cyberpunk download folder and installs it for Cyberpunk VR only. Wait for **VR setup complete**. If detection fails, expand **Manual installation if download detection fails** and choose the ZIP; no extraction or file placement is needed.
-
-AVRcade applies a local compatibility repair to the recognized More Occluders v0.3 script: ordinary mesh occluders remain enabled, while the obsolete instanced-mesh branch is skipped on game 2.5. The original script is backed up. Unknown modified files are preserved and can require an update through Vortex. Visual Holsters, Equipment-EX and Nova Optics remain separate author-listed feature dependencies. See the [v0.5.7 setup and validation notes](docs/release/WINDOWS-V0.5.7.md).
-
-Before a real VR launch, AVRcade recovers interrupted managed sessions and verifies its stored VR runtime files. If repair is needed, it downloads the same pinned official package and checks both the archive and individual file hashes. Changed stored files are backed up; personal camera, grip and overlay settings remain intact. A healthy launch needs no repair download. Another manager's unknown active deployment is preserved and requires your attention. Framework updates and Nexus authorization remain separate setup steps.
-
-If gameplay health/ammo appears doubled, open **F10 → HUD** and enable **Stereo depth**. This setting resolved the reported headset HUD overlap.
-
-## Game versions and updates
-
-AVRcade uses each player's own game installation. Compatibility depends on that game's VR conversion; a game update can require a newer VR package. CyberpunkVR Port 0.1.9's [author requirements](https://github.com/dariulone/cyberpunk-vr-port/blob/0.1.9/README.md#requirements) specify Cyberpunk **2.5**; this VR package no longer supports **2.31**. Steam verification repairs original game files; it does not prove mod compatibility or restore an older game version.
-
-The v0.5.3 installer and portable ZIP include these fixes:
-
-- Cyberpunk checks the VR package's declared game versions instead of requiring every player's Steam build ID and executable hash to match the developer's recorded copy. Exact-binary integrations such as classic San Andreas retain their separate adapter requirements.
-- **Update mods** can check author releases while VR is blocked. It reports newer releases and keeps incompatible or unreviewed packages from being installed. It does not automatically install every author's newest release.
-- **Recheck setup** retains compatibility problems even when file and controller checks pass. **Run diagnostics** refreshes only the selected game's play buttons. Results remain isolated by game and installation.
-- Controller keymapping appears only in each game's bottom **Controls** tab, with custom assignments, saved defaults, reset and original bindings preserved.
-- Cyberpunk monitor launches are checked independently of VR-only game-version requirements.
-
-Use v0.5.3 or later to get these fixes. Downloading GitHub's **Source code** ZIP does not install AVRcade; use the Windows installer or portable ZIP linked above.
-
-## Troubleshoot one game
-
-Open a game's page and select **Troubleshooting** in the tabs at the bottom.
-
-- **Run diagnostics** checks that installation's executable, native dependencies, VR requirements and runtime observations. Findings explain the problem and give a supported action or instructions.
-- **Repair this game's setup** recovers interrupted managed updates and prepares its saved controller routes. Close the affected game first.
-- **Verify game files in Steam** asks Steam to check and repair that game's original files. Wait for Steam to finish, then run diagnostics again. Mod compatibility needs its own checks.
-
-**Recheck setup** stays at the top of the game page and points to Troubleshooting when needed. Results are isolated by game and installation. Diagnostics runs on demand and keeps only the latest small result in memory; it creates no troubleshooting logs or saved history. Checks passing do not confirm headset image, tracking or gameplay.
-
-## Stream or record with OBS
-
-Open any game page and choose **Stream**. Install OBS Studio 28 or newer separately, enable its WebSocket server, and connect using the password shown in OBS. Select a scene containing the game window or a VR runtime mirror, check the picture and audio, then choose **Record** or **Go live**.
-
-For SteamVR, choose **Display VR View / Show VR View** in its desktop menu and capture that window in OBS. If Automatic capture freezes, select **Windows 10 (1903 and up)** in the source properties. Keep VR View open. Game audio and microphone are configured separately in OBS. See the [streaming setup guide](docs/app/STREAMING.md).
-
-## Playing VR with mods
-
-YAPYAP currently requires the source-built [VR package](mods/yapyap-vr/) before
-its VR buttons become available; it is not downloaded by the generic Unity installer.
-It uses SteamVR even through Virtual Desktop. **VR only** launches through Steam
-without a mod manager. **VR + mods** opens your chosen manager so you can select
-a profile containing UUVR and the AVRcade bridge. An extra game mod is optional.
-For **Mods, no VR**, select a profile without those VR plugins. **Vanilla** disables
-the game-folder mod loader for that launch. The current installer includes the launcher integration, but does not bundle or automatically download the YAPYAP VR package.
-
-![The Mods tab](docs/images/game-page-mods.png)
-
-For the Unity games, mods stay in your mod manager. Keep two profiles there: one that includes the game's VR mod, one without it. Pick them on the game's **Mods** tab, and **VR + mods** and **Mods, no VR** each launch their own profile through Steam. AVRcade reads profiles but never writes to them. Start the game once from the manager first, so it places its mod loader in the game folder.
-
-Cyberpunk 2077, San Andreas and Unreal games load mods from the game folder, so any manager works. Choose yours on the **Mods** tab and AVRcade opens it for you.
-
-More detail: [mod manager coexistence](docs/onboarding/MOD-MANAGER-COEXISTENCE.md).
-
-## Safety
-
-- VR conversions are mods. Use the modded modes only in private sessions with friends who agreed to it. AVRcade asks you to confirm before a modded launch.
-- AVRcade refuses games that use anti-cheat.
-- Every download is version-pinned and hash-verified before it is used.
-- Removing a VR mod deletes only the files AVRcade added.
+[Report a problem](https://github.com/Axleonex/AVRcade/issues)
 
 ## Build from source
 
-You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+Use the .NET 8 SDK to build, test, and run the app.
 
 ```powershell
 dotnet build client/VrClient.sln -c Release
-dotnet test  client/VrClient.sln -c Release
+dotnet test client/VrClient.sln -c Release
 dotnet run --project client/VrClient.App -c Release
 ```
 
-The app, the `vrclient` command-line tool and their tests live in `client/`. The native C++ parts (the San Andreas bridge and the experimental native adapters) are optional and need Visual Studio Build Tools 2022; see [tools/toolchain.md](tools/toolchain.md).
+[Windows packaging](docs/release/WINDOWS-V0.5.md) · [Add a game](docs/onboarding/ADD-A-GAME.md)
 
-To build the installer, see [docs/release/WINDOWS-V0.5.md](docs/release/WINDOWS-V0.5.md).
-
-### Repository layout
-
-| Path | Contents |
-|---|---|
-| `client/VrClient.App` | The desktop app (Avalonia) |
-| `client/VrClient.Core` | Game discovery, mod install, safety checks and launch logic, with no UI dependency |
-| `client/VrClient.Cli` | The `vrclient` command-line tool and the Steam launch wrapper |
-| `client/VrClient.Core.Tests` | Unit tests |
-| `config/` | One set of data files per game: mod pack, pinned versions, safety policy, controller map |
-| `adapters/`, `src/native/` | Native C++ VR bridges and experimental adapters |
-| `docs/` | User guides, troubleshooting and design notes |
-
-### Adding a game
-
-A Unity game with a community VR mod on Thunderstore is added as data, without code: follow [docs/onboarding/ADD-A-GAME.md](docs/onboarding/ADD-A-GAME.md).
-
-## Credits
-
-AVRcade is a launcher. The VR conversions are the work of their authors, credited on each game's page and in the table above. Third-party components that AVRcade bundles or downloads are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
-
-AVRcade is not affiliated with or endorsed by Valve, the game publishers, or the mod and mod-manager authors. Game names are trademarks of their owners.
-
-## License
-
-AVRcade's own code is released under the [MIT License](LICENSE). AVRcade is free and will stay free.
-
-The components it bundles or downloads keep their own licenses; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) and the texts in [licenses/](licenses/).
+AVRcade is free and released under the MIT License. Each game page credits its VR mod authors. [MIT License](LICENSE) · [Third-party notices](THIRD-PARTY-NOTICES.md)
