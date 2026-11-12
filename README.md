@@ -31,10 +31,15 @@ Choose **VR + mods** to play in VR with extra mods, **Mods, no VR** for modded m
 
 ## Supported games
 
-The library includes R.E.P.O., Lethal Company, PEAK, Content Warning, Big Walk, Escape the Backrooms, and *RV There Yet?*.
-
-| Game | Extra setup |
+| Game | VR setup and testing |
 | --- | --- |
+| R.E.P.O. | RepoXR. Tested in a headset. |
+| Lethal Company | LCVR. Tested in a headset. |
+| PEAK | PeakVR. Tested in a headset. |
+| Content Warning | CWVR. Tested in a headset. |
+| Big Walk | Big Walk VR. Tested in a headset. |
+| Escape the Backrooms | UEVR with the game's profile and helper setup. [Quest test notes](docs/unreal/BACKROOMS-TESTED-2026-10-17.md) |
+| RV There Yet? | Experimental UEVR profile. |
 | Titanfall 2 VR | Sign in to the EA app, start your OpenXR runtime, and choose **Launch in VR** in CircuitLord’s installer. The installer also detects EA app and Xbox copies. [Titanfall 2 setup](docs/release/WINDOWS-V0.5.8.md) |
 | Cyberpunk 2077 | VR requires Cyberpunk 2.5. Follow the in-app Nexus prompt for More Occluders Scripted v0.3. [Cyberpunk setup and compatibility](docs/release/WINDOWS-V0.5.4.md) |
 | YAPYAP | Prepare its VR package separately and start SteamVR, including when using Virtual Desktop. [YAPYAP package](mods/yapyap-vr/README.md) |
